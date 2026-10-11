@@ -1,4 +1,4 @@
-# My pick: Repro Rodeo
+# My pick: Repo Rodeo
 
 An open-source GitHub bug reproduction and repair playground
 
@@ -8,7 +8,7 @@ Here's the idea:
 
 Someone files a GitHub issue saying their web app is broken. You want to help, but you don't have their computer, dependencies, environment, or a reliable way to reproduce it.
 
-With Repro Rodeo, you paste the issue URL. It sets up the project in an isolated Linux sandbox, helps reproduce the bug, and gives you a live, interactive version of the broken application.
+With Repo Rodeo, you paste the issue URL. It sets up the project in an isolated Linux sandbox, helps reproduce the bug, and gives you a live, interactive version of the broken application.
 
 Then comes the fun part.
 
@@ -22,13 +22,13 @@ And that's why I like this project much more than another agent benchmark. You'r
 
 ## The experience you're building
 
-Imagine somebody reports that a drag-and-drop editor loses elements after saving. A successful Repro Rodeo page would show:
+Imagine somebody reports that a drag-and-drop editor loses elements after saving. A successful Repo Rodeo page would show:
 
-## Repro Rodeo
+## Repo Rodeo
 
 Example issue: Editor loses elements after saving
 
-Reproduced
+Repoduced
 
 Original app
 
@@ -74,7 +74,7 @@ That is compelling enough to give away as a free open-source service, at least f
 
 Every one of these becomes necessary because of a real user need.
 
-| Feature                 | What happens in Repro Rodeo                                                    |
+| Feature                 | What happens in Repo Rodeo                                                    |
 | ----------------------- | ------------------------------------------------------------------------------ |
 | Custom images/templates | Installing a big application's dependencies takes time. Prepare once and reuse |
 | Filesystem snapshots    | Preserve the exact environment after a successful build                        |
@@ -85,7 +85,7 @@ Every one of these becomes necessary because of a real user need.
 | Secrets vault           | Agents need limited GitHub or model API access without reading raw credentials |
 | Background execution    | Tests and agents continue after someone closes the browser                     |
 | Public previews         | Let maintainers interact with the app without a local installation             |
-| Computer use            | Reproduce UI bugs with real clicks, typing, browser screenshots and recordings |
+| Computer use            | Repoduce UI bugs with real clicks, typing, browser screenshots and recordings |
 | File API                | Extract logs, patches, screenshots, traces and test artifacts                  |
 | Webhooks/events         | Notify your application when environments start, stop, fail or finish          |
 | Metrics                 | Determine why a repair job failed, stalled or exhausted memory                 |
@@ -129,7 +129,7 @@ Pass 1 — E2B: Make the broken app come alive
 
 Build the app, capture browser evidence, checkpoint the prepared environment, fork three independent repair attempts, run tests and publish a live preview. Also test leaving a sandbox paused and returning later.
 
-Deliverable: the first genuinely usable Repro Rodeo page.
+Deliverable: the first genuinely usable Repo Rodeo page.
 
 Pass 2 — Daytona: Make it fast and repeatable
 
@@ -147,7 +147,7 @@ Deliverable: a working MainBrella version and an evidence-backed feature roadmap
 
 ## Make the benchmarking part of the open-source product
 
-Don't write three separate implementations of Repro Rodeo. Build one application with three provider adapters, and keep the experience consistent.
+Don't write three separate implementations of Repo Rodeo. Build one application with three provider adapters, and keep the experience consistent.
 
 The project could expose a public comparison that records these measurements for each provider:
 
@@ -174,7 +174,7 @@ Those cases teach you far more about a provider than a successful `echo hello` b
 
 There are already issue-to-PR agents, including [ProPR](https://github.com/integry/propr) and research projects like [PatchSmith](https://github.com/thromel/patchsmith). I wouldn't compete by building another general coding agent.
 
-Instead, own the reproducibility, interactive preview and independently verifiable evidence layer. Use an existing coding agent to propose changes; Repro Rodeo should be responsible for making the bug and its proposed fixes inspectable.
+Instead, own the reproducibility, interactive preview and independently verifiable evidence layer. Use an existing coding agent to propose changes; Repo Rodeo should be responsible for making the bug and its proposed fixes inspectable.
 
 Start with public repositories and user-authorized GitHub write access. Keep credentials outside untrusted code where possible, set resource and spending limits, restrict public previews, and expire environments. Not every repo will install successfully; a useful failure report should be a first-class result.
 
@@ -193,7 +193,7 @@ A partial failure should still produce a useful report, rather than a fake green
 
 ## The blog series practically writes itself
 
-One Bug, Three Clouds: Building Repro Rodeo
+One Bug, Three Clouds: Building Repo Rodeo
 
 The opening post: why GitHub bug reports need executable environments.
 
@@ -205,7 +205,7 @@ What Daytona Does Differently
 
 Volumes, warm pools, computer use and real persistence behavior.
 
-Rebuilding Repro Rodeo on MainBrella
+Rebuilding Repo Rodeo on MainBrella
 
 An open accounting of what works, what needs improvement, and what isn't yet possible.
 
