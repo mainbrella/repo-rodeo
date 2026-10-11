@@ -82,4 +82,6 @@ node repro/capture.mjs
 
 `assets/fork-and-restore.svg` is an editable schematic, with no timing scale. It compares process continuity with a fresh start; the external verifier browser belongs to neither copy.
 
+The article and figures were also reviewed in a temporary Markdown preview at the four viewport sizes below. A publication theme has not been added to this repository.
+
 Local verification: the browser reproduced the first-block loss at 390×844, 768×1024, 1280×800, and 1440×900. Keyboard focus after moving blocks, long labels, empty saved data, reset isolation, malformed storage feedback, touch targets, and page overflow were checked. The site build and TypeScript check pass. The web suite passes 415 of 416 tests; its existing SDK-reference synchronization test fails because `web/public/sdk/javascript.md` differs from `backend/sdk/javascript/README.md`. Neither file was changed here.

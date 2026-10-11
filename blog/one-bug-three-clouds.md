@@ -1,12 +1,12 @@
 # One bug, three clouds: building Repo Rodeo
 
-> Working-backwards draft: the deliberately broken editor and its local screenshot are real. The completed Repo Rodeo product, cloud runs, agent outcomes, and operational experiences below are fictional. We're writing the destination first; we'll replace those assumptions with evidence as we build. Documentation links establish provider capabilities, not completed experiments.
+> Fictional retrospective, written before the cloud runs. The seeded bug and local screenshot are real; the product, provider outcomes, and repair stories are imagined. See the [working notes](README.md) for assumptions we'll replace with evidence.
 
 The button was still there when the editor said “Saved.” It disappeared when we reloaded the page.
 
 That was the entire bug report. Move the “Join the waitlist” block to the top, save, reload, and watch it vanish. No intermittent network failure, no production database to copy, no argument about what the reporter meant by “broken.” Three blocks went in. Two came back.
 
-We built Repo Rodeo around that little disappearing button. Give it a repository and a reproduction recipe, and it prepares the application in a sandbox, proves the bug exists, and opens independent repair attempts from the prepared environment. Each attempt gets a coding agent. You get the original app, the proposed repairs, and enough evidence to disagree with the agents.
+We built Repo Rodeo around that little disappearing button. Give it a GitHub issue and a reproduction recipe, and it prepares the application in a sandbox, proves the bug exists, and opens independent repair attempts from the prepared environment. Each attempt gets a coding agent. You get the original app, the proposed repairs, and enough evidence to disagree with the agents.
 
 We ran the same job on E2B, Daytona, and MainBrella. E2B made branching a running environment convenient. Daytona gave us useful ways to prepare and reuse environments. MainBrella got the demonstration working with filesystem saves and fresh processes, which also made the gaps in our own platform painfully specific.
 
@@ -28,11 +28,11 @@ blocks
 
 Position zero is false. The first block gets thrown away. Save reports success because the storage write succeeded, and the editor keeps displaying its untouched draft. Reload is where the lie becomes visible. Moving the button just makes the missing block easy to recognize; saving the original order loses the heading instead.
 
-This is the local fixture after moving the button first, saving, and reloading. The heading and paragraph survive. The button doesn't.
+The [saved editor still shows all three blocks](assets/before-reload.png). Reload that same draft and the heading and paragraph survive, but the button doesn't.
 
 ![The deliberately broken editor after reload shows two blocks, Friday demo and Bring something that almost works. The Join the waitlist button that occupied the first position is gone.](assets/after-reload.png)
 
-Our reproduction opened a fresh browser context, reset the demo, moved the button, saved, and reloaded. It compared the ordered block IDs and their text with the values before saving. That last part mattered: checking whether the page still contained “Join the waitlist” could pass because some help text mentioned it.
+Our [reproduction](repro/editor.spec.js) opened a fresh browser context, reset the demo, moved the button, saved, and reloaded. It compared the ordered block IDs and their text with the values before saving. That last part mattered: checking whether the page still contained “Join the waitlist” could pass because some help text mentioned it.
 
 Once that test failed, we had something an agent's explanation couldn't talk us out of. A patch had to preserve the document across a reload. Keeping the button visible until the tab closed wasn't a repair.
 

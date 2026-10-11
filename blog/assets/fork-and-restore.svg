@@ -13,7 +13,11 @@
     <text x="24" y="144" font-size="20">Files + running process state</text>
     <path d="M36 212H173" fill="none" stroke="#286d5c" stroke-width="4"/>
     <circle cx="173" cy="212" r="6" fill="#286d5c"/>
-    <path d="M173 212C218 212 218 187 268 187H447M173 212C218 212 218 237 268 237H447M173 212C218 212 218 287 268 287H447" fill="none" stroke="#286d5c" stroke-width="4" marker-end="url(#arrow)"/>
+    <g fill="none" stroke="#286d5c" stroke-width="4" marker-end="url(#arrow)">
+      <path d="M173 212C218 212 218 187 268 187H447"/>
+      <path d="M173 212C218 212 218 237 268 237H447"/>
+      <path d="M173 212C218 212 218 287 268 287H447"/>
+    </g>
     <use href="#file" x="274" y="150"/><use href="#file" x="316" y="200"/><use href="#file" x="358" y="250"/>
     <g font-size="21"><text x="478" y="194">A</text><text x="478" y="244">B</text><text x="478" y="294">C</text></g>
     <text x="24" y="257" font-size="20">Capture</text>
@@ -28,7 +32,11 @@
     <path d="M82 488H154C192 488 193 469 226 469H314M154 488C192 488 193 524 226 524H314M154 488C192 488 193 579 226 579H314" fill="none" stroke="#7b817a" stroke-width="2.5" stroke-dasharray="6 5"/>
     <use href="#file" x="228" y="431"/><use href="#file" x="228" y="486"/><use href="#file" x="228" y="541"/>
     <g fill="#fff" stroke="#9b5e2a" stroke-width="3"><circle cx="324" cy="469" r="9"/><circle cx="324" cy="524" r="9"/><circle cx="324" cy="579" r="9"/></g>
-    <path d="M334 469H447M334 524H447M334 579H447" fill="none" stroke="#286d5c" stroke-width="4" marker-end="url(#arrow)"/>
+    <g fill="none" stroke="#286d5c" stroke-width="4" marker-end="url(#arrow)">
+      <path d="M334 469H447"/>
+      <path d="M334 524H447"/>
+      <path d="M334 579H447"/>
+    </g>
     <g font-size="21"><text x="478" y="476">A</text><text x="478" y="531">B</text><text x="478" y="586">C</text></g>
     <text x="229" y="620" font-size="20" fill="#79491f">○ New server starts</text>
     <path d="M24 644H496" stroke="#c8cdc6"/>
