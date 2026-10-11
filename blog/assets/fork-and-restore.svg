@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="730" viewBox="0 0 520 730" role="img" aria-labelledby="title description">
+  <title id="title">Copying files and copying a running process</title>
+  <desc id="description">Two schematic timelines, not measured durations. A memory fork gives three independent attempts the source's files and running process state. The original keeps running. A filesystem restore gives three attempts saved files, then starts a new server in each. The external browser is copied by neither operation and replays the reproduction in a fresh context.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7Z" fill="#286d5c"/></marker>
+    <g id="file"><path d="M0 0H18L26 8V34H0Z" fill="#fff" stroke="#596764" stroke-width="1.8"/><path d="M18 0V8H26M5 15H21M5 22H21M5 28H16" fill="none" stroke="#596764" stroke-width="1.8"/></g>
+  </defs>
+  <rect width="520" height="730" rx="6" fill="#f5f2e9"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#253430">
+    <text x="24" y="38" font-size="25" font-weight="700">What does each copy inherit?</text>
+    <text x="24" y="69" font-size="20" fill="#59635f">Schematic. No measured time scale.</text>
+    <text x="24" y="116" font-size="24" font-weight="700">Memory fork</text>
+    <text x="24" y="144" font-size="20">Files + running process state</text>
+    <path d="M36 212H173" fill="none" stroke="#286d5c" stroke-width="4"/>
+    <circle cx="173" cy="212" r="6" fill="#286d5c"/>
+    <path d="M173 212C218 212 218 187 268 187H447M173 212C218 212 218 237 268 237H447M173 212C218 212 218 287 268 287H447" fill="none" stroke="#286d5c" stroke-width="4" marker-end="url(#arrow)"/>
+    <use href="#file" x="274" y="150"/><use href="#file" x="316" y="200"/><use href="#file" x="358" y="250"/>
+    <g font-size="21"><text x="478" y="194">A</text><text x="478" y="244">B</text><text x="478" y="294">C</text></g>
+    <text x="24" y="257" font-size="20">Capture</text>
+    <text x="24" y="282" font-size="20">once</text>
+    <text x="24" y="329" font-size="20" fill="#59635f">The original also keeps running.</text>
+    <path d="M24 352H496" stroke="#c8cdc6"/>
+    <text x="24" y="393" font-size="24" font-weight="700">Filesystem restore</text>
+    <text x="24" y="421" font-size="20">Files copied; new processes</text>
+    <use href="#file" x="44" y="464"/>
+    <text x="24" y="531" font-size="20">Saved</text>
+    <text x="24" y="556" font-size="20">files</text>
+    <path d="M82 488H154C192 488 193 469 226 469H314M154 488C192 488 193 524 226 524H314M154 488C192 488 193 579 226 579H314" fill="none" stroke="#7b817a" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <use href="#file" x="228" y="431"/><use href="#file" x="228" y="486"/><use href="#file" x="228" y="541"/>
+    <g fill="#fff" stroke="#9b5e2a" stroke-width="3"><circle cx="324" cy="469" r="9"/><circle cx="324" cy="524" r="9"/><circle cx="324" cy="579" r="9"/></g>
+    <path d="M334 469H447M334 524H447M334 579H447" fill="none" stroke="#286d5c" stroke-width="4" marker-end="url(#arrow)"/>
+    <g font-size="21"><text x="478" y="476">A</text><text x="478" y="531">B</text><text x="478" y="586">C</text></g>
+    <text x="229" y="620" font-size="20" fill="#79491f">○ New server starts</text>
+    <path d="M24 644H496" stroke="#c8cdc6"/>
+    <rect x="25" y="665" width="48" height="41" rx="3" fill="#fff" stroke="#596764" stroke-width="2"/>
+    <path d="M25 676H73" stroke="#596764" stroke-width="2"/>
+    <circle cx="32" cy="671" r="1.5" fill="#596764"/><circle cx="38" cy="671" r="1.5" fill="#596764"/>
+    <text x="90" y="683" font-size="21" font-weight="700">Browser stays outside.</text>
+    <text x="90" y="708" font-size="20">Reset and replay each time.</text>
+  </g>
+</svg>

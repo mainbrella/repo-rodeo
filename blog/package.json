@@ -1,0 +1,11 @@
+{
+  "name": "repo-rodeo-blog-reproduction",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "repro": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
