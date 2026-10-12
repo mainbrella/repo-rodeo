@@ -1,6 +1,6 @@
 # Provider acceptance plan
 
-**Status: MainBrella and E2B adapters implemented; full tracked qualification pending.** The [manual local run](../../notes/2026-10-11-local-mainbrella.md) exercises the real MainBrella API and OrbStack containers. It is evidence for that historical harness, not automatic qualification of this implementation. The [E2B cloud attempt](../../notes/2026-10-11-e2b.md) reached setup and authenticated HTTP readiness but stopped at an unverified browser baseline. Daytona and production comparison runs remain planned.
+**Status: MainBrella, E2B, and Daytona adapters implemented; full tracked qualification pending.** The [manual local run](../../notes/2026-10-11-local-mainbrella.md) exercises the real MainBrella API and OrbStack containers. It is evidence for that historical harness, not automatic qualification of this implementation. The [E2B cloud attempt](../../notes/2026-10-11-e2b.md) reached setup and authenticated HTTP readiness but stopped at an unverified browser baseline. The [Daytona cloud notes](../../notes/2026-10-11-daytona.md) record a protected browser baseline and the snapshot qualification attempt. Production comparison runs remain planned.
 
 ## Tracked command
 
@@ -23,7 +23,7 @@ Quota preflight requires space for four generations and one full-disk save, incl
 
 ## Result and recovery contract
 
-All three provider selections emit [`ExperimentResult` schema version 2](../experiment-result.ts). Daytona currently emits `unsupported` without network requests, with exit 2. MainBrella implements `saved-workspace`; E2B implements `memory-fork` and the separate filesystem-only snapshot `saved-workspace` path. Other modes retain distinct names and report `unsupported` or `not-implemented`; the runner does not silently substitute a restore. The default standalone `--provider local` runner retains its original version-1 manifest.
+All three provider selections emit [`ExperimentResult` schema version 2](../experiment-result.ts). MainBrella and Daytona implement `saved-workspace`; E2B implements `memory-fork` and the separate filesystem-only snapshot `saved-workspace` path. Other modes retain distinct names and report `unsupported` or `not-implemented`; the runner does not silently substitute a restore. The default standalone `--provider local` runner retains its original version-1 manifest.
 
 For E2B, set `E2B_API_KEY` and run `npm run experiment -- --provider e2b --seed 12345`.
 It defaults to the `base` template, `memory-fork`, and the official cloud API.
@@ -44,6 +44,39 @@ supported because the API-key interface does not expose team identity. Workspace
 reservation counters, capture bytes, resource limits and prices are not invented
 when absent from the API. Its command reconnection uses the SDK PID and durable
 guest stdout with a byte offset, not a server SSE cursor.
+
+For Daytona, set `DAYTONA_API_KEY` and run `npm run experiment -- --provider daytona
+--seed 12345`. It defaults to `saved-workspace`, the official cloud API at
+`https://app.daytona.io/api`, and the default container snapshot (`--size default`).
+The guest pins Node before preparation and uses the default image's passwordless
+sudo for `/opt` and `/workspace`; binary uploads are staged in `/tmp` first.
+Capture explicitly stops the source, creates one persistent filesystem snapshot,
+and restarts the source container. The runner verifies that the source and each
+restored branch have no inherited listener, then launches fresh servers. Captures
+allow ten minutes; wall-clock TTLs bound sandbox retention to 30 minutes. Immediate
+auto-delete is disabled so stopping the source does not destroy it before capture.
+
+[Container forks are unsupported](https://www.daytona.io/docs/en/sandboxes/#fork-sandboxes).
+VM memory forks, volumes and warm pools remain separate, unimplemented modes.
+Standard preview tokens use `x-daytona-preview-token` and are sandbox-wide
+credentials; they stay private and are scoped to the preview origin in host and
+browser requests. Stopping a sandbox rotates its token; deletion revokes access.
+The adapter confirms private access with HTTP 401/403 denial and retains the
+strict HTTP 404/410 post-deletion check. Session reattachment recovers the same
+session/command IDs and retained stdout with a byte offset; it does not exercise
+live stream disconnection or dashboard reconnection. Guest `timeout` bounds each
+asynchronous command's runtime.
+
+Daytona has no documented keyed mutation replay contract. Journals persist logical
+SDK inputs, ownership, durable uploads and sanitized receipts before submission;
+unknown admissions are never replayed. The pinned SDK retries non-idempotent
+requests only after a provable pre-submission connection failure. Cleanup discovers
+uncertain resources using exact journaled names, deletes only this run's resources,
+and polls inventory for deletion propagation. An ambiguous provisioning/capture
+operation still prevents full cleanup confirmation even if discovered resources
+are absent. Recovery pins the exact original key fingerprint; rotated-key recovery
+is not implemented. Capacity counters, capture byte accounting and price remain
+unavailable through this adapter and are reported as such.
 
 - Exit 0: expected controls, implemented lifecycle checks, input integrity and API cleanup confirmed.
 - Exit 1: a failed or unverified operation, check or cleanup; partial evidence is retained.
@@ -75,7 +108,7 @@ confirmation; another account is rejected and rotated keys for the original acco
 are accepted. Old runs without that binding are not automatically adopted.
 Recovery replays unresolved create/capture requests only within their retention
 window and removes exact recorded generations/workspace IDs. Generation reuse cannot
-authorize deletion of a replacement. E2B uses the stricter exact-key binding above
+authorize deletion of a replacement. E2B and Daytona use the stricter exact-key binding above
 and never reissues uncertain mutations. Corrupt journals or inconclusive inventory
 leave cleanup unconfirmed. The original result is immutable; recovery writes a
 separate timestamped report. Catchable signals enter cleanup; after a hard kill,

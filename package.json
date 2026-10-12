@@ -22,6 +22,7 @@
     "typescript": "5.9.3"
   },
   "dependencies": {
+    "@daytona/sdk": "0.223.1",
     "e2b": "2.55.0"
   }
 }

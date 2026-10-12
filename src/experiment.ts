@@ -19,28 +19,28 @@ async function main() {
 Provider options:
   --mode saved-workspace|filesystem-fork|memory-fork|volume|warm-pool
   --source <web-checkout> --source-ref <commit>   Otherwise use the bundled editor
-  --api-url <origin>                            Default MAINBRELLA_API_URL or http://localhost:8787
-  --size <catalog-size>                         Default small
+  --api-url <url>                               Provider API URL (official cloud endpoint or MainBrella origin)
+  --size <catalog-size>                         Defaults: MainBrella small, E2B base, Daytona default
   --check-idempotency                           Discard an accepted capture response, then retry the same key
   --cleanup <run-directory>                     Reconcile and remove only that run's resources
 
-Set MAINBRELLA_API_KEY or E2B_API_KEY in the host environment. Keys are never uploaded.
+Set MAINBRELLA_API_KEY, E2B_API_KEY or DAYTONA_API_KEY in the host environment. Keys are never uploaded.
 E2B defaults to memory-fork, the base template and https://api.e2b.dev.
-Daytona currently emits a schema-version-2 unsupported result (exit 2).
+Daytona defaults to saved-workspace, the default container snapshot and https://app.daytona.io/api.
 Provider runs keep raw evidence under private/ and write a sanitized result.json.
 The standalone local runner retains its original version-1 manifest format.`);
     return;
   }
   if (!['local', 'mainbrella', 'e2b', 'daytona'].includes(values.provider)) throw new Error('Unknown provider');
   const mode = values.mode || (values.provider === 'e2b' ? 'memory-fork' : 'saved-workspace');
-  const size = values.size || (values.provider === 'e2b' ? 'base' : 'small');
+  const size = values.size || (values.provider === 'e2b' ? 'base' : values.provider === 'daytona' ? 'default' : 'small');
   const modes = ['saved-workspace', 'filesystem-fork', 'memory-fork', 'volume', 'warm-pool'];
   if (!modes.includes(mode)) throw new Error('Unknown experiment mode');
   const seed = values.seed === undefined ? randomBytes(4).readUInt32LE() : Number(values.seed);
   if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff || values.seed === '') throw new Error('Seed must be an unsigned 32-bit integer');
   if (values.cleanup) {
     const config = JSON.parse(await readFile(join(values.cleanup, 'private', 'connection.json'), 'utf8'));
-    const keyName = config.provider === 'e2b' ? 'E2B_API_KEY' : 'MAINBRELLA_API_KEY';
+    const keyName = config.provider === 'e2b' ? 'E2B_API_KEY' : config.provider === 'daytona' ? 'DAYTONA_API_KEY' : 'MAINBRELLA_API_KEY';
     const key = process.env[keyName];
     if (!key) throw new Error(`Set ${keyName} to reconcile this run`);
     const { cleanupRun } = await import('./provider-runner.ts');
@@ -59,14 +59,14 @@ The standalone local runner retains its original version-1 manifest format.`);
   const { runProvider } = await import('./provider-runner.ts');
   const result = await runProvider({
     provider: values.provider as ProviderName, mode: mode as ExperimentMode, seed, output: values.output,
-    source: values.source, sourceRef: values['source-ref'], apiUrl: values['api-url'] || (values.provider === 'e2b' ? 'https://api.e2b.dev' : process.env.MAINBRELLA_API_URL || 'http://localhost:8787'),
-    apiKey: values.provider === 'e2b' ? process.env.E2B_API_KEY : process.env.MAINBRELLA_API_KEY, size, checkIdempotency: values['check-idempotency'],
+    source: values.source, sourceRef: values['source-ref'], apiUrl: values['api-url'] || (values.provider === 'e2b' ? 'https://api.e2b.dev' : values.provider === 'daytona' ? process.env.DAYTONA_API_URL || 'https://app.daytona.io/api' : process.env.MAINBRELLA_API_URL || 'http://localhost:8787'),
+    apiKey: values.provider === 'e2b' ? process.env.E2B_API_KEY : values.provider === 'daytona' ? process.env.DAYTONA_API_KEY : process.env.MAINBRELLA_API_KEY, size, checkIdempotency: values['check-idempotency'],
   });
-  for (const error of result.errors) console.error(redact(error, [process.env.MAINBRELLA_API_KEY || '', process.env.E2B_API_KEY || '']));
+  for (const error of result.errors) console.error(redact(error, [process.env.MAINBRELLA_API_KEY || '', process.env.E2B_API_KEY || '', process.env.DAYTONA_API_KEY || '']));
   process.exitCode = result.status === 'complete' ? 0 : result.status === 'unsupported' ? 2 : 1;
 }
 
 main().catch(error => {
-  console.error(redact(error instanceof Error ? error.message : String(error), [process.env.MAINBRELLA_API_KEY || '', process.env.E2B_API_KEY || '']));
+  console.error(redact(error instanceof Error ? error.message : String(error), [process.env.MAINBRELLA_API_KEY || '', process.env.E2B_API_KEY || '', process.env.DAYTONA_API_KEY || '']));
   process.exitCode = 1;
 });

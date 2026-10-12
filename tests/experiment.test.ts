@@ -106,40 +106,23 @@ test('public export allowlists observations and strips URLs, credentials and unk
   assert.equal(redact('mb_secret Bearer abc https://private.test/foo'), '[redacted-key] Bearer [redacted] [redacted-url]');
 });
 
-for (const provider of ['daytona']) test(`${provider} CLI writes a versioned unsupported result and does no provider work`, async t => {
-  const directory = join(await temporary(t), 'run');
+for (const provider of ['e2b', 'daytona'] as const) test(`${provider} CLI requires its own host credential and selects its provider defaults`, async t => {
+  const directory = join(await temporary(t), `${provider}-run`);
+  const env = { ...process.env, MAINBRELLA_API_KEY: 'mb_do-not-use', E2B_API_KEY: '', DAYTONA_API_KEY: '' };
   const proc = spawnSync(process.execPath, ['src/experiment.ts', '--provider', provider, '--output', directory, '--seed', '12345'], {
-    cwd: repository, env: { ...process.env, MAINBRELLA_API_KEY: 'mb_do-not-leak' }, encoding: 'utf8', timeout: 20_000,
-  });
-  assert.equal(proc.status, 2, proc.stderr);
-  const text = await readFile(join(directory, 'result.json'), 'utf8');
-  const result = JSON.parse(text);
-  assert.equal(result.schemaVersion, 2);
-  assert.equal(result.provider, provider);
-  assert.equal(result.status, 'unsupported');
-  assert.equal(result.scope, 'not-run');
-  assert.deepEqual(result.controls, []);
-  assert.deepEqual(result.evidence.files, {});
-  assert.doesNotMatch(text, /mb_do-not-leak/);
-  const retry = spawnSync(process.execPath, ['src/experiment.ts', '--provider', provider, '--output', directory], { cwd: repository, encoding: 'utf8' });
-  assert.equal(retry.status, 1);
-  assert.equal(await readFile(join(directory, 'result.json'), 'utf8'), text);
-});
-
-test('E2B CLI requires its own host credential and selects its native fork defaults', async t => {
-  const directory = join(await temporary(t), 'e2b-run');
-  const env = { ...process.env, MAINBRELLA_API_KEY: 'mb_do-not-use', E2B_API_KEY: '' };
-  const proc = spawnSync(process.execPath, ['src/experiment.ts', '--provider', 'e2b', '--output', directory, '--seed', '12345'], {
     cwd: repository, env, encoding: 'utf8', timeout: 20000,
   });
   assert.equal(proc.status, 1);
   const text = await readFile(join(directory, 'result.json'), 'utf8');
   const result = JSON.parse(text);
-  assert.equal(result.provider, 'e2b');
-  assert.equal(result.mode, 'memory-fork');
+  assert.equal(result.provider, provider);
+  assert.equal(result.mode, provider === 'e2b' ? 'memory-fork' : 'saved-workspace');
   assert.equal(result.status, 'failed');
   assert.equal(result.scope, 'not-run');
-  assert.match(result.errors.join(' '), /Set E2B_API_KEY/);
-  assert.equal(result.environment.requested.size, 'base');
+  assert.match(result.errors.join(' '), new RegExp(`Set ${provider === 'e2b' ? 'E2B' : 'DAYTONA'}_API_KEY`));
+  assert.equal(result.environment.requested.size, provider === 'e2b' ? 'base' : 'default');
   assert.doesNotMatch(text, /mb_do-not-use/);
+  const retry = spawnSync(process.execPath, ['src/experiment.ts', '--provider', provider, '--output', directory], { cwd: repository, env, encoding: 'utf8' });
+  assert.equal(retry.status, 1);
+  assert.equal(await readFile(join(directory, 'result.json'), 'utf8'), text);
 });

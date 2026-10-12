@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "status": "paused-at-user-request",
+  "lastInventoryAt": "2026-10-12T03:18:34.301Z",
+  "remainingSandboxes": [
+    {
+      "id": "237d7ff6-ffda-431e-9fb5-926b91c54f4e",
+      "state": "stopped"
+    }
+  ],
+  "remainingSnapshots": [
+    {
+      "id": "c3a09352-ab3a-4c94-831a-259b642a6be5",
+      "name": "rodeo-6b6a8475-efcd-42a3-bb74-63cfe15da546-prepared",
+      "state": "active"
+    }
+  ],
+  "sourceScheduledDestructionAt": "2026-10-12T03:40:32.892Z",
+  "scheduledDeletionVerified": false,
+  "keyPermissions": [
+    "write:sandboxes",
+    "delete:sandboxes"
+  ],
+  "snapshotDeleteStatus": 403,
+  "sourceDeleteDuringSnapshottingStatus": 409,
+  "preparedBaseline": {
+    "status": "reproduced",
+    "verifiedExpectedFailure": true,
+    "reason": "All five persistence tests failed specifically on first-block loss; reset isolation passed.",
+    "browserVersion": "153.0.8010.12"
+  },
+  "preparedBaselineTests": [
+    {
+      "id": "button-refresh",
+      "status": "failed",
+      "observations": 1
+    },
+    {
+      "id": "button-reload",
+      "status": "failed",
+      "observations": 1
+    },
+    {
+      "id": "original-order",
+      "status": "failed",
+      "observations": 1
+    },
+    {
+      "id": "edited-text",
+      "status": "failed",
+      "observations": 1
+    },
+    {
+      "id": "reset-isolation",
+      "status": "passed",
+      "observations": 0
+    },
+    {
+      "id": "holdout",
+      "status": "failed",
+      "observations": 1
+    }
+  ]
+}

@@ -125,7 +125,7 @@ async function successfulFixture(t: TestContext, leak?: 'source' | 'marker', mem
       if (sandbox.id === 'misleading' && leak === 'marker') states.get('correct')!.branchMarker = 'misleading';
     }
     if (request.name.endsWith('-launch')) state.process = {
-      nonce: `process-${sandbox.id}`, pid: 10 + states.size, serverReachable: true, observedAt: '',
+      nonce: `process-${sandbox.id}-${request.name}`, pid: 10 + states.size, serverReachable: true, observedAt: '',
     };
     return { ...completed, stdout: JSON.stringify({ ...state, dependencyHash: null, mode: 493, link: '/workspace/rodeo-prepared' }) };
   };
@@ -202,6 +202,46 @@ test('successful runner prepares, restores and verifies three controls, reconnec
   for (const [file, digest] of Object.entries(result.evidence.files)) {
     assert.equal(sha256(await readFile(join(f.options.output, 'private', file))), digest, file);
   }
+});
+
+test('Daytona runner verifies snapshot controls and session recovery without inventing memory or keyed replay', async t => {
+  const f = await successfulFixture(t);
+  f.caps.resources = [{ id: 'default' }];
+  const capture = f.adapter.capture;
+  f.adapter.capture = async (sandbox, request) => {
+    const prepared = await capture(sandbox, request);
+    await f.adapter.execute(sandbox, { name: 'source-stop-inherited-server', timeoutMs: 1000, argv: [] });
+    return prepared;
+  };
+  const result = await runProvider({ ...f.options, provider: 'daytona', mode: 'saved-workspace',
+    apiUrl: 'https://app.daytona.io/api', size: 'default' }, f.services);
+  assert.equal(result.status, 'complete', result.errors.join('\n'));
+  assert.equal(result.scope, 'cloud-api');
+  assert.equal(result.controls.length, 3);
+  assert.equal(result.checks.captureIdempotency.status, 'unsupported');
+  assert.match(result.checks.captureIdempotency.detail, /Daytona/);
+  assert.match(result.checks.processes.detail, /no listener/);
+  assert.match(result.checks.jobReattachment.detail, /session and command IDs/);
+  assert.equal(f.calls.filter(c => c === 'capture').length, 1);
+  assert.ok(f.calls.includes('source-runtime'));
+  const config = JSON.parse(await readFile(join(f.options.output, 'private', 'connection.json'), 'utf8'));
+  assert.equal(config.apiUrl, 'https://app.daytona.io/api');
+});
+
+test('Daytona accepts explicit HTTP 401 denial and stops when the protected browser baseline is unverified', async t => {
+  const f = await fixture(t);
+  f.caps.resources = [{ id: 'default' }];
+  f.adapter.startJob = async (sandbox, request) => f.adapter.execute(sandbox, request);
+  f.adapter.preview = async () => ({ id: 'preview', url: 'https://private.example.test', headers: { 'x-daytona-preview-token': 'private-token' }, expiresAt: null });
+  let cleaned = false;
+  const cleanup = f.adapter.cleanup;
+  f.adapter.cleanup = async () => { cleaned = true; return cleanup(); };
+  const result = await runProvider({ ...f.options, provider: 'daytona', mode: 'saved-workspace', apiUrl: 'https://app.daytona.io/api', size: 'default' }, {
+    ...f.services, previewStatus: async (_url, _path, headers) => cleaned ? 404 : headers ? 200 : 401,
+  });
+  assert.match(result.errors.join(' '), /Prepared baseline was not verified/);
+  assert.equal(result.cleanup?.confirmed, true);
+  assert.ok(!f.calls.includes('capture'));
 });
 
 test('memory-fork runner verifies inherited listeners and process state before stopping and restarting each control', async t => {

@@ -17,6 +17,11 @@ import type { Check, ExperimentResult } from './experiment-result.ts';
 import type { Execution, ExperimentMode, Inventory, Operation, Preview, ProcessProbe, ProviderAdapter, ProviderName, Sandbox } from './providers/interface.ts';
 import { MainbrellaAdapter } from './providers/mainbrella.ts';
 import { E2BAdapter } from './providers/e2b.ts';
+import { DaytonaAdapter } from './providers/daytona.ts';
+
+function cloudAdapter(provider: ProviderName, config: { apiUrl: string; apiKey: string; directory: string }) {
+  return provider === 'e2b' ? new E2BAdapter(config) : provider === 'daytona' ? new DaytonaAdapter(config) : new MainbrellaAdapter(config);
+}
 
 const repository = fileURLToPath(new URL('../', import.meta.url));
 export interface ProviderRunOptions {
@@ -72,7 +77,7 @@ export function checkCapacity(inventory: Inventory, diskBytes: number) {
 }
 
 export async function runProvider(options: ProviderRunOptions, services: RunServices = {
-  adapter: config => options.provider === 'e2b' ? new E2BAdapter(config) : new MainbrellaAdapter(config), verify: verifyPreview, previewStatus,
+  adapter: config => cloudAdapter(options.provider, config), verify: verifyPreview, previewStatus,
 }): Promise<ExperimentResult> {
   const runId = `${options.provider}-${new Date().toISOString().replace(/[:.]/g, '-')}-${randomUUID().slice(0, 8)}`;
   const output = resolve(options.output || join(repository, 'artifacts', runId));
@@ -110,12 +115,13 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
   const launch = async (sandbox: Sandbox, name: string) => {
     const request = {
       ...operation(`${name}-launch`), cwd: '/workspace/rodeo',
-      env: { VITE_API_URL: options.provider === 'e2b' ? 'http://localhost:8787' : options.apiUrl,
-        ...(options.provider === 'e2b' ? { RODEO_ALLOWED_HOSTS: '.e2b.app' } : {}) },
+      env: { VITE_API_URL: options.provider !== 'mainbrella' ? 'http://localhost:8787' : options.apiUrl,
+        ...(options.provider === 'e2b' ? { RODEO_ALLOWED_HOSTS: '.e2b.app' } : {}),
+        ...(options.provider === 'daytona' ? { RODEO_ALLOWED_HOSTS: '.proxy.daytona.work,.proxy.daytona.works' } : {}) },
       argv: ['/bin/sh', '-c', `setsid node rodeo-server.mjs ${result.source.kind} > /workspace/rodeo-server.log 2>&1 < /dev/null &`],
     };
     let server: Execution | undefined;
-    if (options.provider === 'e2b') {
+    if (options.provider !== 'mainbrella') {
       server = await adapter!.startJob(sandbox, { ...request, timeoutMs: 30 * 60_000,
         argv: ['node', 'rodeo-server.mjs', result.source.kind] });
       await writeJson(join(privateDirectory, `${name}-server-job.json`), server);
@@ -136,30 +142,27 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     const preview = await adapter!.preview(sandbox, { ...operation(`${name}-preview`), port: 5173 });
     previews.push({ sandbox, preview });
     await writeFile(join(privateDirectory, 'previews.json'), `${JSON.stringify(previews, null, 2)}\n`, { mode: 0o600 });
-    if (preview.headers && await services.previewStatus(preview.url, '/repo-rodeo-bug') !== 403) throw new Error('Protected preview did not reject unauthenticated access');
+    const denied = preview.headers ? await services.previewStatus(preview.url, '/repo-rodeo-bug') : null;
+    if (denied !== null && !(options.provider === 'daytona' ? [401, 403] : [403]).includes(denied)) throw new Error('Protected preview did not reject unauthenticated access');
     if (await services.previewStatus(preview.url, '/repo-rodeo-bug', preview.headers) !== 200) throw new Error('Preview readiness did not return HTTP 200');
     return preview;
   };
   try {
     progress(`Evidence: ${output}`);
-    if (options.provider === 'daytona') {
-      result.status = 'unsupported';
-      result.errors.push(`${options.provider} adapter is not implemented. No provider requests were made.`);
-      return result;
-    }
     const scenario = await readScenario(join(repository, 'fixtures/editor/scenario.json'));
     if (process.versions.node !== scenario.runtime.node) throw new Error(`Use Node ${scenario.runtime.node}`);
     const playwrightVersion = JSON.parse(await readFile(join(repository, 'node_modules/@playwright/test/package.json'), 'utf8')).version;
     result.environment.host.playwright = playwrightVersion;
     if (playwrightVersion !== scenario.runtime.playwright) throw new Error('Pinned Playwright is required; run npm ci');
-    if (!options.apiKey) throw new Error(`Set ${options.provider === 'e2b' ? 'E2B_API_KEY' : 'MAINBRELLA_API_KEY'} for the test account`);
+    if (!options.apiKey) throw new Error(`Set ${options.provider === 'e2b' ? 'E2B_API_KEY' : options.provider === 'daytona' ? 'DAYTONA_API_KEY' : 'MAINBRELLA_API_KEY'} for the test account`);
     const api = new URL(options.apiUrl);
-    if (api.username || api.password || api.search || api.hash || api.pathname !== '/') throw new Error('MAINBRELLA_API_URL must be an origin without credentials');
+    if (api.username || api.password || api.search || api.hash || api.pathname !== (options.provider === 'daytona' ? '/api' : '/')) throw new Error('Invalid provider API URL');
     const local = ['localhost', '127.0.0.1', '[::1]'].includes(api.hostname);
     if (api.protocol !== 'https:' && !(local && api.protocol === 'http:')) throw new Error('Remote API origins require HTTPS');
     result.scope = local ? 'local-api' : 'cloud-api';
-    await writeJson(join(privateDirectory, 'connection.json'), { schemaVersion: 1, provider: options.provider, apiUrl: api.origin });
-    adapter = services.adapter({ apiUrl: api.origin, apiKey: options.apiKey, directory: privateDirectory });
+    const apiUrl = options.provider === 'daytona' ? `${api.origin}/api` : api.origin;
+    await writeJson(join(privateDirectory, 'connection.json'), { schemaVersion: 1, provider: options.provider, apiUrl });
+    adapter = services.adapter({ apiUrl, apiKey: options.apiKey, directory: privateDirectory });
     result.capabilities = await adapter.capabilities();
     const mode = result.capabilities.modes[options.mode];
     if (mode.status !== 'supported') {
@@ -184,8 +187,9 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     result.source.archiveSha256 = sha256(source.archive);
     progress('Preparing one source container.');
     if (options.provider === 'e2b') result.environment.requested.image = 'base';
+    if (options.provider === 'daytona') result.environment.requested.image = 'default';
     const { sandbox } = await adapter.create({ ...operation('source-create', 180_000), image: result.environment.requested.image, size: options.size });
-    if (options.provider === 'e2b') {
+    if (options.provider !== 'mainbrella') {
       assert.match(scenario.runtime.node, /^\d+\.\d+\.\d+$/);
       const archive = `node-v${scenario.runtime.node}-linux-x64.tar.xz`;
       requireSuccess(await adapter.execute(sandbox, { ...operation('source-runtime', 300_000), argv: ['/bin/sh', '-c',
@@ -221,11 +225,11 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     const baseline = await services.verify({ repository, directory: join(privateDirectory, 'prepared-baseline'), url: sourcePreview.url, headers: sourcePreview.headers, seed: options.seed, scenario, signal: abort.signal });
     if (baseline.status !== 'reproduced') throw new Error('Prepared baseline was not verified; capture and candidates were not started');
 
-    progress('Capturing the prepared filesystem and restoring three controls.');
+    progress('Capturing prepared state and creating three controls.');
     const checkIdempotency = options.checkIdempotency && options.provider === 'mainbrella';
-    if (options.checkIdempotency && !checkIdempotency) result.checks.captureIdempotency = { status: 'unsupported', detail: 'E2B has no documented keyed create/fork/snapshot replay contract; no response-loss mutation was reissued.' };
+    if (options.checkIdempotency && !checkIdempotency) result.checks.captureIdempotency = { status: 'unsupported', detail: `${options.provider === 'e2b' ? 'E2B' : 'Daytona'} has no documented keyed create/fork/snapshot replay contract; no response-loss mutation was reissued.` };
     activeCheck = checkIdempotency ? 'captureIdempotency' : undefined;
-    const captureOperation = { ...operation('prepared-capture', 180_000), mode: options.mode, dropResponseAfterHeaders: checkIdempotency };
+    const captureOperation = { ...operation('prepared-capture', options.provider === 'daytona' ? 600_000 : 180_000), mode: options.mode, dropResponseAfterHeaders: checkIdempotency };
     const prepared = await adapter.capture(sandbox, captureOperation);
     result.storage.captureBytes = prepared.bytes;
     const afterCapture = await adapter.inventory();
@@ -244,8 +248,14 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     }
     activeCheck = 'processes';
     const after = await inspect(sandbox, 'source-after-capture');
-    assert.equal(after.process.nonce, original.process.nonce, 'Capture changed the source process nonce');
-    assert.equal(after.process.pid, original.process.pid, 'Capture changed the source PID');
+    if (options.provider === 'daytona') {
+      assert.equal(after.process.serverReachable, false, 'Stopped container snapshot unexpectedly retained its source listener');
+      const resumed = await launch(sandbox, 'source-resumed');
+      assert.ok(resumed.process.nonce && resumed.process.nonce !== original.process.nonce, 'Source restart reused pre-capture process state');
+    } else {
+      assert.equal(after.process.nonce, original.process.nonce, 'Capture changed the source process nonce');
+      assert.equal(after.process.pid, original.process.pid, 'Capture changed the source PID');
+    }
     const branches: { id: string; sandbox: Sandbox; nonce: string | null; hashes: Record<string, string> }[] = [];
     for (const control of scenario.controls) {
       activeCheck = 'filesystem';
@@ -312,6 +322,8 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     assert.equal(new Set(branches.map(branch => branch.nonce)).size, 3, 'Restored servers reused a process nonce');
     result.checks.processes = verified(prepared.preservation === 'filesystem+memory'
       ? 'Source nonce/PID survived capture; each memory fork retained the listener, nonce and PID. Its inherited server was stopped, then explicitly restarted with a distinct nonce for patch verification.'
+      : options.provider === 'daytona'
+      ? 'Container capture explicitly stopped and restarted its source; the source listener was absent after restart and its server received a fresh nonce when relaunched. Each filesystem restore had no listener, then a distinct nonce after explicitly starting a server.'
       : 'Source nonce/PID survived capture; each restore had no listener, then a distinct nonce after explicitly starting a server.');
     activeCheck = 'jobReattachment';
     if (result.capabilities.jobReattachment) {
@@ -334,6 +346,8 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       await writeJson(join(privateDirectory, 'reattachment.json'), { executionId: job.id, first, record, remaining });
       result.checks.jobReattachment = verified(options.provider === 'e2b'
         ? 'An E2B SDK command stream disconnected after initial output; a new SDK client reconnected to the same sandbox and command PID. It recovered exit 0 and durable guest stdout, then read the remaining bytes from the saved offset. This is not server-side SSE cursor replay or dashboard reconnection.'
+        : options.provider === 'daytona'
+        ? 'After initial session output, the first polling client detached. A new Daytona SDK client recovered the same session and command IDs, exit 0 and retained stdout, then read remaining bytes from the saved offset. Live stream disconnection, server SSE replay and dashboard reconnection were not exercised.'
         : 'An API SSE client disconnected after initial output; a new client recovered the same execution ID, exit 0 and remaining output from its cursor. Dashboard/browser session reconnection was not exercised.');
     } else result.checks.jobReattachment = { status: 'unsupported', detail: 'Deployment does not advertise managed execution reconnection.' };
     activeCheck = undefined;
@@ -397,10 +411,8 @@ export async function cleanupRun(directory: string, apiKey: string) {
   const output = resolve(directory);
   const privateDirectory = join(output, 'private');
   const config = JSON.parse(await readFile(join(privateDirectory, 'connection.json'), 'utf8'));
-  if (!['mainbrella', 'e2b'].includes(config.provider) || config.schemaVersion !== 1) throw new Error('Unsupported cleanup metadata');
-  const adapter = config.provider === 'e2b'
-    ? new E2BAdapter({ apiUrl: config.apiUrl, apiKey, directory: privateDirectory })
-    : new MainbrellaAdapter({ apiUrl: config.apiUrl, apiKey, directory: privateDirectory });
+  if (!['mainbrella', 'e2b', 'daytona'].includes(config.provider) || config.schemaVersion !== 1) throw new Error('Unsupported cleanup metadata');
+  const adapter = cloudAdapter(config.provider, { apiUrl: config.apiUrl, apiKey, directory: privateDirectory });
   const cleanup = await adapter.cleanup();
   let previews: { preview: Preview }[] = [];
   try { previews = JSON.parse(await readFile(join(privateDirectory, 'previews.json'), 'utf8')); }

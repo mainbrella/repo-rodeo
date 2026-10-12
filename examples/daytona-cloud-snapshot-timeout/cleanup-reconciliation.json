@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "kind": "cleanup-reconciliation",
+  "completedAt": "2026-10-12T03:18:35.007Z",
+  "cleanup": {
+    "confirmed": false,
+    "sandboxes": [
+      {
+        "sandbox": {
+          "id": "237d7ff6-ffda-431e-9fb5-926b91c54f4e",
+          "generation": "237d7ff6-ffda-431e-9fb5-926b91c54f4e"
+        },
+        "absent": false
+      }
+    ],
+    "workspaces": [
+      {
+        "id": "c3a09352-ab3a-4c94-831a-259b642a6be5",
+        "absent": false
+      }
+    ],
+    "physicalStorage": "not-measured",
+    "errors": [
+      "Daytona operation prepared-capture remains uncertain; it was not reissued",
+      "One or more Daytona resources remain"
+    ]
+  },
+  "previewStatuses": [
+    400
+  ],
+  "confirmed": false
+}
