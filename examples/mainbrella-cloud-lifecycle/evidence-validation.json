@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-12T14:14:19.779Z",
+  "resultSha256": "a7c932850ff23c6de9a1219fde47e5657c4691dce6113f54b2f5739145f5a9c7",
+  "resultChecksumMatches": true,
+  "privateFilesChecked": 89,
+  "allPrivateHashesMatch": true,
+  "publicApiKeyScanPassed": true,
+  "previewHostnameScanPassed": true,
+  "inputFilesRetained": 23,
+  "status": "completed_with_sdk_findings",
+  "deploymentObservations": {
+    "api": {
+      "versions": [
+        {
+          "version_id": "96f234b3-5065-4116-b47e-7875494f5164",
+          "percentage": 100
+        }
+      ],
+      "unchangedAcrossRun": true
+    },
+    "runtime": {
+      "versions": [
+        {
+          "version_id": "88bcb93d-3e88-41a3-b620-d03ae5aec63b",
+          "percentage": 100
+        }
+      ],
+      "unchangedAcrossRun": true
+    }
+  },
+  "postRunPortability": {
+    "runtimeJavaScriptUnchanged": true,
+    "retainedRunnerSha256": "86a7a091881f368fdfb808bfd067341a5f998b767890fffc2b3ce8fce2da13cc",
+    "currentRunnerSha256": "392a36909b3c6121a444476fd27fa8b0ad6770f18b0eeb95aa27ae53052dd152",
+    "typecheck": "passed",
+    "focusedTestsPassed": 4
+  }
+}

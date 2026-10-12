@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-12T14:14:19.775Z",
+  "authenticatedAccountMatches": true,
+  "containers": [],
+  "workspaces": [],
+  "usage": {
+    "starts": 133,
+    "concurrentComputeUnits": 0,
+    "workspaces": {
+      "saved": 0,
+      "reservedBytes": 0,
+      "savesThisMonth": 14,
+      "captureBytesThisMonth": 82000000000,
+      "retainedCaptureBytes": 82000000000,
+      "captureBudgetResetsAt": 1793491200000,
+      "nextRetainedCaptureReleaseAt": 1796471738902,
+      "nextRetainedCaptureReleaseBytes": 6000000000
+    }
+  },
+  "ownedGenerationsAbsent": [
+    {
+      "id": "small",
+      "createdAt": "2026-10-12T14:10:28.713Z",
+      "absent": true
+    },
+    {
+      "id": "c1",
+      "createdAt": "2026-10-12T14:10:51.746Z",
+      "absent": true
+    },
+    {
+      "id": "small",
+      "createdAt": "2026-10-12T14:11:18.504Z",
+      "absent": true
+    }
+  ],
+  "ownedWorkspacesAbsent": [
+    {
+      "id": "0ed68649-b240-4118-bdba-6fd7d30d5061",
+      "absent": true
+    },
+    {
+      "id": "107c1125-9934-47ac-ab27-c28b43e1a381",
+      "absent": true
+    }
+  ],
+  "oldPreviewObservations": [
+    {
+      "label": "source",
+      "status": 403
+    },
+    {
+      "label": "fork",
+      "status": 403
+    },
+    {
+      "label": "resume",
+      "status": 403
+    }
+  ],
+  "originalInventoryPreserved": true,
+  "scope": "Independent authenticated GET requests and old preview requests; no new paid operation."
+}

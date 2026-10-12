@@ -7,15 +7,62 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { setTimeout as pause } from 'node:timers/promises';
 import { hashFiles, sha256, writeJson } from './evidence.ts';
-import type { AccountState, ContainerIdentity, Sandbox } from '../../backend/sdk/javascript/index.js';
+
+type ContainerIdentity = { id: string; createdAt: string };
+type ContainerDescriptor = ContainerIdentity & { status?: string; workspaceId?: string };
+type AccountState = {
+  active: boolean;
+  sizes: { id: string; diskGB: number; computeUnits: number }[];
+  imageCatalog: { id: string }[];
+  limits: { maxStartsPerMonth: number; maxContainers: number; maxConcurrentComputeUnits: number; maxSessionMs: number };
+  usage: { starts: number; concurrentComputeUnits: number; availableComputeUnitHours: number };
+  containers: ContainerDescriptor[];
+};
+type Workspaces = {
+  workspaces: { id: string; name: string; source: ContainerIdentity }[];
+  usage: { saved: number; reservedBytes: number; savesThisMonth: number; captureBytesThisMonth: number; retainedCaptureBytes: number };
+  limits: { maxSaved: number; maxReservedBytes: number; maxSavesPerMonth: number; maxCaptureBytesPerMonth: number; maxRetainedCaptureBytes: number };
+};
+type LifecycleSandbox = ContainerIdentity & {
+  workspaceId?: string;
+  commands: {
+    run(command: string, options?: { timeoutMs?: number }): Promise<{ exitCode: number; stdout: string }>;
+    start(argv: string[], options?: { timeoutMs?: number }): Promise<{ id: string }>;
+    list(): Promise<{ executions: { id: string; status: string }[] }>;
+  };
+  files: { read(path: string): Promise<Uint8Array>; write(path: string, bytes: Uint8Array): Promise<unknown> };
+  previews: { create(port: number, options?: { ttlSeconds?: number }): Promise<{ url: string }> };
+  waitUntilReady(options?: { waitTimeoutMs?: number }): Promise<unknown>;
+  configureStartup(recipe: unknown): Promise<unknown>;
+  fork(options: { name: string; idempotencyKey: string; waitTimeoutMs?: number }): Promise<LifecycleSandbox>;
+  stop(options: { idempotencyKey: string }): Promise<AccountState>;
+  resume(options: { idempotencyKey: string; waitTimeoutMs?: number }): Promise<LifecycleSandbox>;
+  kill(): Promise<unknown>;
+};
+type LifecycleClient = {
+  capabilities(): Promise<{
+    apiVersion: string;
+    persistence: { filesystemAfterStop: boolean; filesystemFork: boolean; startupConfiguration: boolean; restoreLaunch: boolean; [key: string]: unknown };
+    networking: Record<string, unknown>;
+    secrets: Record<string, unknown>;
+    previews: { supported: boolean };
+    execution: { background: boolean; argv: boolean };
+  }>;
+  request<T = unknown>(path: string, options?: { method?: string; body?: unknown; headers?: HeadersInit }): Promise<T>;
+  list(): Promise<AccountState>;
+  workspaces: { list(): Promise<Workspaces>; delete(id: string): Promise<unknown> };
+  create(options: { catalogId: string; size: string; name: string; idempotencyKey: string; waitTimeoutMs?: number }): Promise<LifecycleSandbox>;
+  connect(identity: ContainerIdentity): LifecycleSandbox;
+};
+type LifecycleSdk = {
+  Mainbrella: new (options: { apiKey: string; baseUrl: string; fetch: typeof fetch; timeoutMs: number }) => LifecycleClient;
+  MainbrellaError: new (...args: never[]) => Error & { code: string; status?: number };
+};
 
 const repository = fileURLToPath(new URL('../', import.meta.url));
 const apiUrl = 'https://api.mainbrella.com';
 const identity = (value: ContainerIdentity) => ({ id: value.id, createdAt: value.createdAt });
 const same = (a: ContainerIdentity, b: ContainerIdentity) => a.id === b.id && a.createdAt === b.createdAt;
-type Workspaces = { workspaces: { id: string; name: string; source: ContainerIdentity }[];
-  usage: { saved: number; reservedBytes: number; savesThisMonth: number; captureBytesThisMonth: number; retainedCaptureBytes: number };
-  limits: { maxSaved: number; maxReservedBytes: number; maxSavesPerMonth: number; maxCaptureBytesPerMonth: number; maxRetainedCaptureBytes: number } };
 
 export function checkLifecycleCapacity(account: AccountState, workspaces: Workspaces): number {
   assert.equal(account.active, true, 'Paid account required');
@@ -60,7 +107,7 @@ marker:await readFile('/workspace/lifecycle-marker','utf8'),authorization:req.he
 }).listen(3000,'0.0.0.0');
 `;
 
-export async function runLifecycle(output: string, sdkModule: string) {
+export async function runLifecycle(output: string, sdkModule: string, candidateSource: string) {
   const apiKey = process.env.MAINBRELLA_API_KEY || '';
   assert.match(apiKey, /^mb_[a-f0-9]{64}$/i, 'MAINBRELLA_API_KEY required');
   assert.equal(process.versions.node, '22.22.2');
@@ -69,14 +116,17 @@ export async function runLifecycle(output: string, sdkModule: string) {
   await mkdir(privateDirectory, { mode: 0o700 });
   const inputs = join(privateDirectory, 'inputs');
   await mkdir(inputs);
+  await cp(candidateSource, join(inputs, 'candidate-source.json'));
   await cp(dirname(sdkModule), join(inputs, 'sdk'), { recursive: true });
   for (const file of ['src/lifecycle-experiment.ts', 'src/evidence.ts', 'tests/lifecycle-experiment.test.ts', 'package.json', 'package-lock.json']) {
     await mkdir(dirname(join(inputs, file)), { recursive: true });
     await cp(join(repository, file), join(inputs, file));
   }
-  const sdk: typeof import('../../backend/sdk/javascript/index.js') = await import(pathToFileURL(join(inputs, 'sdk', 'index.js')).href);
+  const sdk = await import(pathToFileURL(join(inputs, 'sdk', 'index.js')).href) as unknown as LifecycleSdk;
   const sdkMetadata = JSON.parse(await readFile(join(inputs, 'sdk/package.json'), 'utf8'));
+  const provenance = JSON.parse(await readFile(join(inputs, 'candidate-source.json'), 'utf8'));
   assert.equal(sdkMetadata.version, '0.2.0');
+  assert.equal(provenance.version, sdkMetadata.version);
   const runId = randomUUID(), sourceName = `Rodeo lifecycle ${runId}`, forkName = `Rodeo fork ${runId}`;
   const abort = new AbortController();
   const interrupt = () => abort.abort(new Error('qualification_interrupted'));
@@ -88,7 +138,12 @@ export async function runLifecycle(output: string, sdkModule: string) {
   const operations: { action: string; path: string; body: Record<string, unknown>; key: string; attempted: boolean; settled: boolean; rejected?: boolean }[] = [];
   const result: any = { schemaVersion: 1, experiment: 'mainbrella-deployed-filesystem-lifecycle', runId,
     status: 'failed', apiUrl, startedAt: new Date().toISOString(), budget: { maxStarts: 3, maxCaptures: 2 },
-    sdk: { version: sdkMetadata.version, source: 'clean installation of the locally qualified npm candidate archive' },
+    sdk: { version: sdkMetadata.version, archiveSha256: provenance.archive.sha256, qualifiedAt: provenance.qualifiedAt,
+      source: 'clean installation of the locally qualified npm candidate archive' },
+    deploymentObservations: Object.fromEntries(Object.entries(provenance.deploymentObservations || {}).map(([name, values]) => {
+      const last = (values as { created_on: string; versions: { version_id: string; percentage: number }[] }[]).at(-1);
+      return [name, last && { createdAt: last.created_on, versions: last.versions }];
+    })),
     runner: { commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repository, encoding: 'utf8' }).trim(),
       dirty: !!execFileSync('git', ['status', '--porcelain'], { cwd: repository, encoding: 'utf8' }).trim() },
     inputHashes: await hashFiles(inputs), checks: {}, processes: {}, sdkFindings: [], errors: [], cleanup: { confirmed: false, errors: [] },
@@ -152,12 +207,12 @@ export async function runLifecycle(output: string, sdkModule: string) {
     operation.settled = true; await save(); return value;
   };
   const requestWorkspaces = () => client.workspaces.list() as Promise<Workspaces>;
-  const inspect = async (sandbox: Sandbox) => {
+  const inspect = async (sandbox: LifecycleSandbox) => {
     const command = await sandbox.commands.run('node -e "fetch(\'http://127.0.0.1:3000/probe\').then(r=>r.text()).then(console.log)"', { timeoutMs: 15000 });
     assert.equal(command.exitCode, 0, 'Guest probe failed');
     return JSON.parse(command.stdout);
   };
-  const preview = async (sandbox: Sandbox, label: string) => {
+  const preview = async (sandbox: LifecycleSandbox, label: string) => {
     const link = await sandbox.previews.create(3000, { ttlSeconds: 600 });
     previews.push({ label, url: link.url }); await save();
     const response = await fetch(new URL('/probe', link.url), { headers: { Authorization: 'Bearer disposable-header-must-strip', Cookie: 'session=disposable-header-must-strip' },
@@ -338,7 +393,7 @@ export async function runLifecycle(output: string, sdkModule: string) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { values } = parseArgs({ options: { output: { type: 'string' }, 'sdk-module': { type: 'string' } } });
-  assert.ok(values.output && values['sdk-module'], 'Use --output <new-directory> --sdk-module <clean installed index.js>');
-  process.exitCode = await runLifecycle(resolve(values.output), resolve(values['sdk-module']));
+  const { values } = parseArgs({ options: { output: { type: 'string' }, 'sdk-module': { type: 'string' }, 'candidate-source': { type: 'string' } } });
+  assert.ok(values.output && values['sdk-module'] && values['candidate-source'], 'Use --output <new-directory> --sdk-module <clean installed index.js> --candidate-source <archive provenance JSON>');
+  process.exitCode = await runLifecycle(resolve(values.output), resolve(values['sdk-module']), resolve(values['candidate-source']));
 }

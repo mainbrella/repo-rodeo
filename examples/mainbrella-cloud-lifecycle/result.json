@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "experiment": "mainbrella-deployed-filesystem-lifecycle",
+  "runId": "fd5e31e6-0f37-471b-8274-f0cd736f28d6",
+  "status": "completed_with_sdk_findings",
+  "apiUrl": "https://api.mainbrella.com",
+  "startedAt": "2026-10-12T14:10:25.384Z",
+  "budget": {
+    "maxStarts": 3,
+    "maxCaptures": 2
+  },
+  "sdk": {
+    "version": "0.2.0",
+    "archiveSha256": "23c735a2d831f273628d7e09e85a95a4ba75bf6c7c292c02fe643d2b1e58be02",
+    "qualifiedAt": "2026-10-12T13:45:07.561Z",
+    "source": "clean installation of the locally qualified npm candidate archive"
+  },
+  "deploymentObservations": {
+    "api": {
+      "createdAt": "2026-10-12T13:57:06.773834Z",
+      "versions": [
+        {
+          "version_id": "96f234b3-5065-4116-b47e-7875494f5164",
+          "percentage": 100
+        }
+      ]
+    },
+    "runtime": {
+      "createdAt": "2026-10-12T13:56:34.916206Z",
+      "versions": [
+        {
+          "version_id": "88bcb93d-3e88-41a3-b620-d03ae5aec63b",
+          "percentage": 100
+        }
+      ]
+    }
+  },
+  "runner": {
+    "commit": "60f85944aa4445534c614cec3dfc5457d34d4c0e",
+    "dirty": true
+  },
+  "inputHashes": {
+    "candidate-source.json": "460b6d395f3eb4adc3e7257bf2fee7a3f74bbbf512ba7497eca96ad944cf9903",
+    "package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c",
+    "package.json": "ebd5fe7fcaf7137e1e441a9b57b492604cfa8fb97d422bb9a0a3a4ea96ad6762",
+    "sdk/cli.mjs": "4b76274b5179c060c9e1c520bb81b240edd6921cfcc264678e617b507a1087a7",
+    "sdk/desktop-guest.js": "eab096dd36b50c6418a8c5503907184689b7f4d0b521aa7bdbc6bd243a5fa064",
+    "sdk/desktop.js": "37a889bb13ddbe44488593b03c64241aa53a1fc1144b8fb99c8c530446769b5e",
+    "sdk/file-transfers.js": "fb699ee595216b8db5c617f7d2fefd64aef0abc6bbe62f55f24ce41364be1129",
+    "sdk/file-watch.js": "e1db5439655c5551f6c05dc26cec26ac275abffa40b9a1713070b3fbb403fbff",
+    "sdk/git.js": "3bafde3fa60dd26ad95e70a55693daff568d3038f1786e0308f21b8a20d3372e",
+    "sdk/images.js": "39b2c76f060a9519296c8581966baf34c6dd775c2eb31c556992ff73d25f1e7d",
+    "sdk/index.d.ts": "564d68d321d2553879ccda71af366b49517c36923ac6f3d510afdb5f9ab09d28",
+    "sdk/index.js": "441014991aadaa4c4d9974be5c43f8b04ded1bf05f708c036789ed4bfd6a24c8",
+    "sdk/LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "sdk/managed-pools.js": "78e47c39eae8375cdc6070bedc48e8e4fcba42eb2b792a7b3100e55c3c60bd10",
+    "sdk/mcp.mjs": "4cf7abad2b4a5bd5270f42d217615a45ecea50372d8536c03fc64a4d13d5a6c6",
+    "sdk/network-policy.js": "8611ef871d5cb25d08249ca27f7a9ade62a784106b299f58382d78205d3bb838",
+    "sdk/package.json": "33b1aa7364bc79331119f2eb33194e7e350cb810f1853e6661cbba50f7d21847",
+    "sdk/pool.js": "419345843c3ff58b0bd7b43f0379634be43792430bf156d0202c6c59b088ad9f",
+    "sdk/README.md": "da109728834585aa389cec52bfa9b8bf3207c16ad4f135aa0fddde60fb77a50f",
+    "sdk/watch-guest.js": "46c6bdb6179eefa20c7c9a89c18c36fd2d8eca10223952671601bb7937c2e916",
+    "src/evidence.ts": "e2a148a19d2ee05fc52c4c4d7181adf3a73fb284b987546e5d07b070477cd1ca",
+    "src/lifecycle-experiment.ts": "86a7a091881f368fdfb808bfd067341a5f998b767890fffc2b3ce8fce2da13cc",
+    "tests/lifecycle-experiment.test.ts": "26e98e22b9b476c73d1279d688026b2d00ade8a6b3aac03273de18f921fdab7a"
+  },
+  "checks": {
+    "configurationKeepsSourceProcess": true,
+    "fork": {
+      "sourceAlive": true,
+      "independentWrites": true,
+      "binaryPreserved": true,
+      "freshProcessAndHeap": true,
+      "automaticStartup": true,
+      "replaySameGeneration": true,
+      "successfulReplyLossRecovered": true,
+      "changedBodyRejected": true
+    },
+    "stop": {
+      "stoppedIdentityRetained": true,
+      "snapshotVisible": true,
+      "replaySameWorkspace": true
+    },
+    "stoppedReadDenied": true,
+    "staleReadDenied": true,
+    "staleDeleteDenied": true,
+    "sdkLateStopReplay": false,
+    "resume": {
+      "freshGeneration": true,
+      "freshProcessAndHeap": true,
+      "automaticStartup": true,
+      "binaryAndMetadataPreserved": true,
+      "forkStillIndependent": true,
+      "replayDoesNotRelaunch": true,
+      "lateStopReplayKeepsReplacementRunning": true
+    },
+    "budget": {
+      "starts": 3,
+      "captures": 2,
+      "reservedCaptureBytes": 4000000000
+    }
+  },
+  "processes": {
+    "source": {
+      "fixture": "rodeo-lifecycle",
+      "nonce": "8d633be4-37e7-4d73-bdf3-378ac2bdb3a4",
+      "pid": 33,
+      "heap": 1,
+      "marker": "source",
+      "authorization": null,
+      "cookie": null
+    },
+    "fork": {
+      "fixture": "rodeo-lifecycle",
+      "nonce": "077c0f63-9373-440c-901d-1d1f148d75dd",
+      "pid": 4,
+      "heap": 0,
+      "marker": "source",
+      "authorization": null,
+      "cookie": null
+    },
+    "resume": {
+      "fixture": "rodeo-lifecycle",
+      "nonce": "4b9d9863-a54d-4761-81cc-cd1c4fa5ad25",
+      "pid": 7,
+      "heap": 0,
+      "marker": "source",
+      "authorization": null,
+      "cookie": null
+    }
+  },
+  "sdkFindings": [
+    {
+      "code": "stop_unconfirmed",
+      "operation": "stop replay after resume",
+      "apiSucceededWithoutStoppingReplacement": true
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "confirmed": true,
+    "errors": [],
+    "generations": [
+      {
+        "id": "small",
+        "createdAt": "2026-10-12T14:10:28.713Z"
+      },
+      {
+        "id": "c1",
+        "createdAt": "2026-10-12T14:10:51.746Z"
+      },
+      {
+        "id": "small",
+        "createdAt": "2026-10-12T14:11:18.504Z"
+      }
+    ],
+    "workspaces": [
+      "0ed68649-b240-4118-bdba-6fd7d30d5061",
+      "107c1125-9934-47ac-ab27-c28b43e1a381"
+    ],
+    "originalInventoryPreserved": true,
+    "previewObservations": [
+      {
+        "label": "source",
+        "status": 403
+      },
+      {
+        "label": "fork",
+        "status": 403
+      },
+      {
+        "label": "resume",
+        "status": 403
+      }
+    ]
+  },
+  "limitations": [
+    "Three Lite starts and two full-disk captures, not a performance or price comparison.",
+    "Response loss occurs after successful HTTP headers and a privately retained response, not during snapshot capture.",
+    "HTTP previews are exercised; dashboard browser controls, SSH, WebSockets and Python installed SDK are separate checks.",
+    "The SDK candidate is unpublished. API deletion does not establish physical snapshot erasure.",
+    "Egress and vault are disabled and are not qualified by this lifecycle run."
+  ],
+  "capabilities": {
+    "apiVersion": "2026-10-11",
+    "persistence": {
+      "startupConfiguration": true,
+      "restoreLaunch": true,
+      "filesystemAfterStop": true,
+      "filesystemFork": true,
+      "snapshots": true,
+      "workspaces": true,
+      "exports": true,
+      "memory": false,
+      "volumes": false
+    },
+    "networking": {
+      "outboundInternet": true,
+      "internetControl": false,
+      "privateServices": false,
+      "egressPolicies": false,
+      "regionSelection": false
+    },
+    "secrets": {
+      "vault": false
+    }
+  },
+  "diskReservationBytes": 2000000000,
+  "source": {
+    "id": "small",
+    "createdAt": "2026-10-12T14:10:28.713Z"
+  },
+  "binary": {
+    "bytes": 7,
+    "sha256": "63cb9f7c51e30e458d5ebf3a03bee9e30a41dad7ac8ccd80e7482cd2d0c39c33"
+  },
+  "recipe": {
+    "command": "set -eu\nexec node /workspace/rodeo-lifecycle-server.mjs",
+    "cwd": "/workspace",
+    "readiness": {
+      "port": 3000,
+      "path": "/probe",
+      "timeoutMs": 60000
+    }
+  },
+  "fork": {
+    "id": "c1",
+    "createdAt": "2026-10-12T14:10:51.746Z"
+  },
+  "resume": {
+    "id": "small",
+    "createdAt": "2026-10-12T14:11:18.504Z"
+  },
+  "finishedAt": "2026-10-12T14:11:48.957Z",
+  "evidence": {
+    "privateDirectory": "private",
+    "files": {
+      "full-result.json": "8cf052f972420e2b038dfc55f88a0466f5f469b6f4aa387da78572b4ab2befc3",
+      "inputs/candidate-source.json": "460b6d395f3eb4adc3e7257bf2fee7a3f74bbbf512ba7497eca96ad944cf9903",
+      "inputs/package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c",
+      "inputs/package.json": "ebd5fe7fcaf7137e1e441a9b57b492604cfa8fb97d422bb9a0a3a4ea96ad6762",
+      "inputs/sdk/cli.mjs": "4b76274b5179c060c9e1c520bb81b240edd6921cfcc264678e617b507a1087a7",
+      "inputs/sdk/desktop-guest.js": "eab096dd36b50c6418a8c5503907184689b7f4d0b521aa7bdbc6bd243a5fa064",
+      "inputs/sdk/desktop.js": "37a889bb13ddbe44488593b03c64241aa53a1fc1144b8fb99c8c530446769b5e",
+      "inputs/sdk/file-transfers.js": "fb699ee595216b8db5c617f7d2fefd64aef0abc6bbe62f55f24ce41364be1129",
+      "inputs/sdk/file-watch.js": "e1db5439655c5551f6c05dc26cec26ac275abffa40b9a1713070b3fbb403fbff",
+      "inputs/sdk/git.js": "3bafde3fa60dd26ad95e70a55693daff568d3038f1786e0308f21b8a20d3372e",
+      "inputs/sdk/images.js": "39b2c76f060a9519296c8581966baf34c6dd775c2eb31c556992ff73d25f1e7d",
+      "inputs/sdk/index.d.ts": "564d68d321d2553879ccda71af366b49517c36923ac6f3d510afdb5f9ab09d28",
+      "inputs/sdk/index.js": "441014991aadaa4c4d9974be5c43f8b04ded1bf05f708c036789ed4bfd6a24c8",
+      "inputs/sdk/LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "inputs/sdk/managed-pools.js": "78e47c39eae8375cdc6070bedc48e8e4fcba42eb2b792a7b3100e55c3c60bd10",
+      "inputs/sdk/mcp.mjs": "4cf7abad2b4a5bd5270f42d217615a45ecea50372d8536c03fc64a4d13d5a6c6",
+      "inputs/sdk/network-policy.js": "8611ef871d5cb25d08249ca27f7a9ade62a784106b299f58382d78205d3bb838",
+      "inputs/sdk/package.json": "33b1aa7364bc79331119f2eb33194e7e350cb810f1853e6661cbba50f7d21847",
+      "inputs/sdk/pool.js": "419345843c3ff58b0bd7b43f0379634be43792430bf156d0202c6c59b088ad9f",
+      "inputs/sdk/README.md": "da109728834585aa389cec52bfa9b8bf3207c16ad4f135aa0fddde60fb77a50f",
+      "inputs/sdk/watch-guest.js": "46c6bdb6179eefa20c7c9a89c18c36fd2d8eca10223952671601bb7937c2e916",
+      "inputs/src/evidence.ts": "e2a148a19d2ee05fc52c4c4d7181adf3a73fb284b987546e5d07b070477cd1ca",
+      "inputs/src/lifecycle-experiment.ts": "86a7a091881f368fdfb808bfd067341a5f998b767890fffc2b3ce8fce2da13cc",
+      "inputs/tests/lifecycle-experiment.test.ts": "26e98e22b9b476c73d1279d688026b2d00ade8a6b3aac03273de18f921fdab7a",
+      "receipt-1.json": "8b831af5f659069a96d0cc4f4c560e006d2b4df43191fc0137db85fc3ce4fcfe",
+      "receipt-10.json": "46cca7774b920359ac42d0ff96ab3b3d0e7811ba8c611b03146e99ffe8aceb85",
+      "receipt-11.json": "e3667607b70959457787961c34afba518b83ad535d44db87ac5c1674b4af574f",
+      "receipt-12.json": "27ff8b7fdc0896be061fe9ca8176923a27e76f382d4533b4f668c5b2dd9ccffd",
+      "receipt-13.json": "6c8672de2a0aae7c9da856028c1c0eb09c9d3aacf63fc9b69ee7ffca8f8abc3d",
+      "receipt-14.json": "0a8a9fe1914216e67d20acc6887f81d89d0608b2d64615e3e47c374ae4115857",
+      "receipt-15.json": "380736386880b7937c073e401650defdcaf15bd042c8917be1b62f99cb3ad611",
+      "receipt-16.json": "4d838d8aa3825a0de2f804395505dfac3803bf5a6a6458336aafbb058a0d4da2",
+      "receipt-17.json": "bb6077d70794345a7ef8777082fdf85d080229772f663c58f16e0d7c39d207ef",
+      "receipt-18.json": "55e33a4170c52232750139fde9e5ec2de48d2be3cbc575ec5fc42efa4138d0e9",
+      "receipt-19.json": "c5a587b631b2b2ee2399ebe17762bf88548d8e2e3ca66281d99b2199eaf1cc79",
+      "receipt-2.json": "b0b2e09a7f52cb79656589be7a9593c9fc3b2371d47bc8a0806545e7c02fdc3f",
+      "receipt-20.json": "eca0f81b6f02daa59bd10d47130032658e425f006206937c3fd33b8810b3a62b",
+      "receipt-21.json": "2ee12cb0efd29a50746828cb4bf9cd3c29cf9f771d6157ccf3749626a4734f39",
+      "receipt-22.json": "d2f77920d56f865de466030e3b8615fb61d91c18dee0eaa70f4b0549f2e9dd8c",
+      "receipt-23.json": "aa42213816921f94f402b911df4cf09dcfb24ff9cf34da4d8b96a66074e3de4a",
+      "receipt-24.json": "9454cf06c7a3c3345ba62b774959f7d4337d6b6f3fe811acf17fee81da9fabc8",
+      "receipt-25.json": "85362b9ee4c260241398d626013d3daacf1734cf3857ae9c2ac55023a614f15d",
+      "receipt-26.json": "52b5dfe4b13e30f3a3b003fc17454110b3299e1c2349abc229dece8d402cf368",
+      "receipt-27.json": "93df25b4379d02577d458ba1a66ca16af277b6cdf53e05e8401a1dc046dd8ead",
+      "receipt-28.json": "ec81082895025624e714bdc61e3b5ac1da7c7b7ce8e6b5a1d36d740a96c2c4f4",
+      "receipt-29.json": "db2fc2e79cb5569920f3188cfc31d89e9594279c6f1d6d5ff048ce358a21a8f9",
+      "receipt-3.json": "69ab97b4c090678db479ead89360be64969598478ceb4cb9f7b07c562c7b3a41",
+      "receipt-30.json": "95751340ee1934d21559a0494d7a9613c6dcae4fc1595a988a01cbd2722cdfbc",
+      "receipt-31.json": "87bd7b18ac5f98ac565393f065538200d694d1b2a65993c63008e710a21945d4",
+      "receipt-32.json": "c7cdafae13d8504aa50c6dbfffd0e5ffadb647e9ab9cacdf6da30d9f0246b815",
+      "receipt-33.json": "ab2b57f8d18132bd7591e96954cf98dc823c320a28d031b748896d9da177aac5",
+      "receipt-34.json": "b87f66b66c578d4d0fb488696483823363951092e891410bfdf1979c2cac5af9",
+      "receipt-35.json": "e8a1b92ab0fc16b34b926aa6842ff3698c58138b61e1ea77944a8bdc9f2b224e",
+      "receipt-36.json": "c6c43837be933e75f4d36ac10e1171941580bcd3dfe5f1778c85a7f7b10ae305",
+      "receipt-37.json": "b5dca3324549a373cde73910da53fa077830df961aa414f42f1a607485f7a0a1",
+      "receipt-38.json": "eaa3312fb9dc6b7f84836ceacfd62e9d7b4c4115df85302fc4c266199a5db969",
+      "receipt-39.json": "4db327d4d743b660280558edc5983d8d3b7d6d5bae26a79ac6deddf96ec26db5",
+      "receipt-4.json": "0ea5efe705ac2be10ad208ff9d8d6595a8398d4417ea1df6231c44fd2b44bae4",
+      "receipt-40.json": "22fe0c13d9de44c8c338c85de1b6d6a848dfefb2662cb771ab3b42b5d9f8e78b",
+      "receipt-41.json": "df2b32b20e29696cea47316091f9cf16dd60e577a2e5222f6e72d7cfac384f3d",
+      "receipt-42.json": "270d9fa09a9febdb2d307c09115b16dfd742f6cb2e7dfd74a191733c9ce53cdb",
+      "receipt-43.json": "95705402bc14a1485be357965d8dc723125b33c78c87101d7f77fcb3f47d936a",
+      "receipt-44.json": "92f9461a1bd0cc078f65ed2fc3cfe98f6c29c6e081f4cb2854d5228963e6debd",
+      "receipt-45.json": "4aff90452a6590107376863fdd06107e5caf5345cadb9d4943f261400de60ef5",
+      "receipt-46.json": "4df0ac27c73e9eaa699d9060d0e644f1c136a431b48581f46880f76d4abf9e8c",
+      "receipt-47.json": "7bb36965ca08501e6b2324547b14d7a288301d0797f969cbc3aa97d70f59f37d",
+      "receipt-48.json": "762d81ae98286c8c557b5aae8d36a36a1059b4c1887c5a9c87fd37820bfc0cec",
+      "receipt-49.json": "0c011c566871c9e8fe5ce1e26515dc7fe7fd8421351a9cffcf03f303c5346146",
+      "receipt-5.json": "1a0162edafd153ab1e800bc13da3f9ab29d1f6fd3c52b3411a620221fa355bbb",
+      "receipt-50.json": "2ffdb276b187f7009a6848e33fb3505249e745c3e0796c9a29b79d846d38358d",
+      "receipt-51.json": "bd7250c886a0762feb1014adcb248ca0403249d6e36fa4797165adbe5a3700f5",
+      "receipt-52.json": "b17f9ae1f66daefdeb89a2a2c11bd1f1221a585100b76257da49bb50d40ed1b4",
+      "receipt-53.json": "507a3dc62d625bef1c690873f74b532719e51f5ede3c291f42bb27ba62a008c8",
+      "receipt-54.json": "6fc977e4a8b3606081031ad9ecd8f7f3f81dd867b1fdf008c66c6a29b165e9c5",
+      "receipt-55.json": "84272ed15b778772c2d3f03b81e938a4456d3fd6d2e3dab8c364a1b41acbeced",
+      "receipt-56.json": "fbefb9dad666f632bd640226048dc03ab433638e7557af98f599f184b12816e9",
+      "receipt-57.json": "fe16c40ba126a3e6c887ac5a349948a24de5b1aee1e696e50b71d4bd81e5ba69",
+      "receipt-58.json": "4321bfeb23720f62e19d4c925fdab54d3ad001962da2902d5778167d4ae33e18",
+      "receipt-59.json": "9bbe9fcc7620858dc240bd2791aacf11e6b11f83dee887b9115fd386bd84ef0a",
+      "receipt-6.json": "e7934646ab724885b8cdea72d1c99d75b0d4f3b82727e66056926b0656d7c3f7",
+      "receipt-60.json": "3d19820a68f27f4c3c71fe64689fe4ba69adc49da453986ec6e163404935cf23",
+      "receipt-61.json": "c706a9e7a1f268c285b25430bb32c04cc842516b1a5564a11e3ef3918a71dc09",
+      "receipt-62.json": "13cf632715c806facf9623222d330f0669e84843109e2cc45a54e110b1fd8cb2",
+      "receipt-63.json": "7427bbe5501d7d6a530fca935d307a44bf11a3213d6ac63cd0c0c44b00f1b3df",
+      "receipt-64.json": "8caf75c79f06e1b87925bba1a058b05606950ec0c5578455ef97b16b000953b3",
+      "receipt-7.json": "749d56252b80951701f8a5d3340b623f24640ebcd0b030ade7083286e6614029",
+      "receipt-8.json": "85611d943b4701ac352c740a0d2bf29ce94d93a800fbfac621e31c01726ca6e5",
+      "receipt-9.json": "b942d0a0096ab873f8fc4e21b391b2cc1dbfd2319f1d4b5fce2ffd517a28a7ab",
+      "recovery.json": "eda8705497daa36f33258c1117376c66384fc75f4fd97858cb75f8a22a2eb7d7"
+    }
+  },
+  "accounting": {
+    "startsBefore": 130,
+    "startsAfter": 133,
+    "workspacesBefore": {
+      "saved": 0,
+      "reservedBytes": 0,
+      "savesThisMonth": 12,
+      "captureBytesThisMonth": 78000000000,
+      "retainedCaptureBytes": 78000000000,
+      "captureBudgetResetsAt": 1793491200000,
+      "nextRetainedCaptureReleaseAt": 1796471738902,
+      "nextRetainedCaptureReleaseBytes": 6000000000
+    },
+    "workspacesBeforeCleanup": {
+      "saved": 2,
+      "reservedBytes": 4000000000,
+      "savesThisMonth": 14,
+      "captureBytesThisMonth": 82000000000,
+      "retainedCaptureBytes": 82000000000,
+      "captureBudgetResetsAt": 1793491200000,
+      "nextRetainedCaptureReleaseAt": 1796471738902,
+      "nextRetainedCaptureReleaseBytes": 6000000000
+    },
+    "workspacesAfter": {
+      "saved": 0,
+      "reservedBytes": 0,
+      "savesThisMonth": 14,
+      "captureBytesThisMonth": 82000000000,
+      "retainedCaptureBytes": 82000000000,
+      "captureBudgetResetsAt": 1793491200000,
+      "nextRetainedCaptureReleaseAt": 1796471738902,
+      "nextRetainedCaptureReleaseBytes": 6000000000
+    }
+  }
+}

@@ -73,6 +73,10 @@ filesystem preservation, branch isolation, capture replay after successful
 response headers, API job reconnection and cleanup. All four test generations
 and the workspace were removed; existing account resources were preserved.
 
+The separate [production filesystem lifecycle run](notes/2026-10-12-production-lifecycle.md)
+verified the stop, resume and fork APIs. Cleanup succeeded; the result records one
+unfixed JavaScript SDK finding on a late stop replay.
+
 ## MainBrella experiment
 
 Use a test account with capacity for four containers and one saved workspace, including its full-disk capture reservation. The command reads quotas before creating anything. It never seeds account entitlements or deletes existing account resources to make room.
