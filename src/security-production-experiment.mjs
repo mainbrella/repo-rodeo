@@ -9,14 +9,14 @@ import { parseArgs, parseEnv } from 'node:util';
 import { Mainbrella } from '../../backend/sdk/javascript/index.js';
 import { assessTcpDns } from '../../backend/scripts/security-local-dns.mjs';
 import { assertAcknowledgment, assertNoCredentialLeak } from './security-verifier.ts';
-import { ownsSecurityResource, verifyProductionSecurity } from './security-production-verifier.ts';
+import { ownsSecurityResource, verifiedOnlineControl, verifyProductionSecurity } from './security-production-verifier.ts';
 
 const repository = fileURLToPath(new URL('../', import.meta.url)), backend = resolve(repository, '../backend');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const identity = value => ({ id: value.id, createdAt: value.createdAt });
 const delay = ms => new Promise(done => setTimeout(done, ms));
 
-export async function qualifyProductionSecurity({ output, infrastructure, account, secondaryAccount }) {
+export async function qualifyProductionSecurity({ output, infrastructure, account, secondaryAccount, controlEvidence, spentEvidence, fixtureRevision = false }) {
   assert.ok(output && infrastructure && account && secondaryAccount && account !== secondaryAccount, 'Explicit output, private infrastructure file and two distinct account IDs required');
   const privateFile = resolve(infrastructure);
   assert.equal((await stat(privateFile)).mode & 0o077, 0, 'Infrastructure credentials must be private');
@@ -40,8 +40,39 @@ export async function qualifyProductionSecurity({ output, infrastructure, accoun
       'expiry and provider recovery', 'SSH and browser terminal', 'deployed runtime downgrade and in-flight deployment withdrawal'],
     limitations: ['Private qualification account; passing this bounded canary does not authorize public release.',
       'Credential scan covers workspace, tmp, self environment and argv; snapshots are checked after restore.',
+      'Cleanup confirms API-owned inventories and upstream state; physical provider snapshot erasure is not verified.',
       'A trusted scoped upstream is required; reflection checks cover common encodings, not arbitrary transformations.'],
     cleanup: { completed: false, remainingOwnedContainers: null, remainingOwnedSecrets: null, remainingOwnedWorkspaces: null, upstreamAbsent: false, baselinePreserved: false, errors: [] } };
+  let preceding;
+  if (controlEvidence) {
+    const bytes = await readFile(resolve(controlEvidence)); assertNoCredentialLeak(bytes, credentials); preceding = JSON.parse(bytes);
+    assert.equal(verifiedOnlineControl(preceding, report, fixtureRevision), true, 'Continuation requires cleaned, pinned online control evidence');
+    if (fixtureRevision) {
+      assert.equal(settings.ackRevisionTested?.previous, preceding.deployedVersions.ack);
+      assert.equal(settings.ackRevisionTested?.current, report.deployedVersions.ack, 'Revised fixture must be calibrated before reusing network controls');
+    }
+    report.carriedOnlineStarts = 1; report.budget.maxStarts = 5;
+    report.onlineControl = { sha256: hash(bytes), verified: true, runId: preceding.runId };
+    await writeFile(join(output, 'online-control-result.json'), bytes, { mode: 0o600 });
+    if (fixtureRevision) report.fixtureRevision = { previousAck: preceding.deployedVersions.ack, currentAck: report.deployedVersions.ack,
+      reason: 'Acknowledgment route matcher repaired; API, runtime, relay, image, account and network controls remain pinned.' };
+  }
+  let spent;
+  if (spentEvidence) {
+    assert.ok(preceding, 'Spent admission evidence requires preceding online controls');
+    const bytes = await readFile(resolve(spentEvidence)); assertNoCredentialLeak(bytes, credentials); spent = JSON.parse(bytes);
+    assert.equal(spent.target, report.target); assert.deepEqual(spent.accounts, report.accounts);
+    assert.equal(spent.upstreamOrigin, report.upstreamOrigin); assert.equal(spent.imageDigest, preceding.imageDigest);
+    for (const service of ['api', 'runtime', 'relay']) assert.equal(spent.deployedVersions[service], report.deployedVersions[service]);
+    assert.equal(spent.startsRequested, 1); assert.equal(spent.startDelta, 1); assert.equal(spent.captureDelta, 0); assert.equal(spent.secondaryStartDelta, 0);
+    assert.equal(spent.baseline.starts, preceding.baseline.starts + 1);
+    assert.equal(spent.cleanup.completed, true); assert.deepEqual(spent.cleanup.errors, []);
+    for (const name of ['remainingOwnedContainers', 'remainingOwnedSecrets', 'remainingOwnedWorkspaces']) assert.equal(spent.cleanup[name], 0);
+    assert.equal(spent.cleanup.upstreamAbsent, true); assert.equal(spent.cleanup.baselinePreserved, true);
+    report.spentStarts = 1; report.budget.maxStarts--;
+    report.spentEvidence = { sha256: hash(bytes), verified: true, runId: spent.runId };
+    await writeFile(join(output, 'spent-admission-result.json'), bytes, { mode: 0o600 });
+  }
   const persist = async () => {
     const bytes = JSON.stringify(report, null, 2) + '\n'; assertNoCredentialLeak(bytes, credentials);
     await writeFile(join(output, 'result.json.tmp'), bytes, { mode: 0o600 }); await rename(join(output, 'result.json.tmp'), join(output, 'result.json'));
@@ -119,7 +150,8 @@ export async function qualifyProductionSecurity({ output, infrastructure, accoun
       baselineSecrets = (await client.secrets.list()).secrets; baselineWorkspaces = await client.workspaces.list();
       // Require empty guests so uncertain requests can be reconciled safely.
       assert.equal(baseline.containers.length, 0, 'Primary account already has containers'); assert.equal(baselineSecondary.containers.length, 0, 'Control account already has containers');
-      assert.equal(baseline.active, true); assert.ok(baseline.limits.maxStartsPerMonth - baseline.usage.starts >= 6);
+      assert.equal(baseline.active, true); assert.ok(baseline.limits.maxStartsPerMonth - baseline.usage.starts >= report.budget.maxStarts);
+      if (preceding) assert.equal(baseline.usage.starts, preceding.baseline.starts + 1 + (report.spentStarts ?? 0), 'Another admission occurred after the carried evidence');
       assert.ok(baseline.limits.maxContainers >= 2); assert.ok(baseline.usage.availableComputeUnitHours > 0);
       assert.ok(baselineWorkspaces.limits && baselineWorkspaces.limits.maxSavesPerMonth - baselineWorkspaces.usage.savesThisMonth >= 2, 'Two snapshot captures require budget');
       report.baseline = { starts: baseline.usage.starts, secondaryStarts: baselineSecondary.usage.starts,
@@ -141,6 +173,11 @@ export async function qualifyProductionSecurity({ output, infrastructure, accoun
       assert.deepEqual(await control('POST', { value: token }), { configured: true, version: 1 });
     });
     await phase('online-positive-controls', async () => {
+      if (preceding) {
+        report.imageDigest = preceding.imageDigest; report.onlineProtocols = preceding.onlineProtocols;
+        const reply = await fetch(url('public'), { signal: AbortSignal.timeout(10000) }); assert.equal(reply.status, 200);
+        assertAcknowledgment(await reply.json(), runId, false, 1); report.checks.onlineControls = true; return;
+      }
       const online = await journalStart('online', options => client.create({ catalogId: 'node', size: 'lite', name, ...options })); await upload(online);
       report.imageDigest = online.imageDigest;
       report.onlineProtocols = await probe(online, { protocols: true });
@@ -150,14 +187,19 @@ export async function qualifyProductionSecurity({ output, infrastructure, accoun
       assert.equal((await probe(online, { url: 'https://api.mainbrella.com/capabilities' })).status, 200);
       report.checks.onlineControls = true; await online.kill();
     });
-    const selection = { catalogId: 'node', size: 'lite', name, networkPolicy: { allow: [new URL(upstreamOrigin).hostname], deny: ['api.mainbrella.com'] } };
+    const selection = { catalogId: 'node', size: 'lite', name, networkPolicy: { allow: [new URL(upstreamOrigin).hostname, '1.1.1.0/24'], deny: ['api.mainbrella.com', '1.1.1.0/24'] } };
     await phase('vault-metadata-and-admission', async () => {
       report.secretName = name; await persist();
       secret = await client.secrets.create({ name, value: token, hostname: new URL(upstreamOrigin).hostname, header: 'authorization', prefix: 'Bearer ' }); report.secretId = secret.id; await persist();
       assert.deepEqual(Object.keys(secret).sort(), ['createdAt', 'header', 'hostname', 'id', 'name', 'prefix', 'updatedAt']);
       assert.ok((await client.secrets.list()).secrets.some(value => value.id === secret.id)); report.checks.metadataOnly = true;
       assert.equal((await other.secrets.list()).secrets.some(value => value.id === secret.id), false);
-      await denial(() => other.secrets.rotate(secret.id, rotated), 404); report.checks.crossAccountIsolation = true;
+      await denial(() => other.secrets.rotate(secret.id, rotated), 503);
+      // Deletion is idempotent within the caller's own vault. A foreign ID is
+      // absent there; confirm that its successful no-op preserves the owner.
+      assert.deepEqual(await other.secrets.delete(secret.id), { deleted: true });
+      assert.deepEqual((await client.secrets.list()).secrets.find(value => value.id === secret.id), secret);
+      report.checks.crossAccountIsolation = true;
       const starts = (await client.list()).usage.starts;
       await denial(() => client.request('/containers', { method: 'POST', headers: { 'Idempotency-Key': randomUUID() }, body: { ...selection, internet: true } }), 400);
       assert.equal((await client.list()).usage.starts, starts); report.checks.invalidSelectionDoesNotStart = true;
@@ -177,6 +219,7 @@ export async function qualifyProductionSecurity({ output, infrastructure, accoun
       report.checks.allowedHttps = true; report.checks.guestHeaderSpoofing = true;
       const untrusted = await probe(restricted, { url: url('auth'), tamperCa: true }); assert.equal(untrusted.status, 0); assert.equal(untrusted.transportFailure, true); report.checks.caTampering = true;
       assert.equal((await probe(restricted, { url: 'https://api.mainbrella.com/capabilities' })).status, 403); report.checks.domainDenial = true;
+      const cidrDenied = await probe(restricted, { url: 'http://1.1.1.1/' }); assert.equal(cidrDenied.status, 403); assert.equal(cidrDenied.policyDenied, true); report.checks.cidrDenial = true;
       assert.equal((await probe(restricted, { url: url('redirect') })).status, 403); report.checks.redirectDenial = true;
       for (const action of ['reflect', 'reflect-base64', 'reflect-header']) { const reply = await probe(restricted, { url: url(action) }); assert.equal(reply.status, 403); assert.equal(reply.credentialReflected, false); }
       report.checks.reflectionDenial = true;
@@ -220,12 +263,14 @@ export async function qualifyProductionSecurity({ output, infrastructure, accoun
       assert.equal((await probe(restricted, { url: url('auth') })).status, 403); report.checks.deletedBindingDenial = true; await restricted.kill();
       const empty = await journalStart('empty-allow', options => client.create({ catalogId: 'node', size: 'lite', name, networkPolicy: { allow: [] }, ...options })); await upload(empty);
       assert.equal((await probe(empty, { url: url('public') })).status, 403); report.checks.emptyAllowDenial = true; await empty.kill();
-      const records = await lookup(new URL(upstreamOrigin).hostname, { all: true }); const denied = records.find(value => value.family === 4); assert.ok(denied, 'Owned host requires an IPv4 positive control');
-      const cidr = await journalStart('cidr-deny', options => client.create({ catalogId: 'node', size: 'lite', name, networkPolicy: { allow: [denied.address + '/32'], deny: [denied.address + '/32'] }, ...options })); await upload(cidr);
-      assert.equal((await probe(cidr, { url: `https://${denied.address}/` })).status, 403); report.checks.cidrDenial = true; await cidr.kill();
+      if (!spent) {
+        const records = await lookup(new URL(upstreamOrigin).hostname, { all: true }); const denied = records.find(value => value.family === 4); assert.ok(denied, 'Owned host requires an IPv4 positive control');
+        const cidr = await journalStart('cidr-deny', options => client.create({ catalogId: 'node', size: 'lite', name, networkPolicy: { allow: [denied.address + '/32'], deny: [denied.address + '/32'] }, ...options })); await upload(cidr);
+        assert.equal((await probe(cidr, { url: `http://${denied.address}/` })).policyDenied, true); await cidr.kill();
+      }
       report.startDelta = (await client.list()).usage.starts - baseline.usage.starts; report.secondaryStartDelta = (await other.list()).usage.starts - baselineSecondary.usage.starts;
       report.captureDelta = (await client.workspaces.list()).usage.savesThisMonth - baselineWorkspaces.usage.savesThisMonth;
-      assert.equal(report.startDelta, 6); assert.equal(report.secondaryStartDelta, 0); assert.equal(report.captureDelta, 2); report.checks.exactStartBudget = true;
+      assert.equal(report.startDelta, report.budget.maxStarts); assert.equal(report.secondaryStartDelta, 0); assert.equal(report.captureDelta, 2); report.checks.exactStartBudget = true;
     });
   } catch (error) {
     report.errors.push(error?.status ? `HTTP ${error.status}: ${error.code ?? 'api_error'}` : 'qualification_failed');
@@ -261,8 +306,8 @@ export async function qualifyProductionSecurity({ output, infrastructure, accoun
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
-    const { values } = parseArgs({ options: { output: { type: 'string' }, infrastructure: { type: 'string' }, account: { type: 'string' }, 'secondary-account': { type: 'string' } } });
-    const report = await qualifyProductionSecurity({ output: values.output, infrastructure: values.infrastructure, account: values.account, secondaryAccount: values['secondary-account'] });
+    const { values } = parseArgs({ options: { output: { type: 'string' }, infrastructure: { type: 'string' }, account: { type: 'string' }, 'secondary-account': { type: 'string' }, 'control-evidence': { type: 'string' }, 'spent-evidence': { type: 'string' }, 'fixture-revision': { type: 'boolean' } } });
+    const report = await qualifyProductionSecurity({ output: values.output, infrastructure: values.infrastructure, account: values.account, secondaryAccount: values['secondary-account'], controlEvidence: values['control-evidence'], spentEvidence: values['spent-evidence'], fixtureRevision: values['fixture-revision'] });
     console.log(JSON.stringify({ ok: report.ok, releaseQualified: report.releaseQualified, checksPassed: Object.values(report.checks).filter(Boolean).length, starts: report.startDelta, captures: report.captureDelta, cleanup: report.cleanup.completed, output: resolve(values.output) }));
     process.exitCode = report.interruptedBy === 'SIGINT' ? 130 : report.interruptedBy === 'SIGTERM' ? 143 : report.ok ? 0 : 1;
   } catch { console.error('Security production preflight failed; verify explicit inputs and private credential file.'); process.exitCode = 1; }

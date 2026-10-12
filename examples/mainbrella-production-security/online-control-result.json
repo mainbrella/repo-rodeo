@@ -1,0 +1,346 @@
+{
+  "schemaVersion": 1,
+  "experiment": "mainbrella-egress-vault",
+  "target": "restricted-production-api-runtime-relay-tls",
+  "runId": "0d812f96-8eee-4d4a-b424-91ef8e93791a",
+  "startedAt": "2026-10-12T17:51:05.484Z",
+  "ok": false,
+  "releaseQualified": false,
+  "stage": "completed",
+  "checks": {
+    "accountAllowlist": true,
+    "onlineControls": true,
+    "metadataOnly": true
+  },
+  "errors": [
+    "qualification_failed"
+  ],
+  "accounts": {
+    "primary": "03390581-7080-49a1-a942-ce82476196db",
+    "secondary": "23f9cb5f-ad1b-41bf-8b8b-2385f1b12709"
+  },
+  "deployedVersions": {
+    "relay": "175737e7-c1b7-4610-9d21-87b15209a619",
+    "ack": "921611c2-60ef-494a-ae43-b640137bbea1",
+    "api": "aa8fca89-679b-4456-9c94-93ea66704b8f",
+    "runtime": "cd5e43ce-dc0e-45a5-8aab-189a2d92fbd9"
+  },
+  "budget": {
+    "maxStarts": 6,
+    "maxCaptures": 2,
+    "maxConcurrentGuests": 2,
+    "maxWorkloadMs": 720000
+  },
+  "startsRequested": 1,
+  "upstreamOrigin": "https://mainbrella-security-ack.crimson-dust-553b.workers.dev",
+  "operations": [
+    {
+      "kind": "online",
+      "idempotencyKey": "4828a0c9-f853-47fc-bf52-c59a19e01e96",
+      "identity": {
+        "id": "small",
+        "createdAt": "2026-10-12T17:51:16.471Z"
+      }
+    }
+  ],
+  "identities": [
+    {
+      "id": "small",
+      "createdAt": "2026-10-12T17:51:16.471Z"
+    }
+  ],
+  "receipts": [
+    {
+      "sequence": 1,
+      "method": "GET",
+      "path": "/api-keys/me",
+      "status": 200
+    },
+    {
+      "sequence": 2,
+      "method": "GET",
+      "path": "/api-keys/me",
+      "status": 200
+    },
+    {
+      "sequence": 3,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 4,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 5,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 6,
+      "method": "GET",
+      "path": "/workspaces",
+      "status": 200
+    },
+    {
+      "sequence": 7,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 8,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 9,
+      "method": "POST",
+      "path": "/secrets",
+      "status": 503
+    },
+    {
+      "sequence": 10,
+      "method": "POST",
+      "path": "/containers",
+      "status": 503
+    },
+    {
+      "sequence": 11,
+      "method": "POST",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 12,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 13,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 14,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 15,
+      "method": "GET",
+      "path": "/containers/executions/c3a0e2d2-f8fc-42d9-a530-56c37c10f6da",
+      "status": 200
+    },
+    {
+      "sequence": 16,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 17,
+      "method": "GET",
+      "path": "/containers/executions/c5025d78-24e7-48c9-b154-727c1669824c",
+      "status": 200
+    },
+    {
+      "sequence": 18,
+      "method": "GET",
+      "path": "/containers/executions/c5025d78-24e7-48c9-b154-727c1669824c",
+      "status": 200
+    },
+    {
+      "sequence": 19,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 20,
+      "method": "GET",
+      "path": "/containers/executions/db79b256-77f4-4cda-b781-11bba9384efe",
+      "status": 200
+    },
+    {
+      "sequence": 21,
+      "method": "GET",
+      "path": "/containers/executions/db79b256-77f4-4cda-b781-11bba9384efe",
+      "status": 200
+    },
+    {
+      "sequence": 22,
+      "method": "DELETE",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 23,
+      "method": "POST",
+      "path": "/secrets",
+      "status": 201
+    },
+    {
+      "sequence": 24,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 25,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 26,
+      "method": "PUT",
+      "path": "/secrets/sec_9e95a49f-2795-4efc-95e9-f6a394826a03",
+      "status": 503
+    },
+    {
+      "sequence": 27,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 28,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 29,
+      "method": "DELETE",
+      "path": "/secrets/sec_9e95a49f-2795-4efc-95e9-f6a394826a03",
+      "status": 200
+    },
+    {
+      "sequence": 30,
+      "method": "GET",
+      "path": "/workspaces",
+      "status": 200
+    },
+    {
+      "sequence": 31,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 32,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 33,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 34,
+      "method": "GET",
+      "path": "/workspaces",
+      "status": 200
+    }
+  ],
+  "pending": [
+    "IPv6 and full bypass matrix",
+    "complete image/snapshot credential scan beyond workspace",
+    "expiry and provider recovery",
+    "SSH and browser terminal",
+    "deployed runtime downgrade and in-flight deployment withdrawal"
+  ],
+  "limitations": [
+    "Private qualification account; passing this bounded canary does not authorize public release.",
+    "Credential scan covers workspace, tmp, self environment and argv; snapshots are checked after restore.",
+    "A trusted scoped upstream is required; reflection checks cover common encodings, not arbitrary transformations."
+  ],
+  "cleanup": {
+    "completed": true,
+    "remainingOwnedContainers": 0,
+    "remainingOwnedSecrets": 0,
+    "remainingOwnedWorkspaces": 0,
+    "upstreamAbsent": true,
+    "baselinePreserved": true,
+    "errors": []
+  },
+  "baseline": {
+    "starts": 133,
+    "secondaryStarts": 4,
+    "saves": 14,
+    "secrets": [],
+    "workspaces": []
+  },
+  "revisions": {
+    "runner": {
+      "commit": "a95ad3cab47b638d4aa9c0c7504b4dade12a01f2",
+      "dirty": true
+    },
+    "backend": {
+      "commit": "b5ab7ce594ff0de934117c01c550855459eaa202",
+      "dirty": true
+    }
+  },
+  "inputHashes": {
+    "src/security-production-experiment.mjs": "27b7ffa72a5ace02115bf7335cc5ce52d0d75b5b97a6951b905eccad8db233e9",
+    "src/security-production-verifier.ts": "fa5d78afe23334479fa342a07239749a68e9f7414a6e2cb29fceaaa648b9d744",
+    "src/security-verifier.ts": "c3e4a93d6e9618e6feb07c60136c91421017bba9bddce319bc46e4f731fd929a",
+    "fixtures/security/probe.mjs": "e89b9de228526b9ac9524e3d99232bc6b98dae9b5135bc2f11f5c1d327fd314d",
+    "package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c"
+  },
+  "imageDigest": "registry.cloudflare.com/2b7a9be82bb64187230703b024e25157/mainbrella-terminal@sha256:aabf3a74c14fbdb179c4651798bd1cfbeb8caf5c64eb20b806864211432cfd8e",
+  "onlineProtocols": {
+    "udpTxt": true,
+    "tcpDns": {
+      "responseReceived": true,
+      "validResponse": true,
+      "answered": true,
+      "addresses": [
+        "172.66.147.243",
+        "104.20.23.154"
+      ],
+      "expectedAddressMatched": false,
+      "transactionMatched": true,
+      "questionMatched": true,
+      "responseCode": 0,
+      "receivedBytes": 63
+    },
+    "alternateTlsDns": {
+      "responseReceived": true,
+      "validResponse": true,
+      "answered": true,
+      "addresses": [
+        "172.66.147.243",
+        "104.20.23.154"
+      ],
+      "expectedAddressMatched": false,
+      "transactionMatched": true,
+      "questionMatched": true,
+      "responseCode": 0,
+      "receivedBytes": 63
+    }
+  },
+  "secretName": "Rodeo security 0d812f96-8eee-4d4a-b424-91ef8e93791a",
+  "secretId": "sec_9e95a49f-2795-4efc-95e9-f6a394826a03",
+  "failure": {
+    "stage": "vault-metadata-and-admission",
+    "name": "AssertionError",
+    "message": "Expected HTTP 404"
+  },
+  "startDelta": 1,
+  "secondaryStartDelta": 0,
+  "captureDelta": 0,
+  "finishedAt": "2026-10-12T17:51:36.357Z"
+}

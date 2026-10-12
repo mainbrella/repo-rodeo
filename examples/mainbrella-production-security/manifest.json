@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "files": {
+    "result.json": {
+      "sha256": "1221574bf1db5def627f8056be56e0cc486ee64a7fc1821c4ffbf41eb02d5932",
+      "bytes": 35454
+    },
+    "online-control-result.json": {
+      "sha256": "264b011e8b778a1777f501f5207d4ed35ef96b76e393ea2ca76200c5179eda41",
+      "bytes": 8374
+    },
+    "spent-admission-result.json": {
+      "sha256": "6a185cf55f31c9957d742f3b6c4ea5baed2ffcfb2f772d725423f35464ed20b5",
+      "bytes": 20084
+    },
+    "withdrawal.json": {
+      "sha256": "98571d58913401baa89e8744ab0046bc1fe1b046f03a8315bfa6caa577779caf",
+      "bytes": 1099
+    },
+    "metadata-retry-result.json": {
+      "sha256": "f28a8c26a635de26d54bafcb6f2b188d00dabc83b3a5d7f6b7fdf57a731a3408",
+      "bytes": 6901
+    }
+  }
+}

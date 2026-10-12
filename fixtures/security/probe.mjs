@@ -75,9 +75,10 @@ try {
     const response = await fetch(config.url, { headers: config.headers ?? {}, redirect: 'manual', signal: AbortSignal.timeout(15000) });
     const bytes = Buffer.from(await response.arrayBuffer());
     const credentialReflected = matches(bytes);
-    let acknowledgment;
+    let acknowledgment, policyDenied = false;
     try {
       const body = JSON.parse(bytes.toString('utf8'));
+      policyDenied = response.status === 403 && body.error === 'egress_denied';
       // Allowlist fields; never print arbitrary upstream headers/body to an API job log.
       if (body.fixture === 'rodeo-security') acknowledgment = {
         fixture: body.fixture, runId: body.runId === config.runId ? body.runId : null,
@@ -85,7 +86,7 @@ try {
         internalHeaders: body.internalHeaders !== false,
       };
     } catch {}
-    result = { status: response.status, credentialReflected, cookieRemoved: !response.headers.has('set-cookie'), acknowledgment };
+    result = { status: response.status, credentialReflected, policyDenied, cookieRemoved: !response.headers.has('set-cookie'), acknowledgment };
   }
   console.log(JSON.stringify(result));
 } catch { console.log(JSON.stringify({ status: 0, transportFailure: true })); }

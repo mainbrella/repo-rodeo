@@ -1,0 +1,1456 @@
+{
+  "schemaVersion": 1,
+  "experiment": "mainbrella-egress-vault",
+  "target": "restricted-production-api-runtime-relay-tls",
+  "runId": "7847c0e4-ec33-463c-b594-ffa8ad633bf4",
+  "startedAt": "2026-10-12T18:03:55.629Z",
+  "ok": true,
+  "releaseQualified": false,
+  "stage": "completed",
+  "checks": {
+    "accountAllowlist": true,
+    "onlineControls": true,
+    "metadataOnly": true,
+    "crossAccountIsolation": true,
+    "invalidSelectionDoesNotStart": true,
+    "sameKeyReplay": true,
+    "publicTcpDnsDenial": true,
+    "publicUdpDnsDenial": true,
+    "alternatePortDenial": true,
+    "allowedHttps": true,
+    "guestHeaderSpoofing": true,
+    "caTampering": true,
+    "domainDenial": true,
+    "cidrDenial": true,
+    "redirectDenial": true,
+    "reflectionDenial": true,
+    "rotationDuringRequest": true,
+    "rotation": true,
+    "guestCredentialScan": true,
+    "protectedPreview": true,
+    "previewWebSocket": true,
+    "filesystemFork": true,
+    "staleGeneration": true,
+    "stopResume": true,
+    "snapshotCredentialScan": true,
+    "deletionDuringRequest": true,
+    "deletedBindingDenial": true,
+    "emptyAllowDenial": true,
+    "exactStartBudget": true
+  },
+  "errors": [],
+  "accounts": {
+    "primary": "03390581-7080-49a1-a942-ce82476196db",
+    "secondary": "23f9cb5f-ad1b-41bf-8b8b-2385f1b12709"
+  },
+  "deployedVersions": {
+    "relay": "175737e7-c1b7-4610-9d21-87b15209a619",
+    "ack": "5c412798-46b0-4da6-9f07-2412136fbedc",
+    "api": "aa8fca89-679b-4456-9c94-93ea66704b8f",
+    "runtime": "cd5e43ce-dc0e-45a5-8aab-189a2d92fbd9"
+  },
+  "budget": {
+    "maxStarts": 4,
+    "maxCaptures": 2,
+    "maxConcurrentGuests": 2,
+    "maxWorkloadMs": 720000
+  },
+  "startsRequested": 4,
+  "upstreamOrigin": "https://mainbrella-security-ack.crimson-dust-553b.workers.dev",
+  "operations": [
+    {
+      "kind": "restricted",
+      "idempotencyKey": "a8a093de-bdf5-4464-a0b6-dfff0803d501",
+      "identity": {
+        "id": "small",
+        "createdAt": "2026-10-12T18:04:12.143Z"
+      }
+    },
+    {
+      "kind": "fork",
+      "idempotencyKey": "4548e8c1-9e8c-4a08-a563-cf921b4df74b",
+      "identity": {
+        "id": "c1",
+        "createdAt": "2026-10-12T18:06:00.004Z"
+      },
+      "workspaceId": "a0646f01-7057-438d-a2c4-9d8e1fae141f"
+    },
+    {
+      "kind": "stop",
+      "idempotencyKey": "aaee6c80-0bdd-453c-86be-9a75b487f41a",
+      "identity": {
+        "id": "small",
+        "createdAt": "2026-10-12T18:04:12.143Z"
+      }
+    },
+    {
+      "kind": "resume",
+      "idempotencyKey": "de74b669-870f-48ad-89a1-4b101cc256ba",
+      "identity": {
+        "id": "small",
+        "createdAt": "2026-10-12T18:06:15.193Z"
+      },
+      "workspaceId": "b50f20ee-b038-4241-9bee-fc286aaaf269"
+    },
+    {
+      "kind": "empty-allow",
+      "idempotencyKey": "6ae81c21-3980-4132-9fd7-ca56aae89de2",
+      "identity": {
+        "id": "small",
+        "createdAt": "2026-10-12T18:06:40.368Z"
+      }
+    }
+  ],
+  "identities": [
+    {
+      "id": "small",
+      "createdAt": "2026-10-12T18:04:12.143Z"
+    },
+    {
+      "id": "c1",
+      "createdAt": "2026-10-12T18:06:00.004Z"
+    },
+    {
+      "id": "small",
+      "createdAt": "2026-10-12T18:06:15.193Z"
+    },
+    {
+      "id": "small",
+      "createdAt": "2026-10-12T18:06:40.368Z"
+    }
+  ],
+  "receipts": [
+    {
+      "sequence": 1,
+      "method": "GET",
+      "path": "/api-keys/me",
+      "status": 200
+    },
+    {
+      "sequence": 2,
+      "method": "GET",
+      "path": "/api-keys/me",
+      "status": 200
+    },
+    {
+      "sequence": 3,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 4,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 5,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 6,
+      "method": "GET",
+      "path": "/workspaces",
+      "status": 200
+    },
+    {
+      "sequence": 7,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 8,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 9,
+      "method": "POST",
+      "path": "/secrets",
+      "status": 503
+    },
+    {
+      "sequence": 10,
+      "method": "POST",
+      "path": "/containers",
+      "status": 503
+    },
+    {
+      "sequence": 11,
+      "method": "POST",
+      "path": "/secrets",
+      "status": 201
+    },
+    {
+      "sequence": 12,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 13,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 14,
+      "method": "PUT",
+      "path": "/secrets/sec_75cb24e3-8da0-4e26-ac64-8ac6fa972e2c",
+      "status": 503
+    },
+    {
+      "sequence": 15,
+      "method": "DELETE",
+      "path": "/secrets/sec_75cb24e3-8da0-4e26-ac64-8ac6fa972e2c",
+      "status": 200
+    },
+    {
+      "sequence": 16,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 17,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 18,
+      "method": "POST",
+      "path": "/containers",
+      "status": 400
+    },
+    {
+      "sequence": 19,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 20,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 21,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 22,
+      "method": "POST",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 23,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 24,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 25,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 26,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 27,
+      "method": "POST",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 28,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 29,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 30,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 31,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 32,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 33,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 34,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 35,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 36,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 37,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 38,
+      "method": "GET",
+      "path": "/containers/executions/f7678fcd-d746-430a-b5b3-b4b08942402c",
+      "status": 200
+    },
+    {
+      "sequence": 39,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 40,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 41,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 42,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 43,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 44,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 45,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 46,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 47,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 48,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 49,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 50,
+      "method": "GET",
+      "path": "/containers/executions/7751a387-9dfd-4fd6-8d1e-b27592c09539",
+      "status": 200
+    },
+    {
+      "sequence": 51,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 52,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 53,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 54,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 55,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 56,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 57,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 58,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 59,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 60,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 61,
+      "method": "GET",
+      "path": "/containers/executions/88a52608-def0-4e5a-8545-1ed595cbbb1c",
+      "status": 200
+    },
+    {
+      "sequence": 62,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 63,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 64,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 65,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 66,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 67,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 68,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 69,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 70,
+      "method": "GET",
+      "path": "/containers/executions/3265ccb6-348c-457e-961c-d6b63b919c82",
+      "status": 200
+    },
+    {
+      "sequence": 71,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 72,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 73,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 74,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 75,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 76,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 77,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 78,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 79,
+      "method": "GET",
+      "path": "/containers/executions/9a403a11-0ddb-49bc-9887-eb098cd1a0b2",
+      "status": 200
+    },
+    {
+      "sequence": 80,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 81,
+      "method": "GET",
+      "path": "/containers/executions/d361098e-3601-407d-8568-ef7b704c8237",
+      "status": 200
+    },
+    {
+      "sequence": 82,
+      "method": "GET",
+      "path": "/containers/executions/d361098e-3601-407d-8568-ef7b704c8237",
+      "status": 200
+    },
+    {
+      "sequence": 83,
+      "method": "GET",
+      "path": "/containers/executions/d361098e-3601-407d-8568-ef7b704c8237",
+      "status": 200
+    },
+    {
+      "sequence": 84,
+      "method": "GET",
+      "path": "/containers/executions/d361098e-3601-407d-8568-ef7b704c8237",
+      "status": 200
+    },
+    {
+      "sequence": 85,
+      "method": "GET",
+      "path": "/containers/executions/d361098e-3601-407d-8568-ef7b704c8237",
+      "status": 200
+    },
+    {
+      "sequence": 86,
+      "method": "GET",
+      "path": "/containers/executions/d361098e-3601-407d-8568-ef7b704c8237",
+      "status": 200
+    },
+    {
+      "sequence": 87,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 88,
+      "method": "GET",
+      "path": "/containers/executions/fedf9461-7ccd-42e6-9a93-1dea3aa0dc80",
+      "status": 200
+    },
+    {
+      "sequence": 89,
+      "method": "GET",
+      "path": "/containers/executions/fedf9461-7ccd-42e6-9a93-1dea3aa0dc80",
+      "status": 200
+    },
+    {
+      "sequence": 90,
+      "method": "GET",
+      "path": "/containers/executions/fedf9461-7ccd-42e6-9a93-1dea3aa0dc80",
+      "status": 200
+    },
+    {
+      "sequence": 91,
+      "method": "GET",
+      "path": "/containers/executions/fedf9461-7ccd-42e6-9a93-1dea3aa0dc80",
+      "status": 200
+    },
+    {
+      "sequence": 92,
+      "method": "GET",
+      "path": "/containers/executions/fedf9461-7ccd-42e6-9a93-1dea3aa0dc80",
+      "status": 200
+    },
+    {
+      "sequence": 93,
+      "method": "GET",
+      "path": "/containers/executions/fedf9461-7ccd-42e6-9a93-1dea3aa0dc80",
+      "status": 200
+    },
+    {
+      "sequence": 94,
+      "method": "GET",
+      "path": "/containers/executions/fedf9461-7ccd-42e6-9a93-1dea3aa0dc80",
+      "status": 200
+    },
+    {
+      "sequence": 95,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 96,
+      "method": "GET",
+      "path": "/containers/executions/4aa17be0-3623-44ca-9133-bdb209e5818b",
+      "status": 200
+    },
+    {
+      "sequence": 97,
+      "method": "GET",
+      "path": "/containers/executions/4aa17be0-3623-44ca-9133-bdb209e5818b",
+      "status": 200
+    },
+    {
+      "sequence": 98,
+      "method": "GET",
+      "path": "/containers/executions/4aa17be0-3623-44ca-9133-bdb209e5818b",
+      "status": 200
+    },
+    {
+      "sequence": 99,
+      "method": "GET",
+      "path": "/containers/executions/4aa17be0-3623-44ca-9133-bdb209e5818b",
+      "status": 200
+    },
+    {
+      "sequence": 100,
+      "method": "GET",
+      "path": "/containers/executions/4aa17be0-3623-44ca-9133-bdb209e5818b",
+      "status": 200
+    },
+    {
+      "sequence": 101,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 102,
+      "method": "GET",
+      "path": "/containers/executions/e676cbd6-abfc-4490-902a-eb2dde1fc877",
+      "status": 200
+    },
+    {
+      "sequence": 103,
+      "method": "GET",
+      "path": "/containers/executions/e676cbd6-abfc-4490-902a-eb2dde1fc877",
+      "status": 200
+    },
+    {
+      "sequence": 104,
+      "method": "GET",
+      "path": "/containers/executions/e676cbd6-abfc-4490-902a-eb2dde1fc877",
+      "status": 200
+    },
+    {
+      "sequence": 105,
+      "method": "GET",
+      "path": "/containers/executions/e676cbd6-abfc-4490-902a-eb2dde1fc877",
+      "status": 200
+    },
+    {
+      "sequence": 106,
+      "method": "GET",
+      "path": "/containers/executions/e676cbd6-abfc-4490-902a-eb2dde1fc877",
+      "status": 200
+    },
+    {
+      "sequence": 107,
+      "method": "GET",
+      "path": "/containers/executions/e676cbd6-abfc-4490-902a-eb2dde1fc877",
+      "status": 200
+    },
+    {
+      "sequence": 108,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 109,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 110,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 111,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 112,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 113,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 114,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 115,
+      "method": "PUT",
+      "path": "/secrets/sec_75cb24e3-8da0-4e26-ac64-8ac6fa972e2c",
+      "status": 200
+    },
+    {
+      "sequence": 116,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 117,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 118,
+      "method": "GET",
+      "path": "/containers/executions/502bafd7-3cbd-4351-8ca9-5a6fd9efa532",
+      "status": 200
+    },
+    {
+      "sequence": 119,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 120,
+      "method": "GET",
+      "path": "/containers/executions/65cdce09-68a6-4dda-ad60-e19526bd128b",
+      "status": 200
+    },
+    {
+      "sequence": 121,
+      "method": "GET",
+      "path": "/containers/executions/65cdce09-68a6-4dda-ad60-e19526bd128b",
+      "status": 200
+    },
+    {
+      "sequence": 122,
+      "method": "GET",
+      "path": "/containers/executions/65cdce09-68a6-4dda-ad60-e19526bd128b",
+      "status": 200
+    },
+    {
+      "sequence": 123,
+      "method": "GET",
+      "path": "/containers/executions/65cdce09-68a6-4dda-ad60-e19526bd128b",
+      "status": 200
+    },
+    {
+      "sequence": 124,
+      "method": "GET",
+      "path": "/containers/executions/65cdce09-68a6-4dda-ad60-e19526bd128b",
+      "status": 200
+    },
+    {
+      "sequence": 125,
+      "method": "GET",
+      "path": "/containers/executions/65cdce09-68a6-4dda-ad60-e19526bd128b",
+      "status": 200
+    },
+    {
+      "sequence": 126,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 127,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 128,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 129,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 130,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 131,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 132,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 133,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 134,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 135,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 136,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 137,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 138,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 139,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 140,
+      "method": "GET",
+      "path": "/containers/executions/0548e1db-661f-4c74-8604-c86f57bf3f55",
+      "status": 200
+    },
+    {
+      "sequence": 141,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 142,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 143,
+      "method": "POST",
+      "path": "/containers/previews",
+      "status": 201
+    },
+    {
+      "sequence": 144,
+      "method": "DELETE",
+      "path": "/containers/previews",
+      "status": 200
+    },
+    {
+      "sequence": 145,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 146,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 147,
+      "method": "POST",
+      "path": "/containers/fork",
+      "status": 200
+    },
+    {
+      "sequence": 148,
+      "method": "GET",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 149,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 150,
+      "method": "GET",
+      "path": "/containers/executions/aa1489e6-1a40-49ca-a926-ccc32fe82937",
+      "status": 200
+    },
+    {
+      "sequence": 151,
+      "method": "GET",
+      "path": "/containers/executions/aa1489e6-1a40-49ca-a926-ccc32fe82937",
+      "status": 200
+    },
+    {
+      "sequence": 152,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 153,
+      "method": "GET",
+      "path": "/containers/executions/48015013-7b32-48f0-b4d7-d2360d835532",
+      "status": 200
+    },
+    {
+      "sequence": 154,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 155,
+      "method": "POST",
+      "path": "/containers/stop",
+      "status": 200
+    },
+    {
+      "sequence": 156,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 157,
+      "method": "POST",
+      "path": "/containers/resume",
+      "status": 200
+    },
+    {
+      "sequence": 158,
+      "method": "GET",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 159,
+      "method": "GET",
+      "path": "/containers/files",
+      "status": 409
+    },
+    {
+      "sequence": 160,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 161,
+      "method": "GET",
+      "path": "/containers/executions/23a5d0fb-302d-4d8d-bb91-3106c399ee6f",
+      "status": 200
+    },
+    {
+      "sequence": 162,
+      "method": "GET",
+      "path": "/containers/executions/23a5d0fb-302d-4d8d-bb91-3106c399ee6f",
+      "status": 200
+    },
+    {
+      "sequence": 163,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 164,
+      "method": "GET",
+      "path": "/containers/executions/95c033cb-a70e-480c-9039-68629fd6658d",
+      "status": 200
+    },
+    {
+      "sequence": 165,
+      "method": "DELETE",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 166,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 167,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 168,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 169,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 170,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 171,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 172,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 173,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 174,
+      "method": "DELETE",
+      "path": "/secrets/sec_75cb24e3-8da0-4e26-ac64-8ac6fa972e2c",
+      "status": 200
+    },
+    {
+      "sequence": 175,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 176,
+      "method": "GET",
+      "path": "/containers/executions/c3f4df88-c265-4158-a758-7a4eab90c758",
+      "status": 200
+    },
+    {
+      "sequence": 177,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 178,
+      "method": "GET",
+      "path": "/containers/executions/e7f9fffb-f194-4202-aeba-6c2acdc59354",
+      "status": 200
+    },
+    {
+      "sequence": 179,
+      "method": "GET",
+      "path": "/containers/executions/e7f9fffb-f194-4202-aeba-6c2acdc59354",
+      "status": 200
+    },
+    {
+      "sequence": 180,
+      "method": "GET",
+      "path": "/containers/executions/e7f9fffb-f194-4202-aeba-6c2acdc59354",
+      "status": 200
+    },
+    {
+      "sequence": 181,
+      "method": "GET",
+      "path": "/containers/executions/e7f9fffb-f194-4202-aeba-6c2acdc59354",
+      "status": 200
+    },
+    {
+      "sequence": 182,
+      "method": "GET",
+      "path": "/containers/executions/e7f9fffb-f194-4202-aeba-6c2acdc59354",
+      "status": 200
+    },
+    {
+      "sequence": 183,
+      "method": "DELETE",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 184,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 185,
+      "method": "POST",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 186,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 187,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 188,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 189,
+      "method": "GET",
+      "path": "/containers/executions/21a8563b-71d6-4666-bd0b-3b651b469b30",
+      "status": 200
+    },
+    {
+      "sequence": 190,
+      "method": "DELETE",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 191,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 192,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 193,
+      "method": "GET",
+      "path": "/workspaces",
+      "status": 200
+    },
+    {
+      "sequence": 194,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 195,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 196,
+      "method": "GET",
+      "path": "/workspaces",
+      "status": 200
+    },
+    {
+      "sequence": 197,
+      "method": "DELETE",
+      "path": "/workspaces/a0646f01-7057-438d-a2c4-9d8e1fae141f",
+      "status": 200
+    },
+    {
+      "sequence": 198,
+      "method": "DELETE",
+      "path": "/workspaces/b50f20ee-b038-4241-9bee-fc286aaaf269",
+      "status": 200
+    },
+    {
+      "sequence": 199,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 200,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 201,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 202,
+      "method": "GET",
+      "path": "/workspaces",
+      "status": 200
+    }
+  ],
+  "pending": [
+    "IPv6 and full bypass matrix",
+    "complete image/snapshot credential scan beyond workspace",
+    "expiry and provider recovery",
+    "SSH and browser terminal",
+    "deployed runtime downgrade and in-flight deployment withdrawal"
+  ],
+  "limitations": [
+    "Private qualification account; passing this bounded canary does not authorize public release.",
+    "Credential scan covers workspace, tmp, self environment and argv; snapshots are checked after restore.",
+    "A trusted scoped upstream is required; reflection checks cover common encodings, not arbitrary transformations."
+  ],
+  "cleanup": {
+    "completed": true,
+    "remainingOwnedContainers": 0,
+    "remainingOwnedSecrets": 0,
+    "remainingOwnedWorkspaces": 0,
+    "upstreamAbsent": true,
+    "baselinePreserved": true,
+    "errors": []
+  },
+  "carriedOnlineStarts": 1,
+  "onlineControl": {
+    "sha256": "264b011e8b778a1777f501f5207d4ed35ef96b76e393ea2ca76200c5179eda41",
+    "verified": true,
+    "runId": "0d812f96-8eee-4d4a-b424-91ef8e93791a"
+  },
+  "fixtureRevision": {
+    "previousAck": "921611c2-60ef-494a-ae43-b640137bbea1",
+    "currentAck": "5c412798-46b0-4da6-9f07-2412136fbedc",
+    "reason": "Acknowledgment route matcher repaired; API, runtime, relay, image, account and network controls remain pinned."
+  },
+  "spentStarts": 1,
+  "spentEvidence": {
+    "sha256": "6a185cf55f31c9957d742f3b6c4ea5baed2ffcfb2f772d725423f35464ed20b5",
+    "verified": true,
+    "runId": "d5d334b8-c73e-4d42-97d6-bfe8f6c18cf0"
+  },
+  "baseline": {
+    "starts": 135,
+    "secondaryStarts": 4,
+    "saves": 14,
+    "secrets": [],
+    "workspaces": []
+  },
+  "revisions": {
+    "runner": {
+      "commit": "bd2ff252ce31f763e2715697d8c53d7b98890b29",
+      "dirty": true
+    },
+    "backend": {
+      "commit": "48fdeadc6881920faebe8e338da13114635c9bed",
+      "dirty": true
+    }
+  },
+  "inputHashes": {
+    "src/security-production-experiment.mjs": "f39d23a659f971358652dfbfb1e214928395782c7abb0f2b5cab2fbbbea33db7",
+    "src/security-production-verifier.ts": "347c502ba846313107cbd674785db574d8f0afa4acff2852bca866a14c462580",
+    "src/security-verifier.ts": "c3e4a93d6e9618e6feb07c60136c91421017bba9bddce319bc46e4f731fd929a",
+    "fixtures/security/probe.mjs": "e3f0293c22ce75ce5e16cef4b268dfa14650e9040caceb9b238876b688a55cc0",
+    "package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c"
+  },
+  "imageDigest": "registry.cloudflare.com/2b7a9be82bb64187230703b024e25157/mainbrella-terminal@sha256:aabf3a74c14fbdb179c4651798bd1cfbeb8caf5c64eb20b806864211432cfd8e",
+  "onlineProtocols": {
+    "udpTxt": true,
+    "tcpDns": {
+      "responseReceived": true,
+      "validResponse": true,
+      "answered": true,
+      "addresses": [
+        "172.66.147.243",
+        "104.20.23.154"
+      ],
+      "expectedAddressMatched": false,
+      "transactionMatched": true,
+      "questionMatched": true,
+      "responseCode": 0,
+      "receivedBytes": 63
+    },
+    "alternateTlsDns": {
+      "responseReceived": true,
+      "validResponse": true,
+      "answered": true,
+      "addresses": [
+        "172.66.147.243",
+        "104.20.23.154"
+      ],
+      "expectedAddressMatched": false,
+      "transactionMatched": true,
+      "questionMatched": true,
+      "responseCode": 0,
+      "receivedBytes": 63
+    }
+  },
+  "secretName": "Rodeo security 7847c0e4-ec33-463c-b594-ffa8ad633bf4",
+  "secretId": "sec_75cb24e3-8da0-4e26-ac64-8ac6fa972e2c",
+  "offlineProtocols": {
+    "udpTxt": false,
+    "tcpDns": {
+      "answered": false,
+      "responseReceived": false,
+      "receivedBytes": 0
+    },
+    "alternateTlsDns": {
+      "answered": false,
+      "responseReceived": false,
+      "receivedBytes": 0
+    }
+  },
+  "guestCredentialScan": {
+    "credentialsFound": false,
+    "scannedBytes": 1394180,
+    "skipped": [],
+    "scope": "/workspace, /tmp, self environment and argv"
+  },
+  "previewId": "e2f2de0eb81764bf03a55fca87036f75",
+  "startDelta": 4,
+  "secondaryStartDelta": 0,
+  "captureDelta": 2,
+  "finishedAt": "2026-10-12T18:06:59.834Z"
+}

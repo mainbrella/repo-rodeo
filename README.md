@@ -129,6 +129,12 @@ Unreachable positive controls fail the run. Passing this bounded canary leaves
 `releaseQualified: false` while the report's wider release gates remain open;
 withdraw API access before disabling the private runtime afterward.
 
+The [October 12 production security qualification](notes/2026-10-12-production-security.md)
+passed 29 checks with six total guest starts, two captures and reconciled API
+cleanup. Both production flags were withdrawn afterward. The report records
+the fixture corrections and remaining release gates; the shared relay is
+deployed and has zero running instances after idle shutdown.
+
 The reproduction intentionally fails against the seeded app: five assertions fail and the reset-isolation check passes. It passes all six checks with the correct repair. The misleading patch rerenders the current draft after saving but retains the serialization bug, so the reload checks continue to fail. `REPRO_BASE_URL` can point the verifier at an already-running app, for example:
 
 ```sh

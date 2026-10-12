@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-12T18:08:40.312Z",
+  "apiVersion": "71f2575b-e2c4-424e-9d82-c84415df5305",
+  "runtimeWithdrawn": true,
+  "capabilities": {
+    "primary": {
+      "egressPolicies": false,
+      "vault": false
+    },
+    "excluded": {
+      "egressPolicies": false,
+      "vault": false
+    },
+    "anonymous": {
+      "egressPolicies": false,
+      "vault": false
+    }
+  },
+  "inventory": [
+    {
+      "account": "primary",
+      "starts": 139,
+      "containers": 0
+    },
+    {
+      "account": "excluded",
+      "starts": 4,
+      "containers": 0
+    }
+  ],
+  "runtimeVersion": "2aac23ba-0403-4913-acb4-20afe59c7995",
+  "runtimeFlags": {
+    "egressPolicies": false,
+    "accounts": ""
+  },
+  "completedAt": "2026-10-12T18:09:52.129Z",
+  "relayIdle": {
+    "checkedAt": "2026-10-12T18:11:07.687Z",
+    "state": "ready",
+    "instances": 0
+  },
+  "snapshotCleanup": {
+    "apiWorkspacesDeleted": 2,
+    "providerErasureVerified": false,
+    "providerTtlDays": 30,
+    "documentation": "https://developers.cloudflare.com/containers/api/durable-object-container/#snapshotcontainer"
+  }
+}
