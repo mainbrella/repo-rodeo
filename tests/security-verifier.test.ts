@@ -5,7 +5,7 @@ import type { SecurityReport } from '../src/security-verifier.ts';
 
 const passing = (): SecurityReport => ({ target: 'isolated-local-api-runtime-relay-tls',
   checks: Object.fromEntries(securityChecks.map(name => [name, true])), errors: [],
-  cleanup: { completed: true, remainingContainers: 0, remainingSecrets: 0, remainingDockerContainers: [], errors: [] } });
+  cleanup: { completed: true, remainingContainers: 0, remainingSecrets: 0, remainingDockerContainers: [], remainingWorkspaces: 0, remainingSnapshotImages: [], errors: [] } });
 
 test('local security qualification requires every check and complete resource cleanup', () => {
   assert.equal(verifyLocalSecurity(passing()), true);
@@ -19,6 +19,7 @@ test('failure, interruption, missing inventory and leftover sidecars cannot qual
     { ...passing(), target: 'production' }, { ...passing(), errors: ['failed'] }, { ...passing(), interruptedBy: 'SIGINT' },
     ...[{ completed: false }, { remainingContainers: 1 }, { remainingSecrets: 1 }, { remainingContainers: null },
       { remainingSecrets: null }, { remainingDockerContainers: null }, { remainingDockerContainers: ['sidecar'] },
+      { remainingWorkspaces: 1 }, { remainingWorkspaces: null }, { remainingSnapshotImages: null }, { remainingSnapshotImages: ['snapshot'] },
       { errors: ['cleanup failed'] }].map(change => ({ ...passing(), cleanup: { ...passing().cleanup, ...change } })),
   ];
   for (const report of variants) assert.equal(verifyLocalSecurity(report), false);

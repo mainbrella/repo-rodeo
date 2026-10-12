@@ -65,14 +65,15 @@ npm run qualify:security:local -- \
 This starts an isolated local API and private runtime with
 `EGRESS_POLICIES_ENABLED=true` and `SECRETS_VAULT_ENABLED=true`, disposable D1
 accounts, the actual relay, and a temporary TLS acknowledgment upstream. It
-uses two sequential native Docker starts, no captures, and never loads `.env`,
+uses four native Docker starts and two filesystem captures, and never loads `.env`,
 changes deployment configuration, or uses an existing account. The runner
 inspects and pins the supplied image; it does not pull or build an image.
 
 The checks cover encrypted vault storage, metadata-only APIs, account isolation,
 admission and replay, native HTTP/HTTPS interception, domain/CIDR/mixed-DNS denial,
 redirect and reflection rejection, rotation/deletion during requests, runtime
-incarnation fencing, missing configuration, credential scans and protected HTTP
+incarnation fencing, private account rollout, CA tampering, alternate-port denial,
+filesystem fork/stop/resume, missing configuration, credential scans and protected HTTP
 previews. Online public TCP/UDP DNS controls must succeed before restricted
 denial counts. Cleanup verifies API inventories and removes only this run's
 Docker namespace, including its sidecars.

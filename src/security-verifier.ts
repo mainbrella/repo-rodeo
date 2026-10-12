@@ -8,6 +8,7 @@ export const securityChecks = [
   'incarnationDuringRequest', 'configurationWithdrawal', 'guestCredentialScan',
   'sameKeyReplay', 'exactStartBudget', 'disabledDiscovery',
   'publicTcpDnsDenial', 'publicUdpDnsDenial', 'protectedPreview',
+  'accountAllowlist', 'withdrawalDuringRequest', 'caTampering', 'filesystemFork', 'stopResume', 'snapshotCredentialScan', 'alternatePortDenial',
 ] as const;
 
 export type SecurityCheck = typeof securityChecks[number];
@@ -17,7 +18,7 @@ export type SecurityReport = {
   errors: string[];
   interruptedBy?: string;
   cleanup: { completed: boolean; remainingContainers: number | null; remainingSecrets: number | null;
-    remainingDockerContainers: string[] | null; errors: string[] };
+    remainingDockerContainers: string[] | null; remainingWorkspaces: number | null; remainingSnapshotImages: string[] | null; errors: string[] };
 };
 
 export function verifyLocalSecurity(report: SecurityReport): boolean {
@@ -26,6 +27,8 @@ export function verifyLocalSecurity(report: SecurityReport): boolean {
     && securityChecks.every(name => report.checks[name] === true)
     && report.cleanup.completed === true && report.cleanup.errors.length === 0
     && report.cleanup.remainingContainers === 0 && report.cleanup.remainingSecrets === 0
+    && report.cleanup.remainingWorkspaces === 0
+    && Array.isArray(report.cleanup.remainingSnapshotImages) && report.cleanup.remainingSnapshotImages.length === 0
     && Array.isArray(report.cleanup.remainingDockerContainers) && report.cleanup.remainingDockerContainers.length === 0;
 }
 

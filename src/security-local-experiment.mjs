@@ -57,6 +57,7 @@ export default {...api,fetch(request,env,ctx){const url=new URL(request.url);if(
 const runtimeSource = `import {UserContainer} from './containers/user-container.js';
 export {EgressOutbound,PrivateServiceOutbound} from './containers/user-container.js';
 export class QualificationContainer extends UserContainer {
+  async qualificationSnapshots(){return this.controller.serialized(async()=>{const rows=Object.values(await this.ctx.storage.get('workspaceReceipts')??{});if(rows.some(row=>!row.handle))throw new Error('ambiguous_snapshot_receipt');return rows.map(row=>row.handle);});}
   async fence(){const metadata=await this.ctx.storage.get('builderMachine');metadata.telemetryId=crypto.randomUUID();await this.ctx.storage.put('builderMachine',metadata);}
   async reinstall(){await this.security.install(await this.ctx.storage.get('builderMachine'));}
   setSecurity(value){this.security.env.EGRESS_POLICIES_ENABLED=value;}
@@ -73,7 +74,7 @@ export async function qualifyLocalSecurity({ image, output }) {
   const apiName = `rodeo-security-api-${suffix}`, runtimeName = `rodeo-security-runtime-${suffix}`;
   const report = { schemaVersion: 1, experiment: 'mainbrella-egress-vault', target: 'isolated-local-api-runtime-relay-tls', runId,
     startedAt: new Date().toISOString(), ok: false, releaseQualified: false, checks: {}, errors: [],
-    budget: { maxStarts: 2, captures: 0 }, startsRequested: 0, stage: 'preflight',
+    budget: { maxStarts: 4, captures: 2 }, startsRequested: 0, stage: 'preflight',
     limitations: [
       'Synthetic local prepaid accounts; no production credentials, remote bindings, deployments or billing proof.',
       'Public DNS policy is real relay code with fixture answers; authorized public IPs map to loopback TLS upstreams.',
@@ -81,10 +82,10 @@ export async function qualifyLocalSecurity({ image, output }) {
       'The credential scan covers /workspace, /tmp, self environment and argv; no complete image or snapshot scan.',
       'RPC changes exercise account configuration and runtime incarnation fencing; no provider crash or deployed rollback proof.',
     ],
-    pending: ['deployed API/runtime/relay transport and DNS/TLS', 'IPv6, alternate ports, raw UDP and full bypass matrix',
-      'guest CA tampering', 'snapshot/fork/resume and secret absence from captures', 'expiry and actual provider recovery',
+    pending: ['deployed API/runtime/relay transport and DNS/TLS', 'IPv6 and full bypass matrix',
+      'complete image/snapshot credential scan beyond workspace', 'expiry and actual provider recovery',
       'SSH, browser terminal and preview WebSockets', 'runtime downgrade and deployment gate withdrawal'],
-    cleanup: { completed: false, remainingContainers: null, remainingSecrets: null, remainingDockerContainers: null, errors: [] } };
+    cleanup: { completed: false, remainingContainers: null, remainingSecrets: null, remainingDockerContainers: null, remainingWorkspaces: null, remainingSnapshotImages: null, errors: [] } };
   const credentials = [], servers = [], waits = [];
   const persist = async () => {
     const bytes = JSON.stringify(report, null, 2) + '\n'; assertNoCredentialLeak(bytes, credentials);
@@ -97,6 +98,7 @@ export async function qualifyLocalSecurity({ image, output }) {
   process.on('SIGINT', onSigint); process.on('SIGTERM', onSigterm);
   const timer = setTimeout(() => { report.errors.push('workload_deadline'); abort.abort(); }, 300000);
   let mf, clients = [], cleanupClients = [], accountStub, runtimeStub, config, sequence = 0;
+  const snapshots = new Set(), runtimeNames = new Set();
   const phase = async (stage, action) => { abort.signal.throwIfAborted(); report.stage = stage; console.log(`Security: ${stage}`); await persist(); await bounded(action(), 90000, abort.signal); await persist(); };
   const denial = async (action, status) => {
     await assert.rejects(action(), error => error.status === status, `Expected HTTP ${status} denial`);
@@ -155,7 +157,8 @@ export async function qualifyLocalSecurity({ image, output }) {
     }));
     const portProbe = http.createServer(); const apiPort = await listen(portProbe);
     await new Promise(done => portProbe.close(done));
-    const bindings = { LOCAL_DEV: 'true', LOCAL_PREVIEW_PORT: String(apiPort), PREVIEWS_ENABLED: 'true', PREVIEW_DOMAIN: 'localhost',
+    const bindings = { LOCAL_DEV: 'true', LOCAL_PREVIEW_PORT: String(apiPort), PREVIEWS_ENABLED: 'true', PREVIEW_DOMAIN: 'localhost', SECURITY_FEATURE_ACCOUNTS: '*',
+      WORKSPACE_PERSISTENCE_ENABLED: 'true', WORKSPACE_LIFECYCLE_ENABLED: 'true',
       EGRESS_POLICIES_ENABLED: 'true', SECRETS_VAULT_ENABLED: 'true', EGRESS_RELAY_URL: 'https://relay.example.com/v1/egress',
       EGRESS_RELAY_TOKEN: relayToken, SECRETS_ENCRYPTION_KEY: encryptionKey, BUILD_ENABLED: 'false', ACTIVITY_WEBSOCKET_ENABLED: 'false' };
     const outboundService = async request => {
@@ -244,7 +247,21 @@ export async function qualifyLocalSecurity({ image, output }) {
       assert.equal(report.onlineProtocols.udpTxt, true, 'Online UDP DNS control is unreachable');
       assert.equal(report.onlineProtocols.tcpDns.validResponse, true, 'Online TCP DNS control is indeterminate');
       assert.equal(report.onlineProtocols.tcpDns.answered, true, 'Online TCP DNS control has no answer');
+      assert.equal(report.onlineProtocols.alternateTlsDns.validResponse, true, 'Online alternate-port TLS DNS control is indeterminate');
+      assert.equal(report.onlineProtocols.alternateTlsDns.answered, true);
       await online.kill();
+    });
+    await phase('private-account-rollout', async () => {
+      for (const worker of config.workers) worker.bindings = { ...worker.bindings, SECURITY_FEATURE_ACCOUNTS: clients[0].userId };
+      await mf.setOptions(convertV4MiniflareOptions(config));
+      const accounts = await mf.getDurableObjectNamespace('CONTAINER_ACCOUNT', apiName);
+      accountStub = accounts.get(accounts.idFromName(`account:${clients[0].userId}`));
+      assert.equal((await client.capabilities()).secrets.vault, true);
+      assert.equal((await other.capabilities()).secrets.vault, false);
+      const publicCaps = await (await fetch(baseUrl + '/capabilities')).json(); assert.equal(publicCaps.secrets.vault, false);
+      await denial(() => other.secrets.create({ name: 'denied', value: token, hostname: 'api.example.com', header: 'authorization' }), 503);
+      await denial(() => other.request('/containers', { method: 'POST', body: selection }), 503);
+      assert.equal((await other.list()).usage.starts, 0); report.checks.accountAllowlist = true;
     });
     await phase('native-restricted-guest', async () => {
       report.startsRequested++; report.restrictedKey = randomUUID(); await persist();
@@ -255,15 +272,20 @@ export async function qualifyLocalSecurity({ image, output }) {
       const namespace = await mf.getDurableObjectNamespace('USER_CONTAINER', runtimeName);
       const machineName = restricted.id === 'small' ? `user:${clients[0].userId}` : `user:${clients[0].userId}:slot:${restricted.id.slice(1)}`;
       runtimeStub = namespace.get(namespace.idFromName(machineName));
+      runtimeNames.add(machineName);
       await upload(restricted);
       report.offlineProtocols = await probe(restricted, { protocols: true });
       assert.equal(assessTcpDns(report.onlineProtocols.tcpDns, report.offlineProtocols.tcpDns), 'denied'); report.checks.publicTcpDnsDenial = true;
       assert.equal(report.offlineProtocols.udpTxt, false); report.checks.publicUdpDnsDenial = true;
+      assert.equal(assessTcpDns(report.onlineProtocols.alternateTlsDns, report.offlineProtocols.alternateTlsDns), 'denied'); report.checks.alternatePortDenial = true;
       const plain = await probe(restricted, { url: 'http://api.example.com/public' }); report.httpProbe = plain;
       assert.equal(plain.status, 200); assertAcknowledgment(plain.acknowledgment, runId, false, 1); report.checks.allowedHttp = true;
       const ack = await probe(restricted, { url: 'https://api.example.com/auth', headers: { authorization: 'guest-spoof', 'x-egress-id': 'c999', 'x-mainbrella-user': 'victim' } });
       assert.equal(ack.status, 200); assert.equal(ack.cookieRemoved, true); assertAcknowledgment(ack.acknowledgment, runId, true, 1);
       report.checks.allowedHttps = true; report.checks.guestHeaderSpoofing = true;
+      const untrusted = await probe(restricted, { url: 'https://api.example.com/auth', tamperCa: true });
+      assert.equal(untrusted.status, 0); assert.equal(untrusted.transportFailure, true);
+      assert.equal((await probe(restricted, { protocols: true })).tcpDns.responseReceived, false); report.checks.caTampering = true;
       for (const [name, urls] of [
         ['domainDenial', ['https://denied.example.com/public', 'https://unlisted.example.org/public']],
         ['cidrDenial', ['https://cidr.example.com/public']], ['mixedDnsDenial', ['https://mixed.example.com/public']],
@@ -289,6 +311,9 @@ export async function qualifyLocalSecurity({ image, output }) {
       assert.equal(reply.status, 200); assertAcknowledgment(reply.acknowledgment, runId, true, 2); report.checks.rotation = true;
       await slow(() => runtimeStub.fence()); report.checks.incarnationDuringRequest = true;
       await runtimeStub.reinstall(); assert.equal((await probe(restricted, { url: 'https://api.example.com/auth' })).status, 200);
+      await slow(() => accountStub.setSecurity('SECURITY_FEATURE_ACCOUNTS', ''));
+      assert.equal((await probe(restricted, { url: 'https://api.example.com/auth' })).status, 403);
+      await accountStub.setSecurity('SECURITY_FEATURE_ACCOUNTS', clients[0].userId); report.checks.withdrawalDuringRequest = true;
       for (const [name, enabled, disabled] of [['EGRESS_POLICIES_ENABLED', 'true', 'false'], ['EGRESS_RELAY_TOKEN', relayToken, ''], ['SECRETS_ENCRYPTION_KEY', encryptionKey, '']]) {
         await accountStub.setSecurity(name, disabled);
         try {
@@ -314,10 +339,41 @@ export async function qualifyLocalSecurity({ image, output }) {
         await new Promise(done => setTimeout(done, 100));
       }
       assert.equal(connected, true); await restricted.previews.revoke(link.id); report.checks.protectedPreview = true;
-      await slow(() => client.secrets.delete(secret.id)); report.checks.deletionDuringRequest = true;
+    });
+    await phase('restricted-filesystem-lifecycle', async () => {
+      await restricted.files.write('/workspace/security-marker', Buffer.from(runId));
+      report.forkKey = randomUUID(); report.startsRequested++; await persist();
+      const fork = await restricted.fork({ name: `Rodeo security fork ${runId}`, idempotencyKey: report.forkKey, waitTimeoutMs: 60000, pollIntervalMs: 50 });
+      report.fork = identity(fork);
+      assert.equal(fork.internet, false); assert.deepEqual(fork.secretBindings, [secret.id]);
+      assert.equal(Buffer.from(await fork.files.read('/workspace/security-marker')).toString(), runId);
+      assertAcknowledgment((await probe(fork, { url: 'https://api.example.com/auth' })).acknowledgment, runId, true, 2);
+      const forkScan = await probe(fork, { scan: true }); assert.equal(forkScan.credentialsFound, false); assert.deepEqual(forkScan.skipped, []);
+      const namespace = await mf.getDurableObjectNamespace('USER_CONTAINER', runtimeName);
+      const forkName = fork.id === 'small' ? `user:${clients[0].userId}` : `user:${clients[0].userId}:slot:${fork.id.slice(1)}`;
+      runtimeNames.add(forkName);
+      report.checks.filesystemFork = true;
+      const previous = restricted; report.stopKey = randomUUID(); await persist();
+      await restricted.stop({ idempotencyKey: report.stopKey });
+      report.resumeKey = randomUUID(); report.startsRequested++; await persist();
+      restricted = await previous.resume({ idempotencyKey: report.resumeKey, waitTimeoutMs: 60000, pollIntervalMs: 50 });
+      report.resumed = identity(restricted);
+      assert.equal(restricted.id, previous.id); assert.notEqual(restricted.createdAt, previous.createdAt);
+      assert.equal(restricted.internet, false); assert.deepEqual(restricted.secretBindings, [secret.id]);
+      assert.equal(Buffer.from(await restricted.files.read('/workspace/security-marker')).toString(), runId);
+      await denial(() => previous.files.read('/workspace/security-marker'), 409);
+      assertAcknowledgment((await probe(restricted, { url: 'https://api.example.com/auth' })).acknowledgment, runId, true, 2);
+      const scan = await probe(restricted, { scan: true }); assert.equal(scan.credentialsFound, false); assert.deepEqual(scan.skipped, []);
+      report.checks.stopResume = true; report.checks.snapshotCredentialScan = true;
+      await fork.kill();
+    });
+    await phase('binding-deletion', async () => {
+      const wait = upstream.hold(); waits.push(wait); const pending = probe(restricted, { url: 'https://api.example.com/slow' }); void pending.catch(() => {});
+      try { await bounded(wait.received, 15000, abort.signal); await client.secrets.delete(secret.id); } finally { try { wait.release(); } catch {} }
+      assert.equal((await pending).status, 403); report.checks.deletionDuringRequest = true;
       assert.equal((await probe(restricted, { url: 'https://api.example.com/auth' })).status, 403); report.checks.deletedBindingDenial = true;
       assert.deepEqual((await client.secrets.list()).secrets, []);
-      assert.equal((await client.list()).usage.starts, 2); assert.equal((await other.list()).usage.starts, 0); report.checks.exactStartBudget = true;
+      assert.equal((await client.list()).usage.starts, 4); assert.equal((await other.list()).usage.starts, 0); report.checks.exactStartBudget = true;
       await restricted.kill();
     });
     await phase('disabled-api-gates', async () => {
@@ -336,27 +392,34 @@ export async function qualifyLocalSecurity({ image, output }) {
     clearTimeout(timer); report.stage = 'cleanup'; await persist();
     for (const wait of waits) { try { wait.release(); } catch {} }
     if (mf) {
+      const namespace = await mf.getDurableObjectNamespace('USER_CONTAINER', runtimeName);
+      for (const name of runtimeNames) try { const stub = namespace.get(namespace.idFromName(name)); for (const handle of await bounded(stub.qualificationSnapshots(), 10000)) if (handle.id) snapshots.add(handle.id); } catch { report.cleanup.errors.push('snapshot_inventory_failed'); }
       for (const client of cleanupClients) try {
         // Each account/key was created exclusively in this run's isolated D1.
         // Recover accepted requests from its inventory, then fence exact identities.
         for (const value of (await client.list()).containers) await client.connect(identity(value)).kill();
         for (const secret of (await client.secrets.list()).secrets) await client.secrets.delete(secret.id);
+        for (const workspace of (await client.workspaces.list()).workspaces) await client.workspaces.delete(workspace.id);
       } catch { report.cleanup.errors.push('api_cleanup_failed'); }
       try {
-        report.cleanup.remainingContainers = 0; report.cleanup.remainingSecrets = 0;
-        for (const client of cleanupClients) { report.cleanup.remainingContainers += (await client.list()).containers.length; report.cleanup.remainingSecrets += (await client.secrets.list()).secrets.length; }
-      } catch { report.cleanup.remainingContainers = null; report.cleanup.remainingSecrets = null; report.cleanup.errors.push('api_inventory_failed'); }
+        report.cleanup.remainingContainers = 0; report.cleanup.remainingSecrets = 0; report.cleanup.remainingWorkspaces = 0;
+        for (const client of cleanupClients) { report.cleanup.remainingContainers += (await client.list()).containers.length; report.cleanup.remainingSecrets += (await client.secrets.list()).secrets.length; report.cleanup.remainingWorkspaces += (await client.workspaces.list()).workspaces.length; }
+      } catch { report.cleanup.remainingContainers = null; report.cleanup.remainingSecrets = null; report.cleanup.remainingWorkspaces = null; report.cleanup.errors.push('api_inventory_failed'); }
       try { await bounded(mf.dispose(), 20000); } catch { report.cleanup.errors.push('runtime_dispose_failed'); }
     }
     for (const server of servers.reverse()) { server.closeAllConnections(); await bounded(new Promise(done => server.close(done)), 5000).catch(() => report.cleanup.errors.push('fixture_shutdown_failed')); }
     try {
       const owned = docker(['ps', '-a', '--format', '{{.ID}}\t{{.Names}}']).split('\n').filter(line => line.split('\t')[1]?.startsWith(`workerd-${runtimeName}-`)).map(line => line.split('\t')[0]);
       if (owned.length) docker(['rm', '-f', ...owned]);
+      for (const id of snapshots) { assert.match(id, /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/); docker(['image', 'rm', `workerd-container-snap-${id}:latest`]); }
+      report.cleanup.remainingSnapshotImages = docker(['image', 'ls', '--format', '{{.Repository}}:{{.Tag}}']).split('\n').filter(name => [...snapshots].some(id => name === `workerd-container-snap-${id}:latest`));
+      if (report.cleanup.remainingSnapshotImages.length) report.cleanup.errors.push('snapshot_cleanup_failed');
       report.cleanup.remainingDockerContainers = docker(['ps', '-a', '--format', '{{.Names}}']).split('\n').filter(name => name.startsWith(`workerd-${runtimeName}-`));
     } catch { report.cleanup.errors.push('docker_cleanup_failed'); }
     await rm(work, { recursive: true, force: true });
     report.cleanup.completed = report.cleanup.errors.length === 0 && report.cleanup.remainingContainers === 0
-      && report.cleanup.remainingSecrets === 0 && report.cleanup.remainingDockerContainers?.length === 0;
+      && report.cleanup.remainingSecrets === 0 && report.cleanup.remainingWorkspaces === 0
+      && report.cleanup.remainingSnapshotImages?.length === 0 && report.cleanup.remainingDockerContainers?.length === 0;
     report.finishedAt = new Date().toISOString(); report.stage = 'completed'; report.ok = verifyLocalSecurity(report); await persist();
     await writeFile(join(output, 'result.sha256'), hash(await readFile(join(output, 'result.json'))) + '  result.json\n', { flag: 'wx', mode: 0o600 });
     process.off('SIGINT', onSigint); process.off('SIGTERM', onSigterm);
