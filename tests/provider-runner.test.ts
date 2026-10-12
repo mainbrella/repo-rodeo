@@ -6,7 +6,7 @@ import test, { type TestContext } from 'node:test';
 import { runProvider } from '../src/provider-runner.ts';
 import { MainbrellaAdapter } from '../src/providers/mainbrella.ts';
 import { hashFiles, sha256 } from '../src/evidence.ts';
-import type { Capabilities, Execution, Inventory, PreparedState, ProviderAdapter, Sandbox } from '../src/providers/interface.ts';
+import type { Capabilities, Execution, Inventory, WorkspaceUsage, PreparedState, ProviderAdapter, Sandbox } from '../src/providers/interface.ts';
 
 async function fixture(t: TestContext) {
   const directory = await mkdtemp(join(tmpdir(), 'rodeo-runner-test-'));
@@ -20,7 +20,7 @@ async function fixture(t: TestContext) {
       'filesystem-fork': { status: 'unsupported', reason: 'fixture' }, 'memory-fork': { status: 'unsupported', reason: 'fixture' },
       volume: { status: 'unsupported', reason: 'fixture' }, 'warm-pool': { status: 'unsupported', reason: 'fixture' },
     } };
-  const inventory: Inventory = { activeContainers: 0, sandboxes: [], containerLimits: { maxContainers: 4 }, workspaces: [],
+  const inventory: Inventory & { workspaceUsage: WorkspaceUsage } = { activeContainers: 0, sandboxes: [], containerLimits: { maxContainers: 4 }, workspaces: [],
     workspaceLimits: { maxSaved: 20, maxReservedBytes: 160e9, maxSavesPerMonth: 100, maxCaptureBytesPerMonth: 400e9, maxRetainedCaptureBytes: 400e9 },
     workspaceUsage: { saved: 0, reservedBytes: 0, savesThisMonth: 0, captureBytesThisMonth: 0, retainedCaptureBytes: 0 } };
   const completed: Execution = { id: 'job', status: 'succeeded', exitCode: 0, timedOut: false, outputTruncated: false, stdout: '', stderr: '', cursor: 0 };
@@ -96,7 +96,7 @@ test('missing deployed mode is unsupported; incomplete cleanup still prevents su
   assert.equal(failed.status, 'failed');
 });
 
-async function successfulFixture(t: TestContext, leak?: 'source' | 'marker') {
+async function successfulFixture(t: TestContext, leak?: 'source' | 'marker', memoryFork = false) {
   const f = await fixture(t);
   const states = new Map<string, { hashes: Record<string, string>; prepared: string; branchMarker: string | null;
     process: { nonce: string | null; pid: number | null; serverReachable: boolean; observedAt: string } }>();
@@ -118,6 +118,7 @@ async function successfulFixture(t: TestContext, leak?: 'source' | 'marker') {
     if (request.name === 'guest-tools') return { ...completed, stdout: JSON.stringify({ node: '24.21.0', npm: '11.19.0' }) };
     if (request.name === 'source-markers') state.prepared = request.argv.at(-1)!;
     if (request.name.endsWith('-write-marker')) state.branchMarker = request.argv.at(-1)!;
+    if (request.name.endsWith('-stop-inherited-server')) state.process = { nonce: null, pid: null, serverReachable: false, observedAt: '' };
     if (request.name.endsWith('-patch')) {
       state.hashes = await hashFiles(join(f.options.output, 'private', `source-${sandbox.id}`));
       if (sandbox.id === 'misleading' && leak === 'source') states.get('correct')!.hashes = { ...state.hashes };
@@ -136,16 +137,20 @@ async function successfulFixture(t: TestContext, leak?: 'source' | 'marker') {
       f.inventory.workspaceUsage = { saved: 1, reservedBytes: 8e9, savesThisMonth: 1,
         captureBytesThisMonth: 8e9, retainedCaptureBytes: 8e9 };
     }
-    return { id: 'prepared', mode: 'saved-workspace', preservation: 'filesystem', source, bytes: 100, receipt };
+    return { id: 'prepared', mode: memoryFork ? 'memory-fork' : 'saved-workspace', preservation: memoryFork ? 'filesystem+memory' : 'filesystem', source, bytes: 100, receipt };
   };
   f.adapter.spawn = async (_prepared, request) => {
     const id = request.name.replace('-restore', '');
     f.calls.push(`spawn-${id}`);
-    states.set(id, { ...createState(), prepared: states.get('source')!.prepared });
+    states.set(id, { ...createState(), prepared: states.get('source')!.prepared,
+      ...(memoryFork ? { process: { ...states.get('source')!.process } } : {}) });
     return { sandbox: { id, generation: `${id}-generation` }, receipt };
   };
   f.adapter.preview = async sandbox => ({ id: `preview-${sandbox.id}`, url: `https://secret-preview.example.test/${sandbox.id}`, expiresAt: null });
-  f.adapter.startJob = async () => { f.calls.push('reattach-job'); return { ...completed, status: 'running', exitCode: null }; };
+  f.adapter.startJob = async (sandbox, request) => {
+    if (request.name.endsWith('-launch')) return f.adapter.execute(sandbox, request);
+    f.calls.push('reattach-job'); return { ...completed, status: 'running', exitCode: null };
+  };
   f.adapter.getJob = async () => ({ ...completed, stdout: 'rodeo-reconnect-start\nrodeo-reconnect-done' });
   f.adapter.readEvents = async (_sandbox, _job, cursor) => cursor === 0
     ? { text: 'rodeo-reconnect-start', cursor: 1 } : { text: 'rodeo-reconnect-done', cursor: 2 };
@@ -165,6 +170,7 @@ async function successfulFixture(t: TestContext, leak?: 'source' | 'marker') {
         verifiedExpectedFailure: !url.endsWith('/correct'), reason: 'Fixture verifier result', tests: [], browserVersion: 'fixture' };
     },
   };
+  if (memoryFork) f.caps.modes['memory-fork'] = { status: 'supported', reason: 'Test memory fork' };
   return { ...f, services, reconnectClients: () => reconnectClients };
 }
 
@@ -196,6 +202,16 @@ test('successful runner prepares, restores and verifies three controls, reconnec
   for (const [file, digest] of Object.entries(result.evidence.files)) {
     assert.equal(sha256(await readFile(join(f.options.output, 'private', file))), digest, file);
   }
+});
+
+test('memory-fork runner verifies inherited listeners and process state before stopping and restarting each control', async t => {
+  const f = await successfulFixture(t, undefined, true);
+  const result = await runProvider({ ...f.options, provider: 'e2b', apiUrl: 'https://api.e2b.dev', mode: 'memory-fork' }, f.services);
+  assert.equal(result.status, 'complete', result.errors.join('\n'));
+  assert.equal(result.checks.processes.status, 'verified');
+  assert.match(result.checks.processes.detail, /retained the listener, nonce and PID/);
+  assert.equal(result.checks.captureIdempotency.status, 'unsupported');
+  for (const id of ['baseline', 'correct', 'misleading']) assert.ok(f.calls.includes(`${id}-stop-inherited-server`));
 });
 
 for (const leak of ['source', 'marker'] as const) {

@@ -9,7 +9,8 @@ const respond = (_request, response) => {
 if (process.argv[2] === 'web-checkout') {
   const { createServer } = await import('vite');
   const server = await createServer({
-    server: { host: '0.0.0.0', port: 5173, strictPort: true, hmr: false, allowedHosts: ['container'] },
+    server: { host: '0.0.0.0', port: 5173, strictPort: true, hmr: false,
+      allowedHosts: ['container', ...(process.env.RODEO_ALLOWED_HOSTS || '').split(',').filter(Boolean)] },
     plugins: [{ name: 'rodeo-process-probe', configureServer(server) {
       server.middlewares.use('/__rodeo_process', respond);
     } }],

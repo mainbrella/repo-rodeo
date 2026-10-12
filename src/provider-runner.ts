@@ -16,6 +16,7 @@ import { redact } from './experiment-result.ts';
 import type { Check, ExperimentResult } from './experiment-result.ts';
 import type { Execution, ExperimentMode, Inventory, Operation, Preview, ProcessProbe, ProviderAdapter, ProviderName, Sandbox } from './providers/interface.ts';
 import { MainbrellaAdapter } from './providers/mainbrella.ts';
+import { E2BAdapter } from './providers/e2b.ts';
 
 const repository = fileURLToPath(new URL('../', import.meta.url));
 export interface ProviderRunOptions {
@@ -53,7 +54,7 @@ function requireSuccess(job: Execution) {
 export function checkCapacity(inventory: Inventory, diskBytes: number) {
   const limits = inventory.workspaceLimits;
   const usage = inventory.workspaceUsage;
-  if (!limits) throw new Error('Workspace quotas are unavailable; use an account with saved-workspace access');
+  if (!limits || !usage) throw new Error('Workspace quotas are unavailable; use an account with saved-workspace access');
   if (!Number.isFinite(diskBytes) || diskBytes <= 0 ||
     ![usage.saved, usage.reservedBytes, usage.savesThisMonth, usage.captureBytesThisMonth, usage.retainedCaptureBytes,
       limits.maxSaved, limits.maxReservedBytes, limits.maxSavesPerMonth, limits.maxCaptureBytesPerMonth, limits.maxRetainedCaptureBytes,
@@ -71,7 +72,7 @@ export function checkCapacity(inventory: Inventory, diskBytes: number) {
 }
 
 export async function runProvider(options: ProviderRunOptions, services: RunServices = {
-  adapter: options => new MainbrellaAdapter(options), verify: verifyPreview, previewStatus,
+  adapter: config => options.provider === 'e2b' ? new E2BAdapter(config) : new MainbrellaAdapter(config), verify: verifyPreview, previewStatus,
 }): Promise<ExperimentResult> {
   const runId = `${options.provider}-${new Date().toISOString().replace(/[:.]/g, '-')}-${randomUUID().slice(0, 8)}`;
   const output = resolve(options.output || join(repository, 'artifacts', runId));
@@ -107,16 +108,27 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     return JSON.parse(text);
   };
   const launch = async (sandbox: Sandbox, name: string) => {
-    requireSuccess(await adapter!.execute(sandbox, {
+    const request = {
       ...operation(`${name}-launch`), cwd: '/workspace/rodeo',
-      env: { VITE_API_URL: options.apiUrl },
+      env: { VITE_API_URL: options.provider === 'e2b' ? 'http://localhost:8787' : options.apiUrl,
+        ...(options.provider === 'e2b' ? { RODEO_ALLOWED_HOSTS: '.e2b.app' } : {}) },
       argv: ['/bin/sh', '-c', `setsid node rodeo-server.mjs ${result.source.kind} > /workspace/rodeo-server.log 2>&1 < /dev/null &`],
-    }));
+    };
+    let server: Execution | undefined;
+    if (options.provider === 'e2b') {
+      server = await adapter!.startJob(sandbox, { ...request, timeoutMs: 30 * 60_000,
+        argv: ['node', 'rodeo-server.mjs', result.source.kind] });
+      await writeJson(join(privateDirectory, `${name}-server-job.json`), server);
+    } else requireSuccess(await adapter!.execute(sandbox, request));
     // The managed launcher exiting is not proof that its detached HTTP server is ready.
     for (let attempt = 0; attempt < 15; attempt++) {
       const state = await inspect(sandbox, `${name}-ready-${attempt}`);
       if (state.process.serverReachable) return state;
       await pause(500, undefined, { signal: abort.signal });
+    }
+    if (server) {
+      try { await writeJson(join(privateDirectory, `${name}-server-diagnostics.json`), await adapter!.getJob(sandbox, server.id)); }
+      catch { /* Preserve the original readiness failure. */ }
     }
     throw new Error('Guest HTTP server did not become ready');
   };
@@ -124,12 +136,13 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     const preview = await adapter!.preview(sandbox, { ...operation(`${name}-preview`), port: 5173 });
     previews.push({ sandbox, preview });
     await writeFile(join(privateDirectory, 'previews.json'), `${JSON.stringify(previews, null, 2)}\n`, { mode: 0o600 });
-    if (await services.previewStatus(preview.url, '/repo-rodeo-bug') !== 200) throw new Error('Preview readiness did not return HTTP 200');
+    if (preview.headers && await services.previewStatus(preview.url, '/repo-rodeo-bug') !== 403) throw new Error('Protected preview did not reject unauthenticated access');
+    if (await services.previewStatus(preview.url, '/repo-rodeo-bug', preview.headers) !== 200) throw new Error('Preview readiness did not return HTTP 200');
     return preview;
   };
   try {
     progress(`Evidence: ${output}`);
-    if (options.provider !== 'mainbrella') {
+    if (options.provider === 'daytona') {
       result.status = 'unsupported';
       result.errors.push(`${options.provider} adapter is not implemented. No provider requests were made.`);
       return result;
@@ -139,13 +152,13 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     const playwrightVersion = JSON.parse(await readFile(join(repository, 'node_modules/@playwright/test/package.json'), 'utf8')).version;
     result.environment.host.playwright = playwrightVersion;
     if (playwrightVersion !== scenario.runtime.playwright) throw new Error('Pinned Playwright is required; run npm ci');
-    if (!options.apiKey) throw new Error('Set MAINBRELLA_API_KEY for the test account');
+    if (!options.apiKey) throw new Error(`Set ${options.provider === 'e2b' ? 'E2B_API_KEY' : 'MAINBRELLA_API_KEY'} for the test account`);
     const api = new URL(options.apiUrl);
     if (api.username || api.password || api.search || api.hash || api.pathname !== '/') throw new Error('MAINBRELLA_API_URL must be an origin without credentials');
     const local = ['localhost', '127.0.0.1', '[::1]'].includes(api.hostname);
     if (api.protocol !== 'https:' && !(local && api.protocol === 'http:')) throw new Error('Remote API origins require HTTPS');
     result.scope = local ? 'local-api' : 'cloud-api';
-    await writeJson(join(privateDirectory, 'connection.json'), { schemaVersion: 1, provider: 'mainbrella', apiUrl: api.origin });
+    await writeJson(join(privateDirectory, 'connection.json'), { schemaVersion: 1, provider: options.provider, apiUrl: api.origin });
     adapter = services.adapter({ apiUrl: api.origin, apiKey: options.apiKey, directory: privateDirectory });
     result.capabilities = await adapter.capabilities();
     const mode = result.capabilities.modes[options.mode];
@@ -160,14 +173,29 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     const resource = result.capabilities.resources.find(resource => resource.id === options.size);
     if (!resource) throw new Error('Requested size is absent from the deployment resource catalog');
     Object.assign(result.environment.requested, { cpuVcpu: resource.cpuVcpu, memoryMiB: resource.memoryMiB, diskGB: resource.diskGB });
-    checkCapacity(before, resource.diskGB * 1_000_000_000);
+    if (options.provider === 'mainbrella') {
+      if (!resource.diskGB) throw new Error('Provider disk size is unavailable');
+      checkCapacity(before, resource.diskGB * 1_000_000_000);
+    }
     const inputs = join(privateDirectory, 'inputs');
     result.source.inputHashes = await snapshotInputs(repository, inputs);
     const source = await prepareSource({ repository, inputs, directory: privateDirectory, scenario, source: options.source, sourceRef: options.sourceRef });
     result.source.commit = source.commit;
     result.source.archiveSha256 = sha256(source.archive);
     progress('Preparing one source container.');
-    const { sandbox } = await adapter.create({ ...operation('source-create', 180_000), image: 'node', size: options.size });
+    if (options.provider === 'e2b') result.environment.requested.image = 'base';
+    const { sandbox } = await adapter.create({ ...operation('source-create', 180_000), image: result.environment.requested.image, size: options.size });
+    if (options.provider === 'e2b') {
+      assert.match(scenario.runtime.node, /^\d+\.\d+\.\d+$/);
+      const archive = `node-v${scenario.runtime.node}-linux-x64.tar.xz`;
+      requireSuccess(await adapter.execute(sandbox, { ...operation('source-runtime', 300_000), argv: ['/bin/sh', '-c',
+        `set -eu; test "$(uname -m)" = x86_64; mkdir -p /tmp/rodeo-runtime /opt/rodeo-node; cd /tmp/rodeo-runtime; ` +
+        `curl -fsSLO https://nodejs.org/dist/v${scenario.runtime.node}/${archive}; ` +
+        `curl -fsSLO https://nodejs.org/dist/v${scenario.runtime.node}/SHASUMS256.txt; ` +
+        `awk '$2 == "${archive}" { print; count++ } END { if (count != 1) exit 1 }' SHASUMS256.txt > runtime.sha256; ` +
+        `sha256sum --check --status runtime.sha256; tar -xJf ${archive} -C /opt/rodeo-node --strip-components=1; /opt/rodeo-node/bin/node --version`,
+      ] }));
+    }
     await adapter.upload(sandbox, { ...operation('source-upload', 300_000), path: '/workspace/rodeo.tar.gz', bytes: source.archive });
     requireSuccess(await adapter.execute(sandbox, { ...operation('source-extract'), argv: ['/bin/sh', '-c', 'mkdir -p /workspace/rodeo && tar -xzf /workspace/rodeo.tar.gz -C /workspace/rodeo'] }));
     for (const [name, path, bytes] of [
@@ -190,21 +218,24 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     assert.deepEqual(original.hashes, source.hashes, 'Source integrity failed before capture');
     if (source.kind === 'web-checkout') assert.ok(original.dependencyHash, 'Installed dependency lockfile missing');
     const sourcePreview = await publish(sandbox, 'source');
-    const baseline = await services.verify({ repository, directory: join(privateDirectory, 'prepared-baseline'), url: sourcePreview.url, seed: options.seed, scenario, signal: abort.signal });
+    const baseline = await services.verify({ repository, directory: join(privateDirectory, 'prepared-baseline'), url: sourcePreview.url, headers: sourcePreview.headers, seed: options.seed, scenario, signal: abort.signal });
     if (baseline.status !== 'reproduced') throw new Error('Prepared baseline was not verified; capture and candidates were not started');
 
     progress('Capturing the prepared filesystem and restoring three controls.');
-    activeCheck = options.checkIdempotency ? 'captureIdempotency' : undefined;
-    const captureOperation = { ...operation('prepared-capture', 180_000), mode: options.mode, dropResponseAfterHeaders: options.checkIdempotency };
+    const checkIdempotency = options.checkIdempotency && options.provider === 'mainbrella';
+    if (options.checkIdempotency && !checkIdempotency) result.checks.captureIdempotency = { status: 'unsupported', detail: 'E2B has no documented keyed create/fork/snapshot replay contract; no response-loss mutation was reissued.' };
+    activeCheck = checkIdempotency ? 'captureIdempotency' : undefined;
+    const captureOperation = { ...operation('prepared-capture', 180_000), mode: options.mode, dropResponseAfterHeaders: checkIdempotency };
     const prepared = await adapter.capture(sandbox, captureOperation);
     result.storage.captureBytes = prepared.bytes;
     const afterCapture = await adapter.inventory();
     result.storage.afterCapture = afterCapture.workspaceUsage;
-    if (options.checkIdempotency) {
+    if (checkIdempotency) {
       const replay = await adapter.capture(sandbox, captureOperation);
       const afterReplay = await adapter.inventory();
       assert.equal(replay.id, prepared.id, 'Capture replay returned another workspace');
       assert.deepEqual(afterReplay.workspaceUsage, afterCapture.workspaceUsage, 'Replay changed workspace reservations');
+      assert.ok(afterCapture.workspaceUsage && before.workspaceUsage && resource.diskGB, 'Capture accounting is unavailable');
       assert.equal(afterCapture.workspaceUsage.savesThisMonth - before.workspaceUsage.savesThisMonth, 1, 'Capture count did not increase by one');
       assert.equal(afterCapture.workspaceUsage.captureBytesThisMonth - before.workspaceUsage.captureBytesThisMonth, resource.diskGB * 1_000_000_000, 'Unexpected capture reservation');
       assert.equal(afterCapture.workspaceUsage.retainedCaptureBytes - before.workspaceUsage.retainedCaptureBytes, resource.diskGB * 1_000_000_000, 'Unexpected retained reservation');
@@ -226,7 +257,19 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       assert.equal(restored.link, original.link, 'Prepared symlink changed');
       assert.equal(restored.dependencyHash, original.dependencyHash, 'Prepared dependencies changed');
       activeCheck = 'processes';
-      assert.equal(restored.process.serverReachable, false, 'Filesystem restore unexpectedly retained a listener');
+      if (prepared.preservation === 'filesystem+memory') {
+        assert.equal(restored.process.serverReachable, true, 'Memory fork lost its listener');
+        assert.equal(restored.process.nonce, original.process.nonce, 'Memory fork lost the source nonce');
+        assert.equal(restored.process.pid, original.process.pid, 'Memory fork changed the source PID');
+        assert.ok(Number.isInteger(restored.process.pid) && restored.process.pid! > 1, 'Memory fork process PID is invalid');
+        requireSuccess(await adapter.execute(branch, { ...operation(`${control.id}-stop-inherited-server`), argv: ['node', '-e',
+          "process.kill(Number(process.argv[1]),'SIGTERM')", String(restored.process.pid)] }));
+        for (let attempt = 0; attempt < 15; attempt++) {
+          if (!(await inspect(branch, `${control.id}-stopped-${attempt}`)).process.serverReachable) break;
+          if (attempt === 14) throw new Error('Inherited server did not stop before patch verification');
+          await pause(100, undefined, { signal: abort.signal });
+        }
+      } else assert.equal(restored.process.serverReachable, false, 'Filesystem restore unexpectedly retained a listener');
       activeCheck = 'isolation';
       assert.equal(restored.branchMarker, null, 'Restore contained another branch marker');
       requireSuccess(await adapter.execute(branch, { ...operation(`${control.id}-write-marker`), argv: ['node', '-e',
@@ -245,7 +288,7 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       assert.ok(running.process.nonce && running.process.nonce !== original.process.nonce, 'Restored server reused source process state');
       branches.push({ id: control.id, sandbox: branch, nonce: running.process.nonce, hashes: record.sourceHashes });
       const preview = await publish(branch, control.id);
-      const verification = await services.verify({ repository, directory: join(privateDirectory, control.id), url: preview.url, seed: options.seed, scenario, signal: abort.signal });
+      const verification = await services.verify({ repository, directory: join(privateDirectory, control.id), url: preview.url, headers: preview.headers, seed: options.seed, scenario, signal: abort.signal });
       result.controls[result.controls.length - 1].verification = verification;
       progress(`${control.id}: ${verification.status}`);
       assert.deepEqual((await inspect(branch, `${control.id}-after-tests`)).hashes, record.sourceHashes, 'Guest source changed during verification');
@@ -267,7 +310,9 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     result.checks.filesystem = verified(`Three restores retained source hashes, prepared marker, permissions and symlink${source.kind === 'web-checkout' ? ', plus installed dependencies without another npm ci' : '; the standalone fixture has no install step'}.`);
     activeCheck = 'processes';
     assert.equal(new Set(branches.map(branch => branch.nonce)).size, 3, 'Restored servers reused a process nonce');
-    result.checks.processes = verified('Source nonce/PID survived capture; each restore had no listener, then a distinct nonce after explicitly starting a server.');
+    result.checks.processes = verified(prepared.preservation === 'filesystem+memory'
+      ? 'Source nonce/PID survived capture; each memory fork retained the listener, nonce and PID. Its inherited server was stopped, then explicitly restarted with a distinct nonce for patch verification.'
+      : 'Source nonce/PID survived capture; each restore had no listener, then a distinct nonce after explicitly starting a server.');
     activeCheck = 'jobReattachment';
     if (result.capabilities.jobReattachment) {
       const job = await adapter.startJob(sandbox, { ...operation('reattach-job', 30_000), argv: ['node', '-e',
@@ -287,7 +332,9 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       const remaining = await secondClient.readEvents(sandbox, job.id, first.cursor);
       assert.ok(remaining.text.includes('rodeo-reconnect-done'), 'Cursor replay lost remaining output');
       await writeJson(join(privateDirectory, 'reattachment.json'), { executionId: job.id, first, record, remaining });
-      result.checks.jobReattachment = verified('An API SSE client disconnected after initial output; a new client recovered the same execution ID, exit 0 and remaining output from its cursor. Dashboard/browser session reconnection was not exercised.');
+      result.checks.jobReattachment = verified(options.provider === 'e2b'
+        ? 'An E2B SDK command stream disconnected after initial output; a new SDK client reconnected to the same sandbox and command PID. It recovered exit 0 and durable guest stdout, then read the remaining bytes from the saved offset. This is not server-side SSE cursor replay or dashboard reconnection.'
+        : 'An API SSE client disconnected after initial output; a new client recovered the same execution ID, exit 0 and remaining output from its cursor. Dashboard/browser session reconnection was not exercised.');
     } else result.checks.jobReattachment = { status: 'unsupported', detail: 'Deployment does not advertise managed execution reconnection.' };
     activeCheck = undefined;
     const current: Record<string, string> = {};
@@ -318,7 +365,7 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       if (previews.length) {
         const statuses: number[] = [];
         for (const { preview } of previews) {
-          try { statuses.push(await services.previewStatus(preview.url, '/repo-rodeo-bug')); } catch { statuses.push(0); }
+          try { statuses.push(await services.previewStatus(preview.url, '/repo-rodeo-bug', preview.headers)); } catch { statuses.push(0); }
         }
         await writeJson(join(privateDirectory, 'preview-revocation.json'), { statuses });
         result.checks.previewRevocation = statuses.every(status => status === 404 || status === 410)
@@ -334,12 +381,12 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     try {
       result.evidence.files = await sealProviderEvidence(privateDirectory);
       result.evidence.publicObservations = await exportObservations(privateDirectory, join(output, 'observations'), result.controls,
-        [options.apiKey || '', ...previews.map(item => item.preview.url)]);
+        [options.apiKey || '', ...previews.flatMap(item => [item.preview.url, ...Object.values(item.preview.headers ?? {})])]);
     } catch {
       result.errors.push('Evidence export failed; inspect the private evidence before sharing.');
       result.status = 'failed';
     }
-    await writeJson(join(output, 'result.json'), redact(result, [options.apiKey || '', ...previews.map(item => item.preview.url)]));
+    await writeJson(join(output, 'result.json'), redact(result, [options.apiKey || '', ...previews.flatMap(item => [item.preview.url, ...Object.values(item.preview.headers ?? {})])]));
     await writeFile(join(output, 'result.sha256'), `${sha256(await readFile(join(output, 'result.json')))}  result.json\n`, { flag: 'wx' });
     progress(`Result: ${join(output, 'result.json')} (${result.status})`);
   }
@@ -350,15 +397,17 @@ export async function cleanupRun(directory: string, apiKey: string) {
   const output = resolve(directory);
   const privateDirectory = join(output, 'private');
   const config = JSON.parse(await readFile(join(privateDirectory, 'connection.json'), 'utf8'));
-  if (config.provider !== 'mainbrella' || config.schemaVersion !== 1) throw new Error('Unsupported cleanup metadata');
-  const adapter = new MainbrellaAdapter({ apiUrl: config.apiUrl, apiKey, directory: privateDirectory });
+  if (!['mainbrella', 'e2b'].includes(config.provider) || config.schemaVersion !== 1) throw new Error('Unsupported cleanup metadata');
+  const adapter = config.provider === 'e2b'
+    ? new E2BAdapter({ apiUrl: config.apiUrl, apiKey, directory: privateDirectory })
+    : new MainbrellaAdapter({ apiUrl: config.apiUrl, apiKey, directory: privateDirectory });
   const cleanup = await adapter.cleanup();
   let previews: { preview: Preview }[] = [];
   try { previews = JSON.parse(await readFile(join(privateDirectory, 'previews.json'), 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   const statuses = [];
   for (const { preview } of previews) {
-    try { statuses.push(await previewStatus(preview.url, '/repo-rodeo-bug')); } catch { statuses.push(0); }
+    try { statuses.push(await previewStatus(preview.url, '/repo-rodeo-bug', preview.headers)); } catch { statuses.push(0); }
   }
   const report = { schemaVersion: 2, kind: 'cleanup-reconciliation', completedAt: new Date().toISOString(), cleanup,
     previewStatuses: statuses, confirmed: cleanup.confirmed && statuses.every(status => status === 404 || status === 410) };

@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": "22.22.2", "npm": "10.9.7" },
+  "engines": {
+    "node": "22.22.2",
+    "npm": "10.9.7"
+  },
   "packageManager": "npm@10.9.7",
   "scripts": {
     "fixture": "node fixtures/editor/app/server.mjs",
@@ -17,5 +20,8 @@
     "@playwright/test": "1.63.0",
     "@types/node": "22.20.5",
     "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "e2b": "2.55.0"
   }
 }

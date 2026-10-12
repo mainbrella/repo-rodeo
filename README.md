@@ -2,7 +2,7 @@
 
 Repo Rodeo makes a bug reproduction and its proposed repairs inspectable. The first milestone is a local, repeatable experiment around a deliberately broken editor: run the same browser reproduction against the seeded app, a correct repair, and a plausible patch that leaves the bug in place.
 
-The standalone runner uses deterministic patches in temporary working copies. A tracked MainBrella adapter now runs the same scenario through its container API, saved workspaces, and protected previews. E2B and Daytona adapters and AI repair agents remain future work. Local temporary copies are not security sandboxes for untrusted code. The [provider contract and run guide](src/providers/README.md) describe the supported modes and evidence format.
+The standalone runner uses deterministic patches in temporary working copies. Tracked MainBrella and E2B adapters implement the scenario through their provider APIs and protected previews; full automated cloud qualification remains pending. Daytona and AI repair agents remain future work. Local temporary copies are not security sandboxes for untrusted code. The [provider contract and run guide](src/providers/README.md) describe the supported modes and evidence format.
 
 A separate [first local Mainbrella run](notes/2026-10-11-local-mainbrella.md) tests the full sibling `../web` checkout through the running Mainbrella API and OrbStack containers. It records provisioning, protected previews, saved-workspace restores, deterministic controls, browser reconnection, interrupted capture retry, and cleanup. That historical result came from the manual harness; it does not qualify the new adapter, production, E2B, or Daytona. Its [public observation bundle](notes/evidence/mainbrella-local-20261011-01/manifest.json) supplements the sanitized result without publishing bearer preview URLs.
 
@@ -88,9 +88,24 @@ npm run experiment -- --provider mainbrella \
 Every provider command writes a version-2 `result.json`, checksum, and allowlisted `observations/`. Raw API receipts, request keys, source archives, browser reports, traces, screenshots, and preview URLs stay in `private/`. Share only the sanitized result and observation files. The raw bundle is private even after previews expire.
 
 ```sh
-npm run experiment -- --provider e2b       # unsupported result, exit 2
+npm run experiment -- --provider e2b       # E2B_API_KEY; native memory-fork, base template
 npm run experiment -- --provider daytona   # unsupported result, exit 2
 npm run experiment -- --cleanup artifacts/<run-directory>
 ```
 
 Cleanup reconciles uncertain creates/saves with their persisted keys, deletes only recorded generations/workspaces, and checks inventory and known preview URLs. It writes a separate reconciliation report without replacing the original result. Retry within the API's idempotency retention window; an expired unresolved operation remains unconfirmed. API deletion does not establish physical snapshot reclamation. See the [provider run guide](src/providers/README.md) for limitations and follow-up experiments.
+
+## E2B experiment
+
+Set `E2B_API_KEY` in the host environment. The default mode uses one native fork
+request for three branches, with explicit 30-minute sandbox lifetimes and protected
+traffic. The guest pins Node `22.22.2` before preparation. E2B's persistent
+filesystem-only snapshots are a separate `--mode saved-workspace` path.
+
+The [first E2B cloud notes](notes/2026-10-11-e2b.md) record setup success and the
+remaining browser-preview authorization blocker. The last cloud run stopped
+before capture and confirmed API cleanup; its failed result is retained. The
+subsequent redirect-auth fix passed a local Chromium check and still needs cloud
+qualification. E2B does not implement MainBrella's keyed replay guarantee, and
+recovery currently requires the exact original E2B key. No comparison of provider
+performance or cost is claimed.

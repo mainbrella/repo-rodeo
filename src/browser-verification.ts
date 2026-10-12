@@ -7,7 +7,7 @@ import type { Scenario } from './scenario.ts';
 import { verifyReport } from './verifier.ts';
 
 export async function verifyPreview(options: {
-  repository: string; directory: string; url: string; seed: number; scenario: Scenario; signal: AbortSignal;
+  repository: string; directory: string; url: string; seed: number; scenario: Scenario; signal: AbortSignal; headers?: Record<string, string>;
 }) {
   const { repository, directory, url, seed, scenario, signal } = options;
   await mkdir(directory);
@@ -17,6 +17,7 @@ export async function verifyPreview(options: {
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/MAINBRELLA|API_KEY|TOKEN|SECRET|PASSWORD/i.test(key)));
   const processResult = await execute(process.execPath, args, {
     cwd: repository, env: { ...env, REPRO_BASE_URL: url, RODEO_SEED: String(seed),
+      RODEO_PREVIEW_HEADERS: JSON.stringify(options.headers ?? {}),
       RODEO_JSON_REPORT: join(directory, 'report.json'), RODEO_TEST_OUTPUT: join(directory, 'test-results') },
     stdout: join(directory, 'stdout.log'), stderr: join(directory, 'stderr.log'), timeoutMs: 180_000, signal,
   });

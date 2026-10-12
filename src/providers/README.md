@@ -1,6 +1,6 @@
 # Provider acceptance plan
 
-**Status: MainBrella saved-workspace adapter implemented; new adapter end-to-end qualification pending.** The [manual local run](../../notes/2026-10-11-local-mainbrella.md) exercises the real API and OrbStack containers. It is evidence for that historical harness, not automatic qualification of this implementation. E2B, Daytona, and production comparison runs remain planned.
+**Status: MainBrella and E2B adapters implemented; full tracked qualification pending.** The [manual local run](../../notes/2026-10-11-local-mainbrella.md) exercises the real MainBrella API and OrbStack containers. It is evidence for that historical harness, not automatic qualification of this implementation. The [E2B cloud attempt](../../notes/2026-10-11-e2b.md) reached setup and authenticated HTTP readiness but stopped at an unverified browser baseline. Daytona and production comparison runs remain planned.
 
 ## Tracked command
 
@@ -23,7 +23,27 @@ Quota preflight requires space for four generations and one full-disk save, incl
 
 ## Result and recovery contract
 
-All three provider selections emit [`ExperimentResult` schema version 2](../experiment-result.ts). E2B/Daytona currently emit `unsupported` without network requests, with exit 2. MainBrella's `saved-workspace` is the only implemented mode. `filesystem-fork`, `memory-fork`, `volume`, and `warm-pool` retain distinct names and report `unsupported` or `not-implemented` from discovery; the runner does not silently substitute a restore. The default standalone `--provider local` runner retains its original version-1 manifest.
+All three provider selections emit [`ExperimentResult` schema version 2](../experiment-result.ts). Daytona currently emits `unsupported` without network requests, with exit 2. MainBrella implements `saved-workspace`; E2B implements `memory-fork` and the separate filesystem-only snapshot `saved-workspace` path. Other modes retain distinct names and report `unsupported` or `not-implemented`; the runner does not silently substitute a restore. The default standalone `--provider local` runner retains its original version-1 manifest.
+
+For E2B, set `E2B_API_KEY` and run `npm run experiment -- --provider e2b --seed 12345`.
+It defaults to the `base` template, `memory-fork`, and the official cloud API.
+One fork call requests three branches with 30-minute lifetimes. The runner checks
+their inherited listener, nonce and PID, then stops each copied server and launches
+a new one for patch verification. Protected HTTP/browser requests use a traffic
+token restricted to that preview origin. Same-origin redirects are bounded.
+Guest Node is checksum-verified and pinned before preparation; the verifier stays
+outside every guest.
+
+E2B mutation retries are disabled because there is no documented keyed replay
+contract. `--check-idempotency` reports unsupported and never injects/replays a lost
+mutation. A completed local operation journal may return its retained result;
+that is not provider idempotency evidence. Ambiguous provisioning remains
+unconfirmed even after cleanup removes discovered run-tagged resources. Recovery
+requires the exact authenticated key fingerprint; rotated-key recovery is not
+supported because the API-key interface does not expose team identity. Workspace
+reservation counters, capture bytes, resource limits and prices are not invented
+when absent from the API. Its command reconnection uses the SDK PID and durable
+guest stdout with a byte offset, not a server SSE cursor.
 
 - Exit 0: expected controls, implemented lifecycle checks, input integrity and API cleanup confirmed.
 - Exit 1: a failed or unverified operation, check or cleanup; partial evidence is retained.
@@ -31,7 +51,13 @@ All three provider selections emit [`ExperimentResult` schema version 2](../expe
 
 Each new output directory contains `result.json`, `result.sha256`, `observations/`, and `private/`. Only the first three are intended for sharing. Observation export allowlists document fields, omits arbitrary metadata, and redacts URLs/credentials. Those observations supplement the result; re-running the strict verifier also requires private trace/screenshot artifacts. `private/` contains the exact inputs, archive, patches, before/after observations, browser results, request journals, each response attempt, and ownership records. Its request/response files have private permissions; provider API credentials are not journaled or uploaded. Protected preview URLs are bearer credentials and remain private.
 
-Operations persist a stable name, generated idempotency key, exact body, and timestamps before network submission. Retries preserve the body and key. MainBrella preview issuance is not idempotent and is never blindly replayed. Cleanup also handles unknown preview issuance by destroying its owned generation.
+MainBrella operations persist a stable name, generated idempotency key, exact
+HTTP body, and timestamps before network submission. Retries preserve the body
+and key. Its preview issuance is not idempotent and is never blindly replayed.
+Cleanup also handles unknown preview issuance by destroying its owned generation.
+E2B journals preserve logical SDK inputs and receipts, not raw protocol bodies or
+credentials; its unknown mutations are never replayed. Upload payloads become
+durable before a journal can reference them.
 
 Before the result is finalized, the current journal is copied into
 `private/journal-snapshot/`. The result hashes that snapshot and the retained
@@ -43,7 +69,17 @@ checksummed evidence.
 npm run experiment -- --cleanup artifacts/<run-directory>
 ```
 
-Use the same account key. Recovery replays unresolved create/capture requests only within their retention window and removes exact recorded generations/workspace IDs. Generation reuse cannot authorize deletion of the replacement. A lost response outside retention, corrupt journal, or inconclusive inventory leaves cleanup unconfirmed. The original result is immutable; recovery writes a separate timestamped report. Catchable signals enter cleanup; after a hard kill, use this command.
+MainBrella persists the authenticated account ID and API origin before any provider
+request journal. Cleanup verifies it before replay, deletion, or inventory
+confirmation; another account is rejected and rotated keys for the original account
+are accepted. Old runs without that binding are not automatically adopted.
+Recovery replays unresolved create/capture requests only within their retention
+window and removes exact recorded generations/workspace IDs. Generation reuse cannot
+authorize deletion of a replacement. E2B uses the stricter exact-key binding above
+and never reissues uncertain mutations. Corrupt journals or inconclusive inventory
+leave cleanup unconfirmed. The original result is immutable; recovery writes a
+separate timestamped report. Catchable signals enter cleanup; after a hard kill,
+use this command with the appropriate provider key.
 
 API deletion revokes restores and releases live quota, but it is **not proof of physical snapshot deletion**. No Docker pruning is performed. The [first-run follow-up](../../notes/2026-10-11-local-mainbrella.md#accounting-and-follow-up) records a prospective physical-retention deadline and independent scoped inventory checks. Full-disk capture reservations, measured capture bytes, Docker image size, and unique physical disk consumption are separate quantities. Pricing comparison is deferred until matched cloud runs and actual charges are available.
 
@@ -72,4 +108,12 @@ Use one pinned source commit, lockfile, scenario, external Playwright suite, ima
 
 ## Receipt and result rules
 
-Every implemented adapter mutation persists its exact request before submission and retains timestamps and raw evidence. Only operations with documented keyed idempotency send an idempotency key; preview issuance explicitly lacks that guarantee. Stop/resume, native fork, volumes and warm pools remain future acceptance experiments. Use explicit timeouts. Report unsupported capabilities and partial failures as outcomes, not as provider-wide failures or successes. Keep provider compute, persistent storage, model inference, and idle-resource cost as separate measured categories. Do not add fake adapters or synthetic provider results to the local experiment.
+Every implemented adapter mutation records its inputs before submission and
+retains timestamps and evidence. MainBrella retains exact HTTP bodies; E2B records
+SDK inputs. Only operations with documented keyed idempotency send an idempotency
+key. E2B native fork is implemented but remains live unqualified; MainBrella native
+fork, pause/resume, volumes, and warm pools remain future acceptance experiments.
+Use explicit timeouts. Report unsupported capabilities and partial failures as
+outcomes, not as provider-wide failures or successes. Keep provider compute,
+persistent storage, model inference, and idle-resource cost as separate measured
+categories. Do not add fake adapters or synthetic provider results to the local experiment.

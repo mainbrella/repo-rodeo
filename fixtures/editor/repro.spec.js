@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { test, expect } from '@playwright/test';
+import { test, expect } from './preview-auth.js';
 
 const scenario = JSON.parse(await readFile(new URL('./scenario.json', import.meta.url), 'utf8'));
 const seed = Number(process.env.RODEO_SEED || '12345');

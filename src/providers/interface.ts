@@ -13,7 +13,7 @@ export interface Capabilities {
   managedJobs: boolean;
   jobReattachment: boolean;
   apiVersion: string | null;
-  resources: { id: string; cpuVcpu: number; memoryMiB: number; diskGB: number }[];
+  resources: { id: string; cpuVcpu?: number; memoryMiB?: number; diskGB?: number }[];
 }
 export interface Operation {
   // Stable within a run; persist the key and exact body before network I/O.
@@ -52,7 +52,7 @@ export interface Execution {
   stderr: string;
   cursor: number;
 }
-export interface Preview { id: string; url: string; expiresAt: string | null }
+export interface Preview { id: string; url: string; expiresAt: string | null; headers?: Record<string, string> }
 export interface WorkspaceUsage {
   saved: number;
   reservedBytes: number;
@@ -65,7 +65,7 @@ export interface Inventory {
   activeContainers: number;
   containerLimits: { maxContainers: number } | null;
   workspaces: { id: string }[];
-  workspaceUsage: WorkspaceUsage;
+  workspaceUsage: WorkspaceUsage | null;
   workspaceLimits: {
     maxSaved: number; maxReservedBytes: number; maxSavesPerMonth: number;
     maxCaptureBytesPerMonth: number; maxRetainedCaptureBytes: number;

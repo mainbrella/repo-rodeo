@@ -10,7 +10,7 @@ import { sha256 } from '../src/evidence.ts';
 import { redact } from '../src/experiment-result.ts';
 import { exportObservations } from '../src/public-evidence.ts';
 import { checkCapacity } from '../src/provider-runner.ts';
-import type { Inventory } from '../src/providers/interface.ts';
+import type { Inventory, WorkspaceUsage } from '../src/providers/interface.ts';
 
 const repository = resolve(import.meta.dirname, '..');
 async function temporary(t: TestContext) {
@@ -67,7 +67,7 @@ test('web source uses a pinned tree, excludes untracked secrets, and rejects tra
 });
 
 test('budget preflight checks full disk reservations and preserves exhausted accounts', () => {
-  const inventory: Inventory = {
+  const inventory: Inventory & { workspaceUsage: WorkspaceUsage } = {
     sandboxes: [], activeContainers: 0, containerLimits: { maxContainers: 4 }, workspaces: [],
     workspaceUsage: { saved: 0, reservedBytes: 0, savesThisMonth: 2, captureBytesThisMonth: 16e9, retainedCaptureBytes: 16e9 },
     workspaceLimits: { maxSaved: 20, maxReservedBytes: 160e9, maxSavesPerMonth: 100, maxCaptureBytesPerMonth: 24e9, maxRetainedCaptureBytes: 24e9 },
@@ -106,7 +106,7 @@ test('public export allowlists observations and strips URLs, credentials and unk
   assert.equal(redact('mb_secret Bearer abc https://private.test/foo'), '[redacted-key] Bearer [redacted] [redacted-url]');
 });
 
-for (const provider of ['e2b', 'daytona']) test(`${provider} CLI writes a versioned unsupported result and does no provider work`, async t => {
+for (const provider of ['daytona']) test(`${provider} CLI writes a versioned unsupported result and does no provider work`, async t => {
   const directory = join(await temporary(t), 'run');
   const proc = spawnSync(process.execPath, ['src/experiment.ts', '--provider', provider, '--output', directory, '--seed', '12345'], {
     cwd: repository, env: { ...process.env, MAINBRELLA_API_KEY: 'mb_do-not-leak' }, encoding: 'utf8', timeout: 20_000,
@@ -124,4 +124,22 @@ for (const provider of ['e2b', 'daytona']) test(`${provider} CLI writes a versio
   const retry = spawnSync(process.execPath, ['src/experiment.ts', '--provider', provider, '--output', directory], { cwd: repository, encoding: 'utf8' });
   assert.equal(retry.status, 1);
   assert.equal(await readFile(join(directory, 'result.json'), 'utf8'), text);
+});
+
+test('E2B CLI requires its own host credential and selects its native fork defaults', async t => {
+  const directory = join(await temporary(t), 'e2b-run');
+  const env = { ...process.env, MAINBRELLA_API_KEY: 'mb_do-not-use', E2B_API_KEY: '' };
+  const proc = spawnSync(process.execPath, ['src/experiment.ts', '--provider', 'e2b', '--output', directory, '--seed', '12345'], {
+    cwd: repository, env, encoding: 'utf8', timeout: 20000,
+  });
+  assert.equal(proc.status, 1);
+  const text = await readFile(join(directory, 'result.json'), 'utf8');
+  const result = JSON.parse(text);
+  assert.equal(result.provider, 'e2b');
+  assert.equal(result.mode, 'memory-fork');
+  assert.equal(result.status, 'failed');
+  assert.equal(result.scope, 'not-run');
+  assert.match(result.errors.join(' '), /Set E2B_API_KEY/);
+  assert.equal(result.environment.requested.size, 'base');
+  assert.doesNotMatch(text, /mb_do-not-use/);
 });
