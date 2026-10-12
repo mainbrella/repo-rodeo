@@ -77,6 +77,27 @@ test('accepted capture response lost after headers retries once with same key an
   } finally { await h.close(); }
 });
 
+test('saved launch recipe survives capture retry and remains filesystem preservation', async () => {
+  const seen: { body: string; key: string | null }[] = [];
+  const h = await harness(async (_input, init) => {
+    seen.push({ body: String(init?.body ?? ''), key: new Headers(init?.headers).get('Idempotency-Key') });
+    if (seen.length === 1) throw new Error('connection reset');
+    return response({ workspace: { id: 'w-launch', bytes: 100 } }, 201);
+  });
+  try {
+    const source = { id: 'c1', generation: 'g1' };
+    const launch = { command: 'node server.mjs', cwd: '/workspace/app',
+      readiness: { port: 5173, path: '/probe', timeoutMs: 30000 } };
+    const request = { name: 'capture-launch', timeoutMs: 5000, mode: 'saved-workspace', launch } as const;
+    const prepared = await h.adapter.capture(source, request);
+    assert.equal(prepared.preservation, 'filesystem');
+    assert.deepEqual(seen[1], seen[0]);
+    assert.deepEqual(JSON.parse(seen[0].body).launch, launch);
+    await assert.rejects(h.adapter.capture(source, { ...request, launch: { ...launch, command: 'node changed.mjs' } }), /different request data/);
+    assert.equal(seen.length, 2);
+  } finally { await h.close(); }
+});
+
 test('terminal job failure is returned with its failure status and exit code', async () => {
   const h = await harness(async (input, init) => {
     const url = new URL(String(input));

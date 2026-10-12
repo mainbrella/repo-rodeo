@@ -432,9 +432,11 @@ export class MainbrellaAdapter implements ProviderAdapter {
     rec.responseBody = text; rec.attemptEvidence.at(-1)!.responseBody = text; rec.error = undefined; await this.putRecord(rec);
     return { text, cursor: max };
   }
-  async capture(sandbox: Sandbox, request: Operation & { mode: ExperimentMode; dropResponseAfterHeaders?: boolean }): Promise<PreparedState> {
+  async capture(sandbox: Sandbox, request: Operation & { mode: ExperimentMode; dropResponseAfterHeaders?: boolean;
+    launch?: { command: string; cwd?: string; readiness: { port: number; path?: string; timeoutMs?: number } } }): Promise<PreparedState> {
     if (request.mode !== 'saved-workspace') throw safeError('Mainbrella adapter only implements saved-workspace capture');
-    const body = { id: sandbox.id, createdAt: sandbox.generation, name: request.name, stop: false };
+    const body = { id: sandbox.id, createdAt: sandbox.generation, name: request.name, stop: false,
+      ...(request.launch ? { launch: request.launch } : {}) };
     const { data } = await this.request(request, 'POST', '/workspaces', body, { keyed: true, retry: true, dropResponseAfterHeaders: request.dropResponseAfterHeaders });
     const w = data.workspace ?? data;
     if (!w.id) throw safeError('Mainbrella capture response did not include a workspace ID');
