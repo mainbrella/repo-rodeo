@@ -1,0 +1,717 @@
+{
+  "schemaVersion": 1,
+  "caseId": "holdout",
+  "seed": 12345,
+  "browserVersion": "153.0.8010.12",
+  "runtimeErrors": [],
+  "observations": [
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "reload": "refresh"
+    },
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "reload": "control"
+    },
+    {
+      "expected": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "reload": "refresh"
+    },
+    {
+      "expected": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "heading",
+          "text": "12345/1/989a046b — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/1/a33e47d — 雨 <&> \" ' long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "reload": "control"
+    },
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "reload": "refresh"
+    },
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": "12345/2/b3197091 — 雨 <&> \" ' long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/2/657ff193 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        }
+      ],
+      "reload": "control"
+    },
+    {
+      "expected": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "reload": "refresh"
+    },
+    {
+      "expected": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/3/fe61b407 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "paragraph",
+          "text": "12345/3/6c42e279 — 雨 <&> \" ' long long long long long long long long long long long "
+        }
+      ],
+      "reload": "control"
+    },
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "reload": "refresh"
+    },
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": "12345/4/ace1b04d — 雨 <&> \" ' long long long "
+        },
+        {
+          "id": "button",
+          "text": ""
+        },
+        {
+          "id": "heading",
+          "text": "12345/4/16b994af — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long "
+        }
+      ],
+      "reload": "control"
+    },
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "reload": "refresh"
+    },
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": "12345/5/76715ae3 — 雨 <&> \" ' long long long long long long long "
+        },
+        {
+          "id": "button",
+          "text": "12345/5/92af19b5 — 雨 <&> \" ' long long long long long long long long long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": ""
+        }
+      ],
+      "reload": "control"
+    }
+  ]
+}

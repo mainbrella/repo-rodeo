@@ -2,7 +2,7 @@ import type { Capabilities, CleanupResult, ExperimentMode, ProviderName, Workspa
 import type { Verification } from './verifier.ts';
 
 export interface Check {
-  status: 'verified' | 'failed' | 'not-exercised' | 'unsupported';
+  status: 'verified' | 'failed' | 'inconclusive' | 'not-exercised' | 'unsupported';
   detail: string;
 }
 export interface ProviderControl {

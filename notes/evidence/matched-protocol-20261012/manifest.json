@@ -1,0 +1,8 @@
+{
+  "baseCommit": "99f25ce",
+  "files": {
+    "runner.patch": "929da6e71c69d1b9ab4772c32dc06c0d234e77a0f68ea46a1f921af64ed10cb5",
+    "matched-followup.ts": "43eab038d8719becef4c89c34c728bc190b02e3cfe3e56fe2d9a1df26606dcba"
+  },
+  "purpose": "Apply runner.patch to the full base commit from followup.json, then add matched-followup.ts at src/matched-followup.ts. Inputs for actual editor runs are pinned by the full input hash manifest in each result; the supplemental runner test added later does not affect these executions."
+}

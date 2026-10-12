@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "sealedPrivateFilesChecked": 1594,
+  "publicObservationsChecked": 24,
+  "retainedInputHashesChecked": 48,
+  "resultChecksumValid": true,
+  "followupChecksumValid": true,
+  "previewSecretScanPassed": true,
+  "independentReplayPossible": false,
+  "limitation": "Public observations and hashes support inspection; independent replay of the strict verifier also requires retained private browser traces/screenshots."
+}

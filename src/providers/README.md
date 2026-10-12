@@ -1,6 +1,6 @@
 # Provider acceptance plan
 
-**Status: MainBrella production saved-workspace and E2B native memory-fork cloud qualification complete; full Daytona qualification pending strict preview revocation after deletion.** The [production MainBrella run](../../notes/2026-10-12-production-mainbrella.md) verifies the tracked capture/restore workflow, deterministic controls, isolation, capture replay, API job reconnection and cleanup against `api.mainbrella.com`. The [manual local run](../../notes/2026-10-11-local-mainbrella.md) exercises the local API and OrbStack containers; its historical harness does not qualify the tracked local adapter. The [E2B cloud notes](../../notes/2026-10-11-e2b.md) preserve the original browser failure and the successful pinned three-branch memory-fork, repair, reconnection and cleanup run. Other modes remain unqualified. The [Daytona cloud notes](../../notes/2026-10-11-daytona.md) record the original attempt; the [October 12 rerun](../../notes/2026-10-12-daytona-rerun.md) confirms snapshot deletion and cleanup while recording the remaining preview revocation failure. Matched production comparison runs remain planned.
+The selected MainBrella saved-workspace, E2B memory-fork and Daytona container-snapshot modes have completed the deterministic editor repair controls. Their different process and recovery semantics are reported separately. Historical records keep their original acceptance rules and bytes; the [matched follow-up](../../notes/2026-10-12-matched-followup.md) uses one cleanup protocol for all three providers. No completion label is a provider ranking.
 
 ## Tracked command
 
@@ -43,14 +43,7 @@ token restricted to that preview origin. Same-origin redirects are bounded.
 Guest Node is checksum-verified and pinned before preparation; the verifier stays
 outside every guest.
 
-E2B cleanup requires confirmed API absence of every preview's exact sandbox and
-three probes, spaced two seconds apart, with and without its retained traffic token.
-HTTP 404/410/502 qualifies as denied application access only with that API evidence.
-Repeated probes of the first deleted cloud sandbox returned 502 in both cases;
-this is an observed gateway response, not a documented token-revocation guarantee.
-Network failures and other responses remain inconclusive. MainBrella and Daytona
-retain their HTTP 404/410 rule. Run cleanup and later reconciliation use the same
-acceptance logic.
+All providers now use three post-cleanup probes, spaced two seconds apart, both with the retained credential and without it. The latest credential for each URL is also probed before cleanup; it must return HTTP 200 to demonstrate an access transition. API absence uses the exact sandbox identity and generation. HTTP 401/403 means access denied; 404/410 means route absent; 502/503/504 means unavailable; network errors are inconclusive. Gateway errors never prove independent token invalidation. The preview check is `inconclusive` when these observations cannot establish a transition, independently of API cleanup and the repair controls. Snapshot absence and physical storage deletion remain separate. The matched follow-up also provisions a known-live preview after the editor resources are deleted, checks it during each round, and cleans it with its own journal. Before/after inventory must preserve every pre-existing resource and contain no run resources.
 
 E2B mutation retries are disabled because there is no documented keyed replay
 contract. `--check-idempotency` reports unsupported and never injects/replays a lost
@@ -90,11 +83,10 @@ VM memory forks, volumes and warm pools remain separate, unimplemented modes.
 Standard preview tokens use `x-daytona-preview-token` and are sandbox-wide
 credentials; they stay private and are scoped to the preview origin in host and
 browser requests. Stopping a sandbox rotates its token; deletion revokes access.
-The adapter confirms private access with HTTP 401/403 denial and retains the
-strict HTTP 404/410 post-deletion check alongside exact API sandbox absence.
+The adapter confirms private access with HTTP 401/403 denial; post-deletion evidence uses the common protocol above.
 After source restart, `previewTokenInvalidation` compares the retained and fresh
 tokens at the same URL: the retained token must return HTTP 401/403 while the
-fresh token returns HTTP 200. HTTP 400 remains inconclusive. Sandbox absence and
+fresh token returns HTTP 200. HTTP 400 remains inconclusive. This optional token rotation observation does not gate the common repair experiment. Sandbox absence and
 snapshot absence remain separate entries in `cleanup`; snapshot observations
 include their state and timestamp independently of the original journal outcome.
 Session reattachment recovers the same
@@ -113,7 +105,7 @@ are absent. Recovery pins the exact original key fingerprint; rotated-key recove
 is not implemented. Capacity counters, capture byte accounting and price remain
 unavailable through this adapter and are reported as such.
 
-- Exit 0: expected controls, implemented lifecycle checks, input integrity and API cleanup confirmed.
+- Exit 0: expected controls, common lifecycle checks, input integrity and API cleanup confirmed. Optional capture replay, token rotation and inconclusive preview observations are reported independently.
 - Exit 1: a failed or unverified operation, check or cleanup; partial evidence is retained.
 - Exit 2: the chosen adapter or experiment mode is unavailable.
 
@@ -179,7 +171,7 @@ Use one pinned source commit, lockfile, scenario, external Playwright suite, ima
 Every implemented adapter mutation records its inputs before submission and
 retains timestamps and evidence. MainBrella retains exact HTTP bodies; E2B records
 SDK inputs. Only operations with documented keyed idempotency send an idempotency
-key. E2B native fork is implemented but remains live unqualified; MainBrella native
+key. E2B native fork is implemented and exercised in the recorded memory-fork runs; MainBrella native
 fork, pause/resume, volumes, and warm pools remain future acceptance experiments.
 Use explicit timeouts. Report unsupported capabilities and partial failures as
 outcomes, not as provider-wide failures or successes. Keep provider compute,

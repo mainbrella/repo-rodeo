@@ -2,7 +2,7 @@
 
 Repo Rodeo makes a bug reproduction and its proposed repairs inspectable. The first milestone is a local, repeatable experiment around a deliberately broken editor: run the same browser reproduction against the seeded app, a correct repair, and a plausible patch that leaves the bug in place.
 
-The standalone runner uses deterministic patches in temporary working copies. Tracked MainBrella, E2B, and Daytona adapters implement the scenario through their provider APIs and protected previews. MainBrella's production saved-workspace experiment and E2B's native memory-fork experiment have completed cloud qualification; full Daytona qualification remains pending strict preview revocation after deletion. The [Daytona rerun notes](notes/2026-10-12-daytona-rerun.md) record the completed snapshot and cleanup evidence. AI repair agents remain future work. Local temporary copies are not security sandboxes for untrusted code. The [provider contract and run guide](src/providers/README.md) describe the supported modes and evidence format.
+The standalone runner uses deterministic patches in temporary working copies. Tracked MainBrella, E2B, and Daytona adapters implement the scenario through their provider APIs and protected previews. The three selected modes complete the deterministic repair controls. Cleanup, preview access, recovery and process preservation are reported as separate observations, not an overall provider ranking. The [Daytona rerun notes](notes/2026-10-12-daytona-rerun.md) record the completed snapshot and cleanup evidence. AI repair agents remain future work. Local temporary copies are not security sandboxes for untrusted code. The [provider contract and run guide](src/providers/README.md) describe the supported modes and evidence format.
 
 A separate [first local Mainbrella run](notes/2026-10-11-local-mainbrella.md) tests the full sibling `../web` checkout through the running Mainbrella API and OrbStack containers. It records provisioning, protected previews, saved-workspace restores, deterministic controls, browser reconnection, interrupted capture retry, and cleanup. That historical result came from the manual harness; it does not qualify the new adapter, production, E2B, or Daytona. Its [public observation bundle](notes/evidence/mainbrella-local-20261011-01/manifest.json) supplements the sanitized result without publishing bearer preview URLs.
 
@@ -115,8 +115,8 @@ failure and the successful pinned follow-up. The
 [completed cloud result](examples/e2b-cloud-memory-fork/result.json) verifies one
 native three-branch fork, inherited process state, independent repairs, external
 browser controls, command reconnection and cleanup. Post-deletion previews returned
-502; confirmation requires repeated denied access and exact API sandbox absence.
-E2B does not implement MainBrella's keyed replay guarantee, and
+502 under that historical rule. The [matched follow-up](notes/2026-10-12-matched-followup.md) now treats those gateway responses as inconclusive preview evidence, separately from confirmed API deletion.
+The E2B adapter does not attempt keyed capture replay, and
 recovery currently requires the exact original E2B key. No comparison of provider
 performance or cost is claimed.
 
@@ -138,8 +138,7 @@ npm run experiment -- --provider daytona --mode saved-workspace \
 
 The [Daytona cloud notes](notes/2026-10-11-daytona.md) record the original
 qualification attempt; the [October 12 rerun](notes/2026-10-12-daytona-rerun.md)
-confirms snapshot deletion and cleanup while strict preview revocation remains
-pending. Container native forks are unsupported; VM memory
+confirms snapshot deletion and cleanup while retaining its original preview-rule failure. New runs use the [common cleanup protocol](notes/2026-10-12-matched-followup.md) and report access denial separately from route absence and token invalidation. Container native forks are unsupported; VM memory
 forks, volumes, and warm pools remain separate unimplemented experiments. Keyed
 mutation replay is unsupported. Capture allows ten minutes, and each sandbox has
 a 30-minute wall-clock TTL. Recovery requires the original key fingerprint.

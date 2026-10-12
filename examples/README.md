@@ -1,4 +1,6 @@
-# Local run record
+# Run records
+
+New [matched editor and cleanup follow-ups](../notes/2026-10-12-matched-followup.md) use identical probes and interpretation for all providers. Their results separate repair controls, API resource deletion, preview HTTP observations, independent token invalidation and physical storage. Historical bundles below retain their original bytes and classifications; those old completion labels are not an overall provider ranking.
 
 [`mainbrella-cloud-saved-workspace/result.json`](mainbrella-cloud-saved-workspace/result.json)
 retains the completed production MainBrella run against `api.mainbrella.com`, web
@@ -40,8 +42,7 @@ The result, checksum and 18 allowlisted observations are copied unchanged from t
 private run. Supplemental validation confirms all input bytes match the pinned
 local implementation commit despite the retained dirty-worktree marker. Independent
 post-run inventory and repeated deletion probes confirm exact sandbox absence and
-HTTP 502 denial with and without retained traffic tokens. This is application-access
-termination, not proof of separately revoked tokens. The original
+HTTP 502 responses with and without retained traffic tokens. The historical rule accepted these; new matched runs classify them as gateway unavailability and leave the preview access transition inconclusive. They do not prove separately revoked tokens. The original
 [`e2b-cloud-preview-failure/result.json`](e2b-cloud-preview-failure/result.json)
 remains unchanged; its unchecked `source.integrity: false` is a historical reporting
 defect, corrected to `null` in new early-failure results. See the

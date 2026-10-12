@@ -266,7 +266,7 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       const freshStatus = await services.previewStatus(freshPreview.url, '/repo-rodeo-bug', freshPreview.headers);
       await writeJson(join(privateDirectory, 'preview-token-invalidation.json'), { retainedStatus, freshStatus, observedAt: new Date().toISOString() });
       result.checks.previewTokenInvalidation = assessPreviewTokenInvalidation(retainedStatus, freshStatus);
-      if (result.checks.previewTokenInvalidation.status !== 'verified') throw new Error(result.checks.previewTokenInvalidation.detail);
+      // Token rotation is reported independently; it does not gate the common repair experiment.
     } else {
       assert.equal(after.process.nonce, original.process.nonce, 'Capture changed the source process nonce');
       assert.equal(after.process.pid, original.process.pid, 'Capture changed the source PID');
@@ -379,6 +379,11 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
   } finally {
     progress('Reconciling and cleaning up this run’s resources.');
     if (adapter) {
+      // A restart can rotate a token at the same URL. Use the latest credential
+      // for the matched deletion check; retain earlier grants in private evidence.
+      const currentPreviews = [...new Map(previews.map(item => [item.preview.url, item])).values()];
+      const beforeCleanup = await probePreviewRevocation(options.provider, currentPreviews, services.previewStatus, { rounds: 1 });
+      await writeJson(join(privateDirectory, 'preview-before-cleanup.json'), { probes: beforeCleanup });
       for (const { sandbox, preview } of previews) {
         try { await adapter.revokePreview(sandbox, preview, { name: `revoke-${preview.id}`, timeoutMs: 30_000 }); }
         catch { /* Destroy below also invalidates grants, including lost issuance responses. */ }
@@ -392,7 +397,7 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       try { result.storage.afterCleanup = (await adapter.inventory()).workspaceUsage; }
       catch { result.errors.push('Post-cleanup accounting could not be read.'); if (result.status === 'complete') result.status = 'failed'; }
       if (previews.length) {
-        const probes = await probePreviewRevocation(options.provider, previews, services.previewStatus);
+        const probes = await probePreviewRevocation(options.provider, currentPreviews, services.previewStatus, { beforeCleanup });
         await writeJson(join(privateDirectory, 'preview-revocation.json'), { probes });
         result.checks.previewRevocation = assessPreviewRevocation(options.provider, result.cleanup, probes);
         if (result.checks.previewRevocation.status === 'failed') result.status = 'failed';
@@ -428,7 +433,11 @@ export async function cleanupRun(directory: string, apiKey: string) {
   let previews: { sandbox: Sandbox; preview: Preview }[] = [];
   try { previews = JSON.parse(await readFile(join(privateDirectory, 'previews.json'), 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
-  const probes = await probePreviewRevocation(config.provider, previews);
+  previews = [...new Map(previews.map(item => [item.preview.url, item])).values()];
+  let beforeCleanup;
+  try { beforeCleanup = JSON.parse(await readFile(join(privateDirectory, 'preview-before-cleanup.json'), 'utf8')).probes; }
+  catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+  const probes = await probePreviewRevocation(config.provider, previews, previewStatus, { beforeCleanup });
   const previewRevocation = assessPreviewRevocation(config.provider, cleanup, probes);
   const statuses = probes.flatMap(probe => probe.rounds.map(round => round.authenticated));
   const report = { schemaVersion: 2, kind: 'cleanup-reconciliation', completedAt: new Date().toISOString(), cleanup,

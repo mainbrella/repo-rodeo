@@ -45,7 +45,7 @@ async function fixture(t: TestContext) {
     spawn: async () => { calls.push('spawn'); throw new Error('unexpected spawn'); },
     preview: async () => ({ id: 'preview', url: 'https://secret-preview.example.test', expiresAt: null }),
     revokePreview: async () => { calls.push('revoke'); },
-    cleanup: async () => { calls.push('cleanup'); cleaned = true; return { confirmed: cleanupConfirmed, sandboxes: [], workspaces: [], physicalStorage: 'not-measured', errors: [] }; },
+    cleanup: async () => { calls.push('cleanup'); cleaned = true; return { confirmed: cleanupConfirmed, sandboxes: [{ sandbox: { id: 'owned', generation: 'generation' }, absent: true }], workspaces: [], physicalStorage: 'not-measured', errors: [] }; },
   };
   const services = { adapter: () => adapter,
     previewStatus: async () => cleaned ? 404 : 200,
@@ -407,4 +407,23 @@ test('tracked Mainbrella adapter completes the runner through an API fixture wit
   const capture = records.find(record => record.name === 'prepared-capture');
   assert.equal(capture.responseLostAfterHeaders, true);
   assert.equal(capture.attempts, 3);
+});
+
+test('matched cleanup keeps gateway uncertainty separate from a completed repair run', async t => {
+  const f = await successfulFixture(t, undefined, true);
+  let cleaned = false;
+  const cleanup = f.adapter.cleanup;
+  f.adapter.cleanup = async () => { cleaned = true; return cleanup(); };
+  const result = await runProvider({ ...f.options, provider: 'e2b', apiUrl: 'https://api.e2b.dev', mode: 'memory-fork', checkIdempotency: false }, {
+    ...f.services, previewStatus: async () => cleaned ? 502 : 200,
+  });
+  assert.equal(result.status, 'complete');
+  assert.equal(result.cleanup?.confirmed, true);
+  assert.equal(result.checks.previewRevocation.status, 'inconclusive');
+  assert.equal(result.checks.captureIdempotency.status, 'not-exercised');
+  const before = JSON.parse(await readFile(join(f.options.output, 'private/preview-before-cleanup.json'), 'utf8'));
+  const after = JSON.parse(await readFile(join(f.options.output, 'private/preview-revocation.json'), 'utf8'));
+  assert.equal(before.probes.length, 4);
+  assert.ok(after.probes.every((probe: { beforeCleanup: { authenticated: number }; rounds: { authenticated: number; unauthenticated: number }[] }) =>
+    probe.beforeCleanup.authenticated === 200 && probe.rounds.length === 3 && probe.rounds.every(round => round.authenticated === 502 && round.unauthenticated === 502)));
 });
