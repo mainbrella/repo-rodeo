@@ -14,6 +14,7 @@
     "capture": "node blog/repro/capture.mjs",
     "experiment": "node src/experiment.ts",
     "qualify:security:local": "node src/security-local-experiment.mjs",
+    "qualify:security:production": "node src/security-production-experiment.mjs",
     "test": "node --test tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

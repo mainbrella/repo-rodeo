@@ -101,6 +101,34 @@ The test exposed and fixed the default relay fetch receiver in
 fetch function to retain `globalThis`; the previous call failed before reaching
 the relay. A backend regression test now covers that receiver requirement.
 
+The extended [local rollout result](examples/mainbrella-local-security-rollout/result.json)
+passed all 33 checks with four starts, two captures and complete cleanup. Its
+source and Worker bundle snapshots remain under
+`artifacts/security-rollout-local-20261012-final/inputs/`.
+
+The separate production runner requires the backend's private operator credential
+file, pinned API/runtime/relay/acknowledgment deployment versions, two exact
+account IDs, empty guest inventories and available quota. Provision the dedicated
+services and deploy the account restriction before invoking it:
+
+```sh
+npm run qualify:security:production -- \
+  --infrastructure ../backend/.wrangler/security-service-credentials.json \
+  --account <private-qualification-account-id> \
+  --secondary-account <excluded-control-account-id> \
+  --output artifacts/security-production-<new-run>
+```
+
+It reads only `MAINBRELLA_API_KEY` and `MAINBRELLA_API_KEY2` from the host
+environment or the backend's ignored `.env`. The six-start, two-capture budget
+includes an online control, a restricted guest, fork/resume and empty/CIDR-deny
+variants. Raw credentials and protected preview URLs never enter evidence or
+guest inputs. Intent keys and exact generations are journaled before mutation;
+cleanup reconciles run-owned guests, secrets, snapshots and upstream state.
+Unreachable positive controls fail the run. Passing this bounded canary leaves
+`releaseQualified: false` while the report's wider release gates remain open;
+withdraw API access before disabling the private runtime afterward.
+
 The reproduction intentionally fails against the seeded app: five assertions fail and the reset-isolation check passes. It passes all six checks with the correct repair. The misleading patch rerenders the current draft after saving but retains the serialization bug, so the reload checks continue to fail. `REPRO_BASE_URL` can point the verifier at an already-running app, for example:
 
 ```sh

@@ -430,7 +430,7 @@ export async function qualifyLocalSecurity({ image, output }) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
     const { values } = parseArgs({ options: { image: { type: 'string' }, output: { type: 'string' }, help: { type: 'boolean' } } });
-    if (values.help) console.log('npm run qualify:security:local -- --image <existing-local-image> --output <new-directory>\nUses isolated local D1/Workers and two sequential native Docker starts. Requires ../backend/node_modules, Docker, Python 3 and OpenSSL.');
+    if (values.help) console.log('npm run qualify:security:local -- --image <existing-local-image> --output <new-directory>\nUses isolated local D1/Workers, four native Docker starts and two filesystem captures. Requires ../backend/node_modules, Docker, Python 3 and OpenSSL.');
     else {
       const report = await qualifyLocalSecurity(values);
       console.log(JSON.stringify({ output: values.output, ok: report.ok, releaseQualified: report.releaseQualified, checks: report.checks, errors: report.errors, failure: report.failure, cleanup: report.cleanup }, null, 2));
