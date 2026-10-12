@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { arch, platform } from 'node:os';
@@ -11,6 +12,7 @@ import { readScenario } from './scenario.ts';
 import { prepareSource } from './experiment-source.ts';
 import { verifyPreview } from './browser-verification.ts';
 import { previewStatus } from './preview.ts';
+import { assessPreviewRevocation, probePreviewRevocation } from './preview-revocation.ts';
 import { exportObservations } from './public-evidence.ts';
 import { redact } from './experiment-result.ts';
 import type { Check, ExperimentResult } from './experiment-result.ts';
@@ -89,7 +91,8 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
   const result: ExperimentResult = {
     schemaVersion: 2, runId, provider: options.provider, mode: options.mode, status: 'failed', scope: 'not-run',
     startedAt: new Date().toISOString(), finishedAt: '', seed: options.seed, capabilities: null,
-    source: { kind: options.source ? 'web-checkout' : 'standalone', commit: null, archiveSha256: null, inputHashes: {}, integrity: false },
+    runner: { commit: null, dirty: null },
+    source: { kind: options.source ? 'web-checkout' : 'standalone', commit: null, archiveSha256: null, inputHashes: {}, integrity: null },
     environment: { host: { node: process.versions.node, platform: platform(), arch: arch(), playwright: null },
       guest: null, requested: { image: 'node', size: options.size }, observedResourceLimits: null, model: null, billing: 'not-measured' },
     controls: [], checks: {
@@ -149,6 +152,8 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
   };
   try {
     progress(`Evidence: ${output}`);
+    result.runner.commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repository, encoding: 'utf8' }).trim();
+    result.runner.dirty = !!execFileSync('git', ['status', '--porcelain', '--untracked-files=all'], { cwd: repository, encoding: 'utf8' }).trim();
     const scenario = await readScenario(join(repository, 'fixtures/editor/scenario.json'));
     if (process.versions.node !== scenario.runtime.node) throw new Error(`Use Node ${scenario.runtime.node}`);
     const playwrightVersion = JSON.parse(await readFile(join(repository, 'node_modules/@playwright/test/package.json'), 'utf8')).version;
@@ -164,6 +169,8 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     await writeJson(join(privateDirectory, 'connection.json'), { schemaVersion: 1, provider: options.provider, apiUrl });
     adapter = services.adapter({ apiUrl, apiKey: options.apiKey, directory: privateDirectory });
     result.capabilities = await adapter.capabilities();
+    const checkIdempotency = options.checkIdempotency && options.provider === 'mainbrella';
+    if (options.checkIdempotency && !checkIdempotency) result.checks.captureIdempotency = { status: 'unsupported', detail: `${options.provider === 'e2b' ? 'E2B' : 'Daytona'} has no documented keyed create/fork/snapshot replay contract; no response-loss mutation was reissued.` };
     const mode = result.capabilities.modes[options.mode];
     if (mode.status !== 'supported') {
       result.status = 'unsupported';
@@ -226,8 +233,6 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     if (baseline.status !== 'reproduced') throw new Error('Prepared baseline was not verified; capture and candidates were not started');
 
     progress('Capturing prepared state and creating three controls.');
-    const checkIdempotency = options.checkIdempotency && options.provider === 'mainbrella';
-    if (options.checkIdempotency && !checkIdempotency) result.checks.captureIdempotency = { status: 'unsupported', detail: `${options.provider === 'e2b' ? 'E2B' : 'Daytona'} has no documented keyed create/fork/snapshot replay contract; no response-loss mutation was reissued.` };
     activeCheck = checkIdempotency ? 'captureIdempotency' : undefined;
     const captureOperation = { ...operation('prepared-capture', options.provider === 'daytona' ? 600_000 : 180_000), mode: options.mode, dropResponseAfterHeaders: checkIdempotency };
     const prepared = await adapter.capture(sandbox, captureOperation);
@@ -377,14 +382,9 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       try { result.storage.afterCleanup = (await adapter.inventory()).workspaceUsage; }
       catch { result.errors.push('Post-cleanup accounting could not be read.'); if (result.status === 'complete') result.status = 'failed'; }
       if (previews.length) {
-        const statuses: number[] = [];
-        for (const { preview } of previews) {
-          try { statuses.push(await services.previewStatus(preview.url, '/repo-rodeo-bug', preview.headers)); } catch { statuses.push(0); }
-        }
-        await writeJson(join(privateDirectory, 'preview-revocation.json'), { statuses });
-        result.checks.previewRevocation = statuses.every(status => status === 404 || status === 410)
-          ? verified(`${statuses.length} preview URLs returned HTTP 404/410 after cleanup.`)
-          : { status: 'failed', detail: 'A preview did not confirm revocation with HTTP 404/410; network failures are inconclusive.' };
+        const probes = await probePreviewRevocation(options.provider, previews, services.previewStatus);
+        await writeJson(join(privateDirectory, 'preview-revocation.json'), { probes });
+        result.checks.previewRevocation = assessPreviewRevocation(options.provider, result.cleanup, probes);
         if (result.checks.previewRevocation.status === 'failed') result.status = 'failed';
       }
     }
@@ -414,15 +414,14 @@ export async function cleanupRun(directory: string, apiKey: string) {
   if (!['mainbrella', 'e2b', 'daytona'].includes(config.provider) || config.schemaVersion !== 1) throw new Error('Unsupported cleanup metadata');
   const adapter = cloudAdapter(config.provider, { apiUrl: config.apiUrl, apiKey, directory: privateDirectory });
   const cleanup = await adapter.cleanup();
-  let previews: { preview: Preview }[] = [];
+  let previews: { sandbox: Sandbox; preview: Preview }[] = [];
   try { previews = JSON.parse(await readFile(join(privateDirectory, 'previews.json'), 'utf8')); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
-  const statuses = [];
-  for (const { preview } of previews) {
-    try { statuses.push(await previewStatus(preview.url, '/repo-rodeo-bug', preview.headers)); } catch { statuses.push(0); }
-  }
+  const probes = await probePreviewRevocation(config.provider, previews);
+  const previewRevocation = assessPreviewRevocation(config.provider, cleanup, probes);
+  const statuses = probes.flatMap(probe => probe.rounds.map(round => round.authenticated));
   const report = { schemaVersion: 2, kind: 'cleanup-reconciliation', completedAt: new Date().toISOString(), cleanup,
-    previewStatuses: statuses, confirmed: cleanup.confirmed && statuses.every(status => status === 404 || status === 410) };
+    previewStatuses: statuses, previewRevocation, confirmed: cleanup.confirmed && previewRevocation.status !== 'failed' };
   const path = join(output, `cleanup-${Date.now()}.json`);
   await writeJson(path, redact(report, [apiKey]));
   console.log(`Cleanup: ${path}`);

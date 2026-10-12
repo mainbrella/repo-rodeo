@@ -60,6 +60,9 @@ test('unverified prepared baseline stops capture and candidate work but cleans u
   const f = await fixture(t);
   const result = await runProvider(f.options, f.services);
   assert.equal(result.status, 'failed');
+  assert.equal(result.source.integrity, null);
+  assert.match(result.runner.commit!, /^[a-f0-9]{40}$/);
+  assert.equal(typeof result.runner.dirty, 'boolean');
   assert.ok(f.calls.includes('create'));
   assert.ok(f.calls.includes('revoke'));
   assert.ok(f.calls.includes('cleanup'));
@@ -242,6 +245,8 @@ test('Daytona accepts explicit HTTP 401 denial and stops when the protected brow
   assert.match(result.errors.join(' '), /Prepared baseline was not verified/);
   assert.equal(result.cleanup?.confirmed, true);
   assert.ok(!f.calls.includes('capture'));
+  assert.equal(result.source.integrity, null);
+  assert.equal(result.checks.captureIdempotency.status, 'unsupported');
 });
 
 test('memory-fork runner verifies inherited listeners and process state before stopping and restarting each control', async t => {

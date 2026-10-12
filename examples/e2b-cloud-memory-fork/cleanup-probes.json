@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "apiAllocation": {
+    "cpuVcpu": 2,
+    "memoryMiB": 512,
+    "envdVersion": "0.9.0"
+  },
+  "priorDeletedPreview": {
+    "previousRun": "artifacts/e2b-cloud-fork-2026-10-12T02-38-50-341Z/run",
+    "at": "2026-10-12T03:25:04.173Z",
+    "runningOrPaused": 0,
+    "snapshots": 0,
+    "samples": [
+      {
+        "at": "2026-10-12T03:25:04.557Z",
+        "apiAbsent": true,
+        "authenticated": 502,
+        "unauthenticated": 502
+      },
+      {
+        "at": "2026-10-12T03:25:06.700Z",
+        "apiAbsent": true,
+        "authenticated": 502,
+        "unauthenticated": 502
+      },
+      {
+        "at": "2026-10-12T03:25:08.824Z",
+        "apiAbsent": true,
+        "authenticated": 502,
+        "unauthenticated": 502
+      }
+    ]
+  },
+  "currentDeletedPreviews": [
+    {
+      "preview": 1,
+      "rounds": [
+        {
+          "at": "2026-10-12T03:29:19.471Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:21.858Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:24.352Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        }
+      ]
+    },
+    {
+      "preview": 2,
+      "rounds": [
+        {
+          "at": "2026-10-12T03:29:19.574Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:22.016Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:24.427Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        }
+      ]
+    },
+    {
+      "preview": 3,
+      "rounds": [
+        {
+          "at": "2026-10-12T03:29:19.680Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:22.094Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:24.503Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        }
+      ]
+    },
+    {
+      "preview": 4,
+      "rounds": [
+        {
+          "at": "2026-10-12T03:29:19.785Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:22.170Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        },
+        {
+          "at": "2026-10-12T03:29:24.639Z",
+          "authenticated": 502,
+          "unauthenticated": 502
+        }
+      ]
+    }
+  ],
+  "acceptance": "Exact API-confirmed sandbox absence plus three HTTP 404/410/502 probes with and without the retained traffic token; no independent token revocation claimed."
+}

@@ -1,6 +1,6 @@
 # Provider acceptance plan
 
-**Status: MainBrella, E2B, and Daytona adapters implemented; full tracked qualification pending.** The [manual local run](../../notes/2026-10-11-local-mainbrella.md) exercises the real MainBrella API and OrbStack containers. It is evidence for that historical harness, not automatic qualification of this implementation. The [E2B cloud attempt](../../notes/2026-10-11-e2b.md) reached setup and authenticated HTTP readiness but stopped at an unverified browser baseline. The [Daytona cloud notes](../../notes/2026-10-11-daytona.md) record a protected browser baseline and the snapshot qualification attempt. Production comparison runs remain planned.
+**Status: E2B native memory-fork cloud qualification complete; full tracked MainBrella and Daytona qualification pending.** The [manual local run](../../notes/2026-10-11-local-mainbrella.md) exercises the real MainBrella API and OrbStack containers. It is evidence for that historical harness, not automatic qualification of this implementation. The [E2B cloud notes](../../notes/2026-10-11-e2b.md) preserve the original browser failure and the successful pinned three-branch memory-fork, repair, reconnection and cleanup run. E2B's other modes remain unqualified. The [Daytona cloud notes](../../notes/2026-10-11-daytona.md) record a protected browser baseline and the snapshot qualification attempt. Production comparison runs remain planned.
 
 ## Tracked command
 
@@ -25,6 +25,12 @@ Quota preflight requires space for four generations and one full-disk save, incl
 
 All three provider selections emit [`ExperimentResult` schema version 2](../experiment-result.ts). MainBrella and Daytona implement `saved-workspace`; E2B implements `memory-fork` and the separate filesystem-only snapshot `saved-workspace` path. Other modes retain distinct names and report `unsupported` or `not-implemented`; the runner does not silently substitute a restore. The default standalone `--provider local` runner retains its original version-1 manifest.
 
+New results identify the implementation with `runner.commit` and `runner.dirty`,
+separately from the application's `source.commit`. Retained input hashes identify
+the actual experiment files. `source.integrity` is `null` until the final host-input
+comparison runs, then `true` or `false`. Historical results retain their original
+bytes; an early failure's old `false` value does not prove an integrity failure.
+
 For E2B, set `E2B_API_KEY` and run `npm run experiment -- --provider e2b --seed 12345`.
 It defaults to the `base` template, `memory-fork`, and the official cloud API.
 One fork call requests three branches with 30-minute lifetimes. The runner checks
@@ -33,6 +39,15 @@ a new one for patch verification. Protected HTTP/browser requests use a traffic
 token restricted to that preview origin. Same-origin redirects are bounded.
 Guest Node is checksum-verified and pinned before preparation; the verifier stays
 outside every guest.
+
+E2B cleanup requires confirmed API absence of every preview's exact sandbox and
+three probes, spaced two seconds apart, with and without its retained traffic token.
+HTTP 404/410/502 qualifies as denied application access only with that API evidence.
+Repeated probes of the first deleted cloud sandbox returned 502 in both cases;
+this is an observed gateway response, not a documented token-revocation guarantee.
+Network failures and other responses remain inconclusive. MainBrella and Daytona
+retain their HTTP 404/410 rule. Run cleanup and later reconciliation use the same
+acceptance logic.
 
 E2B mutation retries are disabled because there is no documented keyed replay
 contract. `--check-idempotency` reports unsupported and never injects/replays a lost

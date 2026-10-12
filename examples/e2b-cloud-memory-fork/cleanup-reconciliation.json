@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 2,
+  "kind": "cleanup-reconciliation",
+  "completedAt": "2026-10-12T03:33:21.895Z",
+  "cleanup": {
+    "confirmed": true,
+    "sandboxes": [
+      {
+        "sandbox": {
+          "id": "iefxullwk8wr5yet00g3h",
+          "generation": "iefxullwk8wr5yet00g3h"
+        },
+        "absent": true
+      },
+      {
+        "sandbox": {
+          "id": "ihhtssn5ldnqn01i5z2f0",
+          "generation": "ihhtssn5ldnqn01i5z2f0"
+        },
+        "absent": true
+      },
+      {
+        "sandbox": {
+          "id": "ifu7lfuedvmtdara69hlj",
+          "generation": "ifu7lfuedvmtdara69hlj"
+        },
+        "absent": true
+      },
+      {
+        "sandbox": {
+          "id": "i8mfzdy9phhocp23xl9wg",
+          "generation": "i8mfzdy9phhocp23xl9wg"
+        },
+        "absent": true
+      }
+    ],
+    "workspaces": [],
+    "physicalStorage": "not-measured",
+    "errors": []
+  },
+  "previewStatuses": [
+    502,
+    502,
+    502,
+    502,
+    502,
+    502,
+    502,
+    502,
+    502,
+    502,
+    502,
+    502
+  ],
+  "previewRevocation": {
+    "status": "verified",
+    "detail": "4 E2B preview sandboxes were confirmed absent by the API; three probes per URL with and without the retained traffic token returned only HTTP 404/410/502. This confirms application access ended, not a separately revoked token."
+  },
+  "confirmed": true
+}

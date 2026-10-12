@@ -24,13 +24,15 @@ export interface ExperimentResult {
   startedAt: string;
   finishedAt: string;
   seed: number;
+  runner: { commit: string | null; dirty: boolean | null };
   capabilities: Capabilities | null;
   source: {
     kind: 'standalone' | 'web-checkout';
     commit: string | null;
     archiveSha256: string | null;
     inputHashes: Record<string, string>;
-    integrity: boolean;
+    // null means the final host-input comparison was never reached.
+    integrity: boolean | null;
   };
   environment: {
     host: { node: string; platform: string; arch: string; playwright: string | null };

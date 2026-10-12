@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "caseId": "reset-isolation",
+  "seed": 12345,
+  "browserVersion": "153.0.8010.12",
+  "runtimeErrors": [],
+  "observations": []
+}

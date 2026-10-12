@@ -15,3 +15,22 @@ unchanged; no container or workspace was created or deleted. This qualifies the
 preflight failure path, not the new adapter's full restore experiment. The raw
 journal remains in `artifacts/mainbrella-adapter-preflight-v2/private/`. A cleanup
 retry preserved the original result and its sealed evidence checksums.
+
+[`e2b-cloud-memory-fork/result.json`](e2b-cloud-memory-fork/result.json) is the
+completed real E2B cloud qualification against web revision `3eb5f1d`, with seed
+`12345`. One native fork produced three branches that inherited the running server's
+PID and nonce. Baseline and misleading controls reproduced first-block loss; the
+correct patch passed all six checks. Filesystem preservation, final isolation,
+command reconnection, host input integrity and cleanup passed. E2B keyed replay
+remains unsupported; performance and cost remain unmeasured.
+
+The result, checksum and 18 allowlisted observations are copied unchanged from the
+private run. Supplemental validation confirms all input bytes match the pinned
+local implementation commit despite the retained dirty-worktree marker. Independent
+post-run inventory and repeated deletion probes confirm exact sandbox absence and
+HTTP 502 denial with and without retained traffic tokens. This is application-access
+termination, not proof of separately revoked tokens. The original
+[`e2b-cloud-preview-failure/result.json`](e2b-cloud-preview-failure/result.json)
+remains unchanged; its unchecked `source.integrity: false` is a historical reporting
+defect, corrected to `null` in new early-failure results. See the
+[run notes](../notes/2026-10-11-e2b.md) for scope and provenance.

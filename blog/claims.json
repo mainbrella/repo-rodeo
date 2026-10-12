@@ -43,9 +43,13 @@
     },
     {
       "id": "e2b-memory-fork",
-      "claim": "An E2B experiment can fork the prepared running environment with the intended filesystem and memory state, and writes remain independent between branches.",
-      "status": "planned",
-      "evidence": []
+      "claim": "The pinned E2B cloud experiment forked one prepared running web application into three branches, preserving the listener, PID, nonce and prepared filesystem; final hashes and markers confirmed independent branch writes.",
+      "status": "verified",
+      "evidence": [
+        "../notes/2026-10-11-e2b.md",
+        "../examples/e2b-cloud-memory-fork/result.json",
+        "../examples/e2b-cloud-memory-fork/evidence-validation.json"
+      ]
     },
     {
       "id": "e2b-pause-resume",
