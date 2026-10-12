@@ -10,7 +10,7 @@ import { Sandbox as E2B } from 'e2b';
 import { E2BAdapter } from './providers/e2b.ts';
 import { DaytonaAdapter } from './providers/daytona.ts';
 import { redact } from './experiment-result.ts';
-import { hashFiles, sealProviderEvidence, sha256, snapshotInputs, writeJson } from './evidence.ts';
+import { sealProviderEvidence, sha256, snapshotInputs, writeJson } from './evidence.ts';
 import type { Inventory, PreparedState, ProviderAdapter } from './providers/interface.ts';
 
 export class LostCaptureResponse extends Error {

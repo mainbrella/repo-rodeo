@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "experiment": "named-snapshot-response-loss-recovery",
+  "provider": "e2b",
+  "runId": "98a75495-5d93-4046-a5c5-0c6fde785818",
+  "status": "completed",
+  "startedAt": "2026-10-12T15:31:43.062Z",
+  "budget": {
+    "maxSandboxCreates": 2,
+    "maxCaptureSubmissions": 1
+  },
+  "runner": {
+    "commit": "5238644b50973d01797a51145c5306e9abcc239d",
+    "dirty": true
+  },
+  "sdkVersion": "2.55.0",
+  "checks": {
+    "responseBodyLost": true,
+    "nameRecovery": true,
+    "captureSubmissions": 1,
+    "restoredSnapshotUsable": true,
+    "preparedFilePreserved": true,
+    "originalInventoryPreserved": true
+  },
+  "errors": [],
+  "cleanup": {
+    "confirmed": true,
+    "sandboxes": [
+      {
+        "sandbox": {
+          "id": "ic8o4pajvsikc7ny50qtj",
+          "generation": "ic8o4pajvsikc7ny50qtj"
+        },
+        "absent": true
+      },
+      {
+        "sandbox": {
+          "id": "iuqdvsndrc59ghsgdkjee",
+          "generation": "iuqdvsndrc59ghsgdkjee"
+        },
+        "absent": true
+      }
+    ],
+    "workspaces": [
+      {
+        "id": "andrews-project-bcb4/rodeo-db939aa4-5c8c-43fe-bc77-2fa1f3c3db1c:default",
+        "absent": true
+      }
+    ],
+    "physicalStorage": "not-measured",
+    "errors": []
+  },
+  "limitations": [
+    "One run per provider, not a reliability, performance or price ranking.",
+    "A successful response is withheld after HTTP headers and body are received privately, not before admission.",
+    "Recovery uses a persisted snapshot name and inventory reads; no undocumented idempotency header is assumed.",
+    "E2B full snapshot and Daytona container filesystem snapshot have different state-preservation semantics.",
+    "API resource absence does not prove physical storage erasure or credential invalidation."
+  ],
+  "inputHashes": {
+    ".node-version": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+    ".nvmrc": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+    "fixtures/editor/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+    "fixtures/editor/app/editor.js": "541c336cdc2d7d2f7a099bbec1a498d49467a2bc02f9608f956350f7409839ec",
+    "fixtures/editor/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+    "fixtures/editor/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+    "fixtures/editor/patches/correct.patch": "51b4735808203dfd60b3463b97f77161b6ce9d15dfae32ddda082f21220dc137",
+    "fixtures/editor/patches/misleading.patch": "8be1a772f25a2eab019078d30719a90f1c0e0c7dd3971c60c684ef27fbf55973",
+    "fixtures/editor/preview-auth.js": "9589de483915c6966a6d38b13e9468ef361a0fe3fdf55c05925b350ac686e2fe",
+    "fixtures/editor/repro.spec.js": "f3c399fb08444f8d128202447e0d960f7aa8f95611cb737f6b02b15e1270468b",
+    "fixtures/editor/scenario.json": "0d83f5c02ea89f22b4f785540189fbfd8a54d2c91771013c9fd7de6fb458c272",
+    "notes/patches/web-correct.patch": "846bd0155eb6b0db3536e9a3a8d1d9b3a4cd380551cc2a2f21612502d5080ee2",
+    "notes/patches/web-misleading.patch": "c85c6166e7d503a4b90166b5afb93c47a4dc8e0d77cc05987641d833d05424a2",
+    "package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c",
+    "package.json": "57dddd890028fb922689356305e6c28968cca31528dba8dba05ec0cb30067a47",
+    "playwright.config.js": "e0f663b73631943a87450ca1688f34639e23134b26f4a6880bce67b044062870",
+    "src/app-restore-launch-experiment.ts": "8be85b5429047e5b60b986d37db1f5d781b0fd28dac3d99910eef9bab5ea205e",
+    "src/browser-verification.ts": "c6fa1c340f6056898735393bbc1d11a9214ea4e746885d81fe8a00f2ebea3c4c",
+    "src/capture-response-loss-experiment.ts": "e0ebb013ac4b9be3c8236bcbcbfb423c1edce01582a5a46e57d0cdade201734a",
+    "src/evidence.ts": "e2a148a19d2ee05fc52c4c4d7181adf3a73fb284b987546e5d07b070477cd1ca",
+    "src/experiment-result.ts": "be7f7536ed98b1df0ed21e376185445cb97f28cf3733686365066feea0dc7189",
+    "src/experiment-source.ts": "6b2a13671d6dd3621eae9ace91be2c79fe91dc618c85865c93d22c9e2b148ce9",
+    "src/experiment.ts": "e3d8617c1ed4084134d82682be1a8c66efd6794ba2a7768217036b81c802a8b6",
+    "src/guest/inspect.mjs": "a60d72fca972c0093b6b986895387ede4802ff269de07188c4141fc4afc20f18",
+    "src/guest/launch.mjs": "a1a2cc769146be3cc6ce3f9a79c0ca8ec2bd6c577dfd70c3db5acaede6a41a69",
+    "src/lifecycle-experiment.ts": "392a36909b3c6121a444476fd27fa8b0ad6770f18b0eeb95aa27ae53052dd152",
+    "src/matched-followup.ts": "43eab038d8719becef4c89c34c728bc190b02e3cfe3e56fe2d9a1df26606dcba",
+    "src/metrics.ts": "a8b74d62580e837ce43ce017d829a5598ffb72c9ff00a82bb67c0142863589d3",
+    "src/preview-revocation.ts": "1ae31f344890770888f2f2fecd4723abe749d3136cedc4fc2be71763511a2ecc",
+    "src/preview.ts": "0a5b6655fcd026b62d434f402dd211056a593577a37a675e857b53c3ddfd8203",
+    "src/process.ts": "ee2035f27b5081de46e06da876f2643f3cfc225aa6484b1463f498954d9916c1",
+    "src/provider-runner.ts": "c2539556ed8c76067a69958b257f2ed7bbb1f76e6a03660fed38e31c5b2dfb56",
+    "src/providers/daytona.ts": "7c9ef6e2f862c765a631769b54402cdd31a26d61e877f5ce17aeb890b9ec2687",
+    "src/providers/e2b.ts": "d8f6e1425142a9f085197bacc8cb7f5ed461a546635e2bde9066791dde82ae7d",
+    "src/providers/interface.ts": "89978a31aa150bc27c29c7a57e3ae5e799c636cf07da5a092ce773273b85dbb0",
+    "src/providers/mainbrella.ts": "1b2a1622484a8264b2f03643ea55c91872ff1360c7aac891189f332b33bb74d0",
+    "src/providers/README.md": "772f6c7a529934e5a1ebf39e19ef394653b0cb40f01c623efa7bc27344e16cac",
+    "src/public-evidence.ts": "feed0ef28aa194260ce247caaed57019f152e45390d604de0954964e676ddcc1",
+    "src/restore-launch-experiment.ts": "21d89239c254fd49274ba3cc90a5506769167f5bffb4501ea3111c2c033c6b9a",
+    "src/runner.ts": "28bc1d17d5f8aac9d295911996e2aa5a98f60db5d788e7193684f230545e2b67",
+    "src/scenario.ts": "44ab0a6700a7358ced88f2f9d8f2664e27416bcd096199bb989c3200643eed6d",
+    "src/security-local-experiment.mjs": "388af5c27dd7818c34f8d442da6b7f66fe4cf54ab365c0e701e8646460d0bb8b",
+    "src/security-verifier.ts": "b715821060b8aa16754b492d859fca48228cc859c8e976be7c4a67773f4d6900",
+    "src/verifier.ts": "90fde94d11ecd59f8ee5e348cfe39799f39cb83f8c5a497c0f8d56024fad871b",
+    "src/worker-experiment.ts": "6b3863c85e8cd544a032f2ac34f276d8b63b4dfc0ade4ba58743fb25f846e94d",
+    "src/worker-verifier.ts": "348b2ae577bb856fd2fc8b0ee088c3ce31e70bded2fa17dbd47b9f0dcc876d8b",
+    "tests/capture-response-loss-experiment.test.ts": "25c4b61cdc95a9aa90a7094f0023d0d45c3f008a7aa3d693947f7e2810456e76",
+    "tests/daytona.test.ts": "4888b45682980a2d51c77c2f8767af625e68fe6744793eaa0605fbd05623bc32",
+    "tests/e2b.test.ts": "ed7333fb95ca627bee389823b2f49031a8611f025550a3cdf4b8407202ece385",
+    "tests/evidence.test.ts": "7795d24c4161f7dc5997ca9e57e2cabe29be4769e49e413a3798729a8c674272",
+    "tests/experiment.test.ts": "2f13422df448f671db51dc6fb5c21f0301a13cc075cf94b208264affe6e0e092",
+    "tests/lifecycle-experiment.test.ts": "26e98e22b9b476c73d1279d688026b2d00ade8a6b3aac03273de18f921fdab7a",
+    "tests/mainbrella.test.ts": "31407a4286c29585a3d7d464b5aacb69adf5f460b3759b28810c9bd240ec4812",
+    "tests/preview-revocation.test.ts": "64379c38e0d79be84856d9b44f1cb37238f1a93fe05821602117c1f9dc97593f",
+    "tests/preview.test.ts": "af74f31563b36c6608a49346863933ee848b45434bd2d2bd6206b52983d97570",
+    "tests/provider-runner.test.ts": "00921a8b2e054223d1a162f03dd98a7357a5664fb6cbf167531816c3348a238c",
+    "tests/security-upstream.test.ts": "1efc7c548a5db6499c7327a42529a7ad7c877c6feffab6ae4f40d07fd3270657",
+    "tests/security-verifier.test.ts": "7706473c9598afc249de9a449241c2cc557cd7aa8df7e74cd9031267e166efcf",
+    "tests/verifier.test.ts": "c81cf02c876606d10f0cbc54b63dedd2dd0da10bebe11556baa3f1eb226b8302",
+    "tests/worker-experiment.test.ts": "0a27ed390f45b120d1aeaeffd11df307d6b2be03f52066ae0770f06ac1fa0179",
+    "tsconfig.json": "7c64772afc11e22bdaa663c5db86a7fc5c492beb1c241ca29d8aec70c453f883"
+  },
+  "snapshotName": "rodeo-db939aa4-5c8c-43fe-bc77-2fa1f3c3db1c",
+  "source": {
+    "id": "ic8o4pajvsikc7ny50qtj",
+    "generation": "ic8o4pajvsikc7ny50qtj"
+  },
+  "recoveryMechanism": "New SDK client lists by persisted snapshot name; no second capture POST",
+  "capture": {
+    "id": "andrews-project-bcb4/rodeo-db939aa4-5c8c-43fe-bc77-2fa1f3c3db1c:default",
+    "preservation": "filesystem+memory"
+  },
+  "restore": {
+    "id": "iuqdvsndrc59ghsgdkjee",
+    "generation": "iuqdvsndrc59ghsgdkjee"
+  },
+  "inventory": {
+    "before": {
+      "sandboxes": [],
+      "workspaces": []
+    },
+    "after": {
+      "sandboxes": [],
+      "workspaces": []
+    }
+  },
+  "lossInjection": {
+    "dropped": true,
+    "submissions": 1
+  },
+  "finishedAt": "2026-10-12T15:31:46.785Z",
+  "evidence": {
+    "capture-request.json": "334940f5e4d28ea5b50d64aea4adaa9856f10e75628fa93e084b5b5122b72502",
+    "e2b-credential.json": "534a6d9876587833fcfebe4867c847eeab2307b8b73510b0d3ab933b120b397b",
+    "independent-inventory/e2b-credential.json": "85d6b59521007ed17dc4091baf0b3e49b811e6935261c9e5a10d80f87c5bef38",
+    "independent-inventory/receipts/inventory-1b18f517-de5b-49fc-b4f2-c70519b43b00.json": "99a62b8154cc9e22768c89c9395b57e94d929af2461e0ffcdaa50918d18d1841",
+    "independent-inventory/receipts/inventory-b610b99c-f823-4055-a349-fbe9a21f57e7.json": "ce764c2f02334ba3a7de87df00fe4befec2d26843de279e5bee64d68aa506738",
+    "inputs/.node-version": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+    "inputs/.nvmrc": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+    "inputs/fixtures/editor/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+    "inputs/fixtures/editor/app/editor.js": "541c336cdc2d7d2f7a099bbec1a498d49467a2bc02f9608f956350f7409839ec",
+    "inputs/fixtures/editor/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+    "inputs/fixtures/editor/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+    "inputs/fixtures/editor/patches/correct.patch": "51b4735808203dfd60b3463b97f77161b6ce9d15dfae32ddda082f21220dc137",
+    "inputs/fixtures/editor/patches/misleading.patch": "8be1a772f25a2eab019078d30719a90f1c0e0c7dd3971c60c684ef27fbf55973",
+    "inputs/fixtures/editor/preview-auth.js": "9589de483915c6966a6d38b13e9468ef361a0fe3fdf55c05925b350ac686e2fe",
+    "inputs/fixtures/editor/repro.spec.js": "f3c399fb08444f8d128202447e0d960f7aa8f95611cb737f6b02b15e1270468b",
+    "inputs/fixtures/editor/scenario.json": "0d83f5c02ea89f22b4f785540189fbfd8a54d2c91771013c9fd7de6fb458c272",
+    "inputs/notes/patches/web-correct.patch": "846bd0155eb6b0db3536e9a3a8d1d9b3a4cd380551cc2a2f21612502d5080ee2",
+    "inputs/notes/patches/web-misleading.patch": "c85c6166e7d503a4b90166b5afb93c47a4dc8e0d77cc05987641d833d05424a2",
+    "inputs/package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c",
+    "inputs/package.json": "57dddd890028fb922689356305e6c28968cca31528dba8dba05ec0cb30067a47",
+    "inputs/playwright.config.js": "e0f663b73631943a87450ca1688f34639e23134b26f4a6880bce67b044062870",
+    "inputs/src/app-restore-launch-experiment.ts": "8be85b5429047e5b60b986d37db1f5d781b0fd28dac3d99910eef9bab5ea205e",
+    "inputs/src/browser-verification.ts": "c6fa1c340f6056898735393bbc1d11a9214ea4e746885d81fe8a00f2ebea3c4c",
+    "inputs/src/capture-response-loss-experiment.ts": "e0ebb013ac4b9be3c8236bcbcbfb423c1edce01582a5a46e57d0cdade201734a",
+    "inputs/src/evidence.ts": "e2a148a19d2ee05fc52c4c4d7181adf3a73fb284b987546e5d07b070477cd1ca",
+    "inputs/src/experiment-result.ts": "be7f7536ed98b1df0ed21e376185445cb97f28cf3733686365066feea0dc7189",
+    "inputs/src/experiment-source.ts": "6b2a13671d6dd3621eae9ace91be2c79fe91dc618c85865c93d22c9e2b148ce9",
+    "inputs/src/experiment.ts": "e3d8617c1ed4084134d82682be1a8c66efd6794ba2a7768217036b81c802a8b6",
+    "inputs/src/guest/inspect.mjs": "a60d72fca972c0093b6b986895387ede4802ff269de07188c4141fc4afc20f18",
+    "inputs/src/guest/launch.mjs": "a1a2cc769146be3cc6ce3f9a79c0ca8ec2bd6c577dfd70c3db5acaede6a41a69",
+    "inputs/src/lifecycle-experiment.ts": "392a36909b3c6121a444476fd27fa8b0ad6770f18b0eeb95aa27ae53052dd152",
+    "inputs/src/matched-followup.ts": "43eab038d8719becef4c89c34c728bc190b02e3cfe3e56fe2d9a1df26606dcba",
+    "inputs/src/metrics.ts": "a8b74d62580e837ce43ce017d829a5598ffb72c9ff00a82bb67c0142863589d3",
+    "inputs/src/preview-revocation.ts": "1ae31f344890770888f2f2fecd4723abe749d3136cedc4fc2be71763511a2ecc",
+    "inputs/src/preview.ts": "0a5b6655fcd026b62d434f402dd211056a593577a37a675e857b53c3ddfd8203",
+    "inputs/src/process.ts": "ee2035f27b5081de46e06da876f2643f3cfc225aa6484b1463f498954d9916c1",
+    "inputs/src/provider-runner.ts": "c2539556ed8c76067a69958b257f2ed7bbb1f76e6a03660fed38e31c5b2dfb56",
+    "inputs/src/providers/daytona.ts": "7c9ef6e2f862c765a631769b54402cdd31a26d61e877f5ce17aeb890b9ec2687",
+    "inputs/src/providers/e2b.ts": "d8f6e1425142a9f085197bacc8cb7f5ed461a546635e2bde9066791dde82ae7d",
+    "inputs/src/providers/interface.ts": "89978a31aa150bc27c29c7a57e3ae5e799c636cf07da5a092ce773273b85dbb0",
+    "inputs/src/providers/mainbrella.ts": "1b2a1622484a8264b2f03643ea55c91872ff1360c7aac891189f332b33bb74d0",
+    "inputs/src/providers/README.md": "772f6c7a529934e5a1ebf39e19ef394653b0cb40f01c623efa7bc27344e16cac",
+    "inputs/src/public-evidence.ts": "feed0ef28aa194260ce247caaed57019f152e45390d604de0954964e676ddcc1",
+    "inputs/src/restore-launch-experiment.ts": "21d89239c254fd49274ba3cc90a5506769167f5bffb4501ea3111c2c033c6b9a",
+    "inputs/src/runner.ts": "28bc1d17d5f8aac9d295911996e2aa5a98f60db5d788e7193684f230545e2b67",
+    "inputs/src/scenario.ts": "44ab0a6700a7358ced88f2f9d8f2664e27416bcd096199bb989c3200643eed6d",
+    "inputs/src/security-local-experiment.mjs": "388af5c27dd7818c34f8d442da6b7f66fe4cf54ab365c0e701e8646460d0bb8b",
+    "inputs/src/security-verifier.ts": "b715821060b8aa16754b492d859fca48228cc859c8e976be7c4a67773f4d6900",
+    "inputs/src/verifier.ts": "90fde94d11ecd59f8ee5e348cfe39799f39cb83f8c5a497c0f8d56024fad871b",
+    "inputs/src/worker-experiment.ts": "6b3863c85e8cd544a032f2ac34f276d8b63b4dfc0ade4ba58743fb25f846e94d",
+    "inputs/src/worker-verifier.ts": "348b2ae577bb856fd2fc8b0ee088c3ce31e70bded2fa17dbd47b9f0dcc876d8b",
+    "inputs/tests/capture-response-loss-experiment.test.ts": "25c4b61cdc95a9aa90a7094f0023d0d45c3f008a7aa3d693947f7e2810456e76",
+    "inputs/tests/daytona.test.ts": "4888b45682980a2d51c77c2f8767af625e68fe6744793eaa0605fbd05623bc32",
+    "inputs/tests/e2b.test.ts": "ed7333fb95ca627bee389823b2f49031a8611f025550a3cdf4b8407202ece385",
+    "inputs/tests/evidence.test.ts": "7795d24c4161f7dc5997ca9e57e2cabe29be4769e49e413a3798729a8c674272",
+    "inputs/tests/experiment.test.ts": "2f13422df448f671db51dc6fb5c21f0301a13cc075cf94b208264affe6e0e092",
+    "inputs/tests/lifecycle-experiment.test.ts": "26e98e22b9b476c73d1279d688026b2d00ade8a6b3aac03273de18f921fdab7a",
+    "inputs/tests/mainbrella.test.ts": "31407a4286c29585a3d7d464b5aacb69adf5f460b3759b28810c9bd240ec4812",
+    "inputs/tests/preview-revocation.test.ts": "64379c38e0d79be84856d9b44f1cb37238f1a93fe05821602117c1f9dc97593f",
+    "inputs/tests/preview.test.ts": "af74f31563b36c6608a49346863933ee848b45434bd2d2bd6206b52983d97570",
+    "inputs/tests/provider-runner.test.ts": "00921a8b2e054223d1a162f03dd98a7357a5664fb6cbf167531816c3348a238c",
+    "inputs/tests/security-upstream.test.ts": "1efc7c548a5db6499c7327a42529a7ad7c877c6feffab6ae4f40d07fd3270657",
+    "inputs/tests/security-verifier.test.ts": "7706473c9598afc249de9a449241c2cc557cd7aa8df7e74cd9031267e166efcf",
+    "inputs/tests/verifier.test.ts": "c81cf02c876606d10f0cbc54b63dedd2dd0da10bebe11556baa3f1eb226b8302",
+    "inputs/tests/worker-experiment.test.ts": "0a27ed390f45b120d1aeaeffd11df307d6b2be03f52066ae0770f06ac1fa0179",
+    "inputs/tsconfig.json": "7c64772afc11e22bdaa663c5db86a7fc5c492beb1c241ca29d8aec70c453f883",
+    "inventory-after.json": "e5fa63bea8f01428730475bf0b58f5128f848f41818472e3b8df1a86b1313758",
+    "inventory-before.json": "e5fa63bea8f01428730475bf0b58f5128f848f41818472e3b8df1a86b1313758",
+    "journal-snapshot/operations/0ce508f74928dbccb759da43a2130526.json": "31bc55909793406e89259a04a26e3314246022b6241802d9cbb7905793d852c7",
+    "journal-snapshot/operations/8c9adb83cb80141b0c4dc1aa0ccd24ea.json": "dc02166dfc2a8e9f53386e3c53fdb8f387ef080949f8a2a5c26dc7e0ea2ed68b",
+    "journal-snapshot/operations/9156788406261d78ba0a3f5edd9bcac3.json": "5082c57e86c7cf2f0f062843a4f249b0274ebc7cb81915ce7c0340e7282451dd",
+    "journal-snapshot/operations/e5b27eb580551f8c24069b496a11f1ac.json": "ec6da69d5ce3b397789e00b6c5764f30f275c150b1a71ce147b71bc777c741a8",
+    "journal-snapshot/owned/e2b.json": "658a2cb6d5a28e0c7363372f45ee6667558a3446abf1bedd9dc4deea9a1c1481",
+    "journal-snapshot/receipts/inventory-62ac0bf0-5cc6-4582-97c3-9e7c8a19eb1c.json": "3a0aeab1f6a77c503dfc85247a68c47d8aecd2214238354f47d0385158ca10f3",
+    "journal-snapshot/receipts/inventory-e47ac2db-a666-49fd-8fbe-64bef42d3700.json": "d509e9587534e6a044f7398fddec7e07044a0422ae73fbf3499765407860d0e6",
+    "journal-snapshot/receipts/source-info.json": "73ff94eb05301ee5b77733bf86deb365921d28489e8489c06566caba3edd03e2",
+    "snapshot-observation-99368be4-0d84-40bd-80ea-1122c3d626cf.json": "aae96d8cee6b151a9a021caeffc88ec965eba27915d065ea8bda578ee8345a59",
+    "uploads/e7975e8347b7a59c2ea8857bcd2ae1e82b1edfa13889d22e177e9570eb4231c0.bin": "e7975e8347b7a59c2ea8857bcd2ae1e82b1edfa13889d22e177e9570eb4231c0",
+    "withheld-response.json": "25de2e94c4341eef8855f291dde1bddfa37401d35ba085ef021445904ab0bdc2"
+  }
+}
