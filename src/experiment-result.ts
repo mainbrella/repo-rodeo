@@ -43,6 +43,7 @@ export interface ExperimentResult {
     billing: 'not-measured';
   };
   controls: ProviderControl[];
+  preparedBaseline: ProviderControl | null;
   checks: {
     filesystem: Check;
     processes: Check;
@@ -50,6 +51,7 @@ export interface ExperimentResult {
     jobReattachment: Check;
     captureIdempotency: Check;
     previewRevocation: Check;
+    previewTokenInvalidation?: Check;
   };
   storage: {
     captureBytes: number | null;

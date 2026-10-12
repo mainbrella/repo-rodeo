@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import test, { type TestContext } from 'node:test';
@@ -61,6 +61,7 @@ test('unverified prepared baseline stops capture and candidate work but cleans u
   const result = await runProvider(f.options, f.services);
   assert.equal(result.status, 'failed');
   assert.equal(result.source.integrity, null);
+  assert.equal(result.preparedBaseline?.verification?.status, 'unverified');
   assert.match(result.runner.commit!, /^[a-f0-9]{40}$/);
   assert.equal(typeof result.runner.dirty, 'boolean');
   assert.ok(f.calls.includes('create'));
@@ -182,6 +183,7 @@ test('successful runner prepares, restores and verifies three controls, reconnec
   const result = await runProvider(f.options, f.services);
   assert.equal(result.status, 'complete', result.errors.join('\n'));
   assert.equal(result.schemaVersion, 2);
+  assert.equal(result.preparedBaseline?.verification?.status, 'reproduced');
   assert.deepEqual(result.controls.map(control => [control.id, control.verification?.status]), [
     ['baseline', 'reproduced'], ['correct', 'passed'], ['misleading', 'reproduced'],
   ]);
@@ -207,20 +209,56 @@ test('successful runner prepares, restores and verifies three controls, reconnec
   }
 });
 
+test('a capture failure preserves the prepared browser baseline and its allowlisted observations', async t => {
+  const f = await successfulFixture(t);
+  f.adapter.capture = async () => { f.calls.push('capture'); throw new Error('snapshot timed out'); };
+  const result = await runProvider(f.options, {
+    ...f.services,
+    verify: async ({ directory }) => {
+      await mkdir(directory);
+      await writeFile(join(directory, 'document.json'), JSON.stringify({ schemaVersion: 1, caseId: 'reset', seed: 12345,
+        browserVersion: 'fixture', runtimeErrors: [], observations: [], secret: 'private-key-sentinel' }));
+      return { status: 'reproduced', verifiedExpectedFailure: true, reason: 'Expected failures verified', browserVersion: 'fixture',
+        tests: [{ id: 'reset', status: 'passed', observations: 0, evidence: 'document.json' }] };
+    },
+  });
+  assert.equal(result.status, 'failed');
+  assert.equal(result.source.integrity, null);
+  assert.deepEqual(result.controls, []);
+  assert.equal(result.preparedBaseline?.verification?.status, 'reproduced');
+  assert.ok(!f.calls.some(c => c.startsWith('spawn-')));
+  const publicResult = JSON.parse(await readFile(join(f.options.output, 'result.json'), 'utf8'));
+  assert.equal(publicResult.preparedBaseline.verification.tests[0].status, 'passed');
+  assert.equal(publicResult.source.integrity, null);
+  const observation = await readFile(join(f.options.output, 'observations/prepared-baseline/reset.json'), 'utf8');
+  assert.doesNotMatch(observation, /private-key-sentinel|secret/);
+  assert.equal(result.evidence.publicObservations['prepared-baseline/reset.json'], sha256(observation));
+});
+
 test('Daytona runner verifies snapshot controls and session recovery without inventing memory or keyed replay', async t => {
   const f = await successfulFixture(t);
   f.caps.resources = [{ id: 'default' }];
   const capture = f.adapter.capture;
+  let rotated = false;
+  let cleaned = false;
+  const cleanup = f.adapter.cleanup;
+  f.adapter.cleanup = async () => { cleaned = true; return cleanup(); };
+  f.adapter.preview = async sandbox => ({ id: `preview-${sandbox.id}`, url: `https://secret-preview.example.test/${sandbox.id}`,
+    expiresAt: null, headers: { 'x-daytona-preview-token': rotated ? 'new-token' : 'old-token' } });
   f.adapter.capture = async (sandbox, request) => {
+    rotated = true;
     const prepared = await capture(sandbox, request);
     await f.adapter.execute(sandbox, { name: 'source-stop-inherited-server', timeoutMs: 1000, argv: [] });
     return prepared;
   };
   const result = await runProvider({ ...f.options, provider: 'daytona', mode: 'saved-workspace',
-    apiUrl: 'https://app.daytona.io/api', size: 'default' }, f.services);
+    apiUrl: 'https://app.daytona.io/api', size: 'default' }, { ...f.services,
+      previewStatus: async (_url, _path, headers) => cleaned ? 404 : !headers || (rotated && headers['x-daytona-preview-token'] === 'old-token') ? 401 : 200,
+    });
   assert.equal(result.status, 'complete', result.errors.join('\n'));
   assert.equal(result.scope, 'cloud-api');
   assert.equal(result.controls.length, 3);
+  assert.equal(result.checks.previewTokenInvalidation?.status, 'verified');
   assert.equal(result.checks.captureIdempotency.status, 'unsupported');
   assert.match(result.checks.captureIdempotency.detail, /Daytona/);
   assert.match(result.checks.processes.detail, /no listener/);

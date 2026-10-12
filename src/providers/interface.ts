@@ -77,6 +77,7 @@ export interface CleanupResult {
   workspaces: { id: string; absent: boolean }[];
   physicalStorage: 'not-measured';
   errors: string[];
+  snapshotObservations?: { operationId: string; name: string; id: string | null; state: string; observedAt: string }[];
 }
 export interface ProviderAdapter {
   readonly name: ProviderName;

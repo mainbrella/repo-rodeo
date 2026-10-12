@@ -34,3 +34,16 @@ termination, not proof of separately revoked tokens. The original
 remains unchanged; its unchecked `source.integrity: false` is a historical reporting
 defect, corrected to `null` in new early-failure results. See the
 [run notes](../notes/2026-10-11-e2b.md) for scope and provenance.
+
+[`daytona-cloud-snapshot-timeout/result.json`](daytona-cloud-snapshot-timeout/result.json)
+retains the original failed capture unchanged. Its empty controls and unchecked
+`source.integrity: false` do not negate the verified prepared browser baseline.
+The separate [baseline reverification](daytona-cloud-snapshot-timeout/prepared-baseline-reverification.json)
+checks the sealed private evidence and confirms five expected failures and one
+passing reset test; six allowlisted documents are in `recovered-observations/`.
+The [read-only inventory reconciliation](daytona-cloud-snapshot-timeout/review-inventory-reconciliation.json)
+records both retained resource IDs absent at `2026-10-12T03:45:10.174Z` with the
+original credential. It also checks the exact snapshot name and sandbox run label.
+No provider mutation was issued. This observation leaves the original uncertain
+capture, automatic cleanup confirmation, preview revocation, and physical storage
+claims unchanged. See the [Daytona notes](../notes/2026-10-11-daytona.md).

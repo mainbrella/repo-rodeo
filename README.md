@@ -116,7 +116,9 @@ performance or cost is claimed.
 
 Set `DAYTONA_API_KEY` in the host environment. The default `saved-workspace` mode
 uses a container filesystem snapshot, then creates three controls from that exact
-snapshot. Capture stops the source container, so the source and restored servers
+snapshot. Preflight requires `write:sandboxes`, `delete:sandboxes`,
+`write:snapshots`, and `delete:snapshots` before provisioning. Capture stops the
+source container, so the source and restored servers
 are explicitly relaunched. The guest pins Node `22.22.2`; private previews use an
 origin-scoped token, and session recovery uses retained command output.
 
@@ -131,4 +133,9 @@ attempt and cleanup evidence. Container native forks are unsupported; VM memory
 forks, volumes, and warm pools remain separate unimplemented experiments. Keyed
 mutation replay is unsupported. Capture allows ten minutes, and each sandbox has
 a 30-minute wall-clock TTL. Recovery requires the original key fingerprint.
+Snapshot submission and exact-name polling have separate durable records; a
+later active observation does not rewrite an expired capture's uncertain journal.
+Partial results retain `preparedBaseline` and its public observations. Source
+integrity remains `null` until its final comparison runs. Token invalidation,
+API sandbox absence, and snapshot removal are checked separately.
 No comparison of performance, physical storage, or actual charges is claimed.

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "prepared-baseline-reverification",
+  "verifiedAt": "2026-10-12T03:47:21.644Z",
+  "seed": 12345,
+  "originalResultSha256": "4bceb48f7f04f95195c10ba3ecf118a7c1ffdf129d8769a783ae8534c0bb7cc2",
+  "originalEvidenceHashesVerified": true,
+  "verification": {
+    "status": "reproduced",
+    "verifiedExpectedFailure": true,
+    "reason": "All five persistence tests failed specifically on first-block loss; reset isolation passed.",
+    "tests": [
+      {
+        "id": "button-refresh",
+        "status": "failed",
+        "observations": 1,
+        "evidence": "test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-75a1996d7c88e85be2098202b3203d51d74ae1cb.json"
+      },
+      {
+        "id": "button-reload",
+        "status": "failed",
+        "observations": 1,
+        "evidence": "test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-a86cb08bc40afb1acd5ec353c1ac9a033e8fe861.json"
+      },
+      {
+        "id": "original-order",
+        "status": "failed",
+        "observations": 1,
+        "evidence": "test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-c63832ab8ae3e96f2953eab7fdb760294541d05c.json"
+      },
+      {
+        "id": "edited-text",
+        "status": "failed",
+        "observations": 1,
+        "evidence": "test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-ada0891c075745cb2b02710b79349836c8b6b0bf.json"
+      },
+      {
+        "id": "reset-isolation",
+        "status": "passed",
+        "observations": 0,
+        "evidence": "test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-89c8f8752eb389c52a110446b4d71ef65af64c5f.json"
+      },
+      {
+        "id": "holdout",
+        "status": "failed",
+        "observations": 1,
+        "evidence": "test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-0cb510318da0645110229e8e32fe0c10291ff4ea.json"
+      }
+    ],
+    "browserVersion": "153.0.8010.12"
+  },
+  "publicObservations": {
+    "prepared-baseline/button-refresh.json": "8bea81f038f7371d0051a1fc07cfdf499796caef437b352158c0e4f3a7a44e80",
+    "prepared-baseline/button-reload.json": "c81f2915b97ee2f3f6f3af8347fd3d7f88a60a709afc944dd11d02ffffd31935",
+    "prepared-baseline/edited-text.json": "905964b428c3842e2768417aee6b7c5e89fc664c5fb06cb727af6645f7508ddd",
+    "prepared-baseline/holdout.json": "9a086047fa52b0b4dcb93b79db12e67ac193d122fb665685216a9d21d0348bff",
+    "prepared-baseline/original-order.json": "e4ddc51b2efa4ecf87510c6cdade51b9164c85140e41c38f98c8a74fd450aec3",
+    "prepared-baseline/reset-isolation.json": "fd97d652c1d8451d36450cdbf607518e223b3a14945447000126a22f0366816a"
+  },
+  "sourceIntegrity": "not-checked",
+  "restoredControlsReached": false
+}

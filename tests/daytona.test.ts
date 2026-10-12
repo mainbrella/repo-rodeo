@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test, { type TestContext } from 'node:test';
@@ -18,12 +18,16 @@ async function fixture(t: TestContext) {
   let timeoutStatus = false;
   let disabledSnapshot = false;
   let ambiguousSnapshot = false;
+  let delayedSnapshot = true;
+  let permissions: unknown = ['write:sandboxes', 'delete:sandboxes', 'write:snapshots', 'delete:snapshots'];
+  let metadataStatus = 200;
   let retainDeleted = false;
   let staleDeleted: any;
   let staleReads = 0;
   const client = (id: string, name: string, labels: Record<string, string> = {}): any => ({
     id, name, labels, state: 'started', public: false, sandboxClass: 'container', cpu: 1, memory: 1, disk: 3,
     refreshData: async () => {}, setTtl: async (minutes: number) => { calls.push({ method: 'ttl', options: { id, minutes } }); },
+    stop: async (timeout: number) => { calls.push({ method: 'stop', options: { id, timeout } }); machines.get(id).state = 'stopped'; },
     getPreviewLink: async (port: number) => ({ url: `https://${port}-${id}.proxy.daytona.work`, token: `traffic-secret-${id}` }),
     fs: { createFolder: async () => {}, uploadFile: async (file: string, path: string) => {
       calls.push({ method: 'upload', options: { path, bytes: await readFile(file) } });
@@ -42,7 +46,7 @@ async function fixture(t: TestContext) {
     createSnapshot: async (name: string) => {
       calls.push({ method: 'snapshot', options: { id, name } });
       if (disabledSnapshot) throw Object.assign(new Error('snapshot disabled'), { statusCode: 403 });
-      snapshots.set('snapshot-1', { id: 'snapshot-1', name });
+      snapshots.set('snapshot-1', { id: 'snapshot-1', name, state: ambiguousSnapshot && delayedSnapshot ? 'snapshotting' : 'active' });
       if (ambiguousSnapshot) throw new Error('snapshot response lost');
     },
   });
@@ -67,15 +71,47 @@ async function fixture(t: TestContext) {
     },
     snapshot: {
       list: async ({ page }: { page: number }) => ({ items: [...snapshots.values()].slice(page - 1, page), totalPages: snapshots.size }),
-      get: async (name: string) => [...snapshots.values()].find(s => s.name === name),
+      get: async (name: string) => {
+        calls.push({ method: 'getSnapshot', options: name });
+        const snapshot = [...snapshots.values()].find(s => s.name === name);
+        if (!snapshot) throw Object.assign(new Error('not found'), { statusCode: 404 });
+        return snapshot;
+      },
       delete: async (id: string) => { calls.push({ method: 'deleteSnapshot', options: id }); snapshots.delete(id); },
     },
   } as unknown as Daytona;
-  const options = { apiUrl: 'https://app.daytona.io/api', apiKey: 'daytona-test-private-key', directory, sdk };
+  const request: typeof fetch = async (input, init) => {
+    const path = new URL(String(input)).pathname;
+    if (path === '/api/api-keys/current') {
+      calls.push({ method: 'permissions' });
+      return Response.json({ permissions, value: 'metadata-secret-must-not-be-recorded' }, { status: metadataStatus });
+    }
+    if (path.startsWith('/api/snapshots/')) {
+      try { return Response.json(await sdk.snapshot.get(decodeURIComponent(path.slice('/api/snapshots/'.length)))); }
+      catch (error) {
+        const status = (error as { statusCode?: number }).statusCode;
+        if (status) return Response.json({}, { status });
+        throw error;
+      }
+    }
+    assert.equal(init?.method, 'POST');
+    assert.equal(init?.redirect, 'error');
+    const id = decodeURIComponent(path.split('/')[3]);
+    const { name } = JSON.parse(String(init?.body));
+    try { await machines.get(id).createSnapshot(name); }
+    catch (error) {
+      if ((error as { statusCode?: number }).statusCode) return Response.json({}, { status: (error as { statusCode: number }).statusCode });
+      throw error;
+    }
+    return Response.json({});
+  };
+  const options = { apiUrl: 'https://app.daytona.io/api', apiKey: 'daytona-test-private-key', directory, sdk, fetch: request };
   const adapter = new DaytonaAdapter(options);
   return { directory, options, adapter, calls, machines, snapshots, commands,
     ambiguousCreate: (http408 = false) => { ambiguousCreate = true; timeoutStatus = http408; },
-    ambiguousSnapshot: () => { ambiguousSnapshot = true; },
+    ambiguousSnapshot: (delayed = true) => { ambiguousSnapshot = true; delayedSnapshot = delayed; },
+    permissions: (value: unknown) => { permissions = value; },
+    metadataStatus: (value: number) => { metadataStatus = value; },
     staleDeletion: () => { retainDeleted = true; },
     disabledSnapshot: () => { disabledSnapshot = true; } };
 }
@@ -110,6 +146,29 @@ test('Daytona cleanup rejects a different credential before deletion', async t =
   assert.equal((await new DaytonaAdapter({ ...f.options, apiKey: 'other-team' }).cleanup()).confirmed, false);
   assert.equal(f.calls.length, count);
   assert.equal((await f.adapter.cleanup()).confirmed, true);
+});
+
+test('Daytona refuses provisioning when either snapshot scope is missing', async t => {
+  for (const missing of ['write:snapshots', 'delete:snapshots']) {
+    const f = await fixture(t);
+    f.permissions(['write:sandboxes', 'delete:sandboxes', ...['write:snapshots', 'delete:snapshots'].filter(p => p !== missing)]);
+    await assert.rejects(f.adapter.create(create), new RegExp(missing));
+    assert.equal(f.calls.filter(c => c.method === 'create').length, 0);
+    assert.deepEqual(await readdir(join(f.directory, 'operations')), []);
+    const receipt = (await readdir(join(f.directory, 'receipts'))).find(name => name.startsWith('permissions-'))!;
+    assert.doesNotMatch(await readFile(join(f.directory, 'receipts', receipt), 'utf8'), /metadata-secret|daytona-test-private-key/);
+    // Cleanup remains usable with restricted scopes; it never runs provisioning preflight.
+    assert.equal((await f.adapter.cleanup()).confirmed, true);
+  }
+});
+
+test('Daytona permission preflight fails closed on unavailable or malformed metadata', async t => {
+  for (const failure of ['unavailable', 'malformed']) {
+    const f = await fixture(t);
+    if (failure === 'unavailable') f.metadataStatus(403); else f.permissions(null);
+    await assert.rejects(f.adapter.create(create), /permission preflight/);
+    assert.equal(f.calls.some(c => c.method === 'create'), false);
+  }
 });
 
 test('Daytona saved workspace uses one persistent snapshot, paginates inventory and deletes only its checkpoint', async t => {
@@ -170,12 +229,59 @@ test('uncertain Daytona snapshot is discovered by its exact persisted name and n
   const f = await fixture(t); const { sandbox } = await f.adapter.create(create); f.ambiguousSnapshot();
   const op = { name: 'capture', timeoutMs: 1000, mode: 'saved-workspace' as const };
   await assert.rejects(f.adapter.capture(sandbox, op), /Daytona snapshot failed/);
+  f.snapshots.get('snapshot-1').state = 'active';
   await assert.rejects(new DaytonaAdapter(f.options).capture(sandbox, op), /already attempted/);
   assert.equal(f.calls.filter(c => c.method === 'snapshot').length, 1);
   const cleanup = await f.adapter.cleanup();
   assert.equal(cleanup.confirmed, false); assert.match(cleanup.errors.join(' '), /remains uncertain/);
+  assert.equal(cleanup.snapshotObservations?.[0].state, 'active');
+  const records = await Promise.all((await readdir(join(f.directory, 'operations'))).map(name => readFile(join(f.directory, 'operations', name), 'utf8').then(JSON.parse)));
+  assert.equal(records.find(r => r.kind === 'snapshot').status, 'uncertain');
+  assert.equal(f.calls.filter(c => c.method === 'start').length, 0);
   assert.deepEqual(cleanup.workspaces, [{ id: 'snapshot-1', absent: true }]);
   assert.deepEqual([...f.snapshots.keys()], ['unrelated-snapshot']);
+});
+
+test('Daytona records acknowledged submission separately from snapshot polling and readiness', async t => {
+  const f = await fixture(t); const { sandbox } = await f.adapter.create(create);
+  let reads = 0;
+  const get = f.options.sdk.snapshot.get.bind(f.options.sdk.snapshot);
+  f.options.sdk.snapshot.get = async name => {
+    const snapshot = await get(name);
+    snapshot.state = ++reads === 1 ? 'snapshotting' : 'active';
+    return snapshot;
+  };
+  await f.adapter.capture(sandbox, { name: 'capture', timeoutMs: 4000, mode: 'saved-workspace' });
+  const file = (await readdir(join(f.directory, 'owned'))).find(n => n.startsWith('snapshot-'))!;
+  const lifecycle = JSON.parse(await readFile(join(f.directory, 'owned', file), 'utf8'));
+  assert.equal(lifecycle.submission, 'acknowledged');
+  assert.equal(lifecycle.phase, 'complete');
+  assert.equal(lifecycle.observation.state, 'active');
+  assert.equal(f.calls.filter(c => c.method === 'snapshot').length, 1);
+  assert.equal(f.calls.filter(c => c.method === 'getSnapshot').length, 2);
+  assert.equal((await f.adapter.cleanup()).confirmed, true);
+});
+
+test('Daytona read failure after snapshot admission stays uncertain rather than rejected', async t => {
+  const f = await fixture(t); const { sandbox } = await f.adapter.create(create);
+  f.options.sdk.snapshot.get = async () => { throw Object.assign(new Error('access denied'), { statusCode: 403 }); };
+  await assert.rejects(f.adapter.capture(sandbox, { name: 'capture', timeoutMs: 1000, mode: 'saved-workspace' }), /Daytona snapshot failed/);
+  const records = await Promise.all((await readdir(join(f.directory, 'operations'))).map(name => readFile(join(f.directory, 'operations', name), 'utf8').then(JSON.parse)));
+  assert.equal(records.find(r => r.kind === 'snapshot').status, 'uncertain');
+  assert.equal(f.calls.some(c => c.method === 'start'), false);
+});
+
+test('Daytona can observe an active snapshot after a lost submission response without resubmitting', async t => {
+  const f = await fixture(t); const { sandbox } = await f.adapter.create(create); f.ambiguousSnapshot(false);
+  const prepared = await f.adapter.capture(sandbox, { name: 'capture', timeoutMs: 1000, mode: 'saved-workspace' });
+  assert.equal(prepared.id, 'snapshot-1');
+  const file = (await readdir(join(f.directory, 'owned'))).find(n => n.startsWith('snapshot-'))!;
+  const lifecycle = JSON.parse(await readFile(join(f.directory, 'owned', file), 'utf8'));
+  assert.equal(lifecycle.submission, 'uncertain');
+  assert.equal(lifecycle.observation.state, 'active');
+  assert.equal(lifecycle.phase, 'complete');
+  assert.equal(f.calls.filter(c => c.method === 'snapshot').length, 1);
+  assert.equal((await f.adapter.cleanup()).confirmed, true);
 });
 
 test('Daytona cleanup waits for deletion to propagate through inventory', async t => {

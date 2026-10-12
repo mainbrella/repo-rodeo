@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "kind": "read-only-inventory-reconciliation",
+  "observedAt": "2026-10-12T03:45:10.174Z",
+  "originalCredential": true,
+  "sandbox": {
+    "id": "237d7ff6-ffda-431e-9fb5-926b91c54f4e",
+    "absentFromInventory": true,
+    "runLabelAbsent": true
+  },
+  "snapshot": {
+    "id": "c3a09352-ab3a-4c94-831a-259b642a6be5",
+    "name": "rodeo-6b6a8475-efcd-42a3-bb74-63cfe15da546-prepared",
+    "absentFromInventory": true
+  },
+  "mutationsIssued": false,
+  "originalCaptureOutcome": "uncertain",
+  "automaticCleanupConfirmed": false,
+  "previewRevocation": "not-checked",
+  "physicalStorage": "not-measured"
+}

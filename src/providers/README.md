@@ -30,6 +30,9 @@ separately from the application's `source.commit`. Retained input hashes identif
 the actual experiment files. `source.integrity` is `null` until the final host-input
 comparison runs, then `true` or `false`. Historical results retain their original
 bytes; an early failure's old `false` value does not prove an integrity failure.
+New results also retain `preparedBaseline` as soon as the external verifier
+returns, including an unverified outcome. Its allowlisted observations are exported
+under `observations/prepared-baseline/`, even when capture fails before any control.
 
 For E2B, set `E2B_API_KEY` and run `npm run experiment -- --provider e2b --seed 12345`.
 It defaults to the `base` template, `memory-fork`, and the official cloud API.
@@ -63,6 +66,11 @@ guest stdout with a byte offset, not a server SSE cursor.
 For Daytona, set `DAYTONA_API_KEY` and run `npm run experiment -- --provider daytona
 --seed 12345`. It defaults to `saved-workspace`, the official cloud API at
 `https://app.daytona.io/api`, and the default container snapshot (`--size default`).
+Before provisioning, a read-only `/api-keys/current` lookup requires all four
+scopes: `write:sandboxes`, `delete:sandboxes`, `write:snapshots`, and
+`delete:snapshots`. Missing, malformed, or unavailable permission metadata fails
+closed. Only scopes are retained; the API key value in the response is discarded.
+Cleanup uses the existing credential binding without requiring provisioning scopes.
 The guest pins Node before preparation and uses the default image's passwordless
 sudo for `/opt` and `/workspace`; binary uploads are staged in `/tmp` first.
 Capture explicitly stops the source, creates one persistent filesystem snapshot,
@@ -70,6 +78,12 @@ and restarts the source container. The runner verifies that the source and each
 restored branch have no inherited listener, then launches fresh servers. Captures
 allow ten minutes; wall-clock TTLs bound sandbox retention to 30 minutes. Immediate
 auto-delete is disabled so stopping the source does not destroy it before capture.
+Capture journals the exact snapshot name before submission, submits one REST
+request, and independently polls that name. Durable lifecycle records distinguish
+submission acknowledgement from snapshot readiness and source restart. A lost
+submission response can be resolved by observing that exact snapshot become active
+within the capture deadline. An expired capture stays uncertain; later cleanup
+observations are separate and never replay submission or overwrite that outcome.
 
 [Container forks are unsupported](https://www.daytona.io/docs/en/sandboxes/#fork-sandboxes).
 VM memory forks, volumes and warm pools remain separate, unimplemented modes.
@@ -77,7 +91,13 @@ Standard preview tokens use `x-daytona-preview-token` and are sandbox-wide
 credentials; they stay private and are scoped to the preview origin in host and
 browser requests. Stopping a sandbox rotates its token; deletion revokes access.
 The adapter confirms private access with HTTP 401/403 denial and retains the
-strict HTTP 404/410 post-deletion check. Session reattachment recovers the same
+strict HTTP 404/410 post-deletion check alongside exact API sandbox absence.
+After source restart, `previewTokenInvalidation` compares the retained and fresh
+tokens at the same URL: the retained token must return HTTP 401/403 while the
+fresh token returns HTTP 200. HTTP 400 remains inconclusive. Sandbox absence and
+snapshot absence remain separate entries in `cleanup`; snapshot observations
+include their state and timestamp independently of the original journal outcome.
+Session reattachment recovers the same
 session/command IDs and retained stdout with a byte offset; it does not exercise
 live stream disconnection or dashboard reconnection. Guest `timeout` bounds each
 asynchronous command's runtime.

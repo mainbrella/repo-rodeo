@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assessPreviewRevocation, type RevocationProbe } from '../src/preview-revocation.ts';
+import { assessPreviewRevocation, assessPreviewTokenInvalidation, type RevocationProbe } from '../src/preview-revocation.ts';
 import type { CleanupResult } from '../src/providers/interface.ts';
 
 const sandbox = { id: 'source', generation: 'source-generation' };
@@ -33,4 +33,21 @@ test('other providers retain explicit 404/410 confirmation and no previews remai
     assert.equal(assessPreviewRevocation(provider, cleanup, [probe(410)]).status, 'verified');
   }
   assert.equal(assessPreviewRevocation('e2b', cleanup, []).status, 'not-exercised');
+});
+
+test('Daytona sandbox absence and snapshot deletion remain separate from preview access', () => {
+  assert.equal(assessPreviewRevocation('daytona', { ...cleanup, confirmed: false, workspaces: [{ id: 'snapshot', absent: false }] }, [probe(404)]).status, 'verified');
+  for (const inventory of [null, { ...cleanup, sandboxes: [] }, { ...cleanup, sandboxes: [{ sandbox, absent: false }] },
+    { ...cleanup, sandboxes: [{ sandbox: { ...sandbox, generation: 'replacement' }, absent: true }] }]) {
+    assert.equal(assessPreviewRevocation('daytona', inventory, [probe(404)]).status, 'failed');
+  }
+  assert.equal(assessPreviewRevocation('daytona', cleanup, [probe(400)]).status, 'failed');
+});
+
+test('preview token invalidation requires an authentication denial and fresh access at the same URL', () => {
+  assert.equal(assessPreviewTokenInvalidation(401, 200).status, 'verified');
+  assert.equal(assessPreviewTokenInvalidation(403, 200).status, 'verified');
+  for (const [retained, fresh] of [[400, 200], [404, 200], [0, 200], [200, 200], [401, 400], [401, 0]]) {
+    assert.equal(assessPreviewTokenInvalidation(retained, fresh).status, 'failed');
+  }
 });

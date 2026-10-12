@@ -6,12 +6,19 @@ import { Daytona, type Sandbox as CloudSandbox, type Snapshot } from '@daytona/s
 import { redact } from '../experiment-result.ts';
 import type { Capabilities, CleanupResult, Execution, Inventory, Operation, PreparedState, Preview, ProviderAdapter, Receipt, Sandbox } from './interface.ts';
 
-type Options = { apiUrl: string; apiKey: string; directory: string; sdk?: Daytona };
+type Options = { apiUrl: string; apiKey: string; directory: string; sdk?: Daytona; fetch?: typeof fetch };
 type State = { sandboxes: Sandbox[]; snapshots: string[] };
 type Journal = { name: string; kind: string; request: unknown; startedAt: string;
   status: 'pending' | 'complete' | 'rejected' | 'uncertain'; response?: unknown; completedAt?: string; error?: string;
   providerError?: { code: string | null; message: string } };
 type Job = { sandbox: Sandbox; sessionId: string; commandId: string };
+type SnapshotLifecycle = {
+  operationId: string; name: string; source: Sandbox;
+  phase: 'stopping' | 'submitting' | 'waiting' | 'restarting' | 'complete' | 'uncertain' | 'rejected';
+  submission: 'not-attempted' | 'pending' | 'acknowledged' | 'uncertain' | 'rejected';
+  submissionHttpStatus?: number;
+  observation?: { id: string | null; state: string; observedAt: string };
+};
 const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
 const quote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
 const guestPath = '/opt/rodeo-node/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
@@ -23,6 +30,7 @@ export class DaytonaAdapter implements ProviderAdapter {
   private readonly directory: string;
   private readonly sdk: Daytona;
   private readonly apiKey: string;
+  private readonly fetch: typeof fetch;
   private ready?: Promise<void>;
   private runLabel = '';
   private readonly clients = new Map<string, CloudSandbox>();
@@ -31,6 +39,7 @@ export class DaytonaAdapter implements ProviderAdapter {
     if (options.apiUrl !== 'https://app.daytona.io/api') throw new Error('The Daytona adapter requires https://app.daytona.io/api');
     this.directory = resolve(options.directory);
     this.apiKey = options.apiKey;
+    this.fetch = options.fetch ?? fetch;
     this.sdk = options.sdk ?? new Daytona({ apiKey: options.apiKey, apiUrl: options.apiUrl, requestTimeoutMs: 30_000, otelEnabled: false });
   }
   private command(argv: string[], env?: Record<string, string>, cwd?: string) {
@@ -151,6 +160,50 @@ export class DaytonaAdapter implements ProviderAdapter {
       if (page >= items.totalPages) return result;
     }
   }
+  private async apiRequest(path: string, method = 'GET', body?: unknown, signal?: AbortSignal, timeoutMs = 30_000) {
+    return this.fetch(`https://app.daytona.io/api${path}`, {
+      method, redirect: 'error', headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.any([AbortSignal.timeout(Math.max(1, Math.ceil(timeoutMs))), ...(signal ? [signal] : [])]),
+    });
+  }
+  private async snapshotPermissions() {
+    const response = await this.apiRequest('/api-keys/current');
+    if (!response.ok) throw new Error(`Daytona permission preflight failed with HTTP ${response.status}; provisioning was not attempted`);
+    const metadata = await response.json() as { permissions?: unknown };
+    if (!Array.isArray(metadata.permissions) || !metadata.permissions.every(p => typeof p === 'string'))
+      throw new Error('Daytona permission preflight returned invalid scopes; provisioning was not attempted');
+    const permissions = metadata.permissions as string[];
+    const required = ['write:sandboxes', 'delete:sandboxes', 'write:snapshots', 'delete:snapshots'];
+    const missing = required.filter(permission => !permissions.includes(permission));
+    await this.json(join(this.directory, 'receipts', `permissions-${randomUUID()}.json`), {
+      observedAt: new Date().toISOString(), required, permissions: metadata.permissions, missing,
+    });
+    if (missing.length) throw new Error(`Daytona saved-workspace requires ${missing.join(', ')}; provisioning was not attempted`);
+  }
+  private snapshotFile(operationId: string) { return join(this.directory, 'owned', `snapshot-${hash(operationId)}.json`); }
+  private async observeSnapshot(operationId: string, name: string, operation?: Operation) {
+    if (name !== `rodeo-${this.runLabel}-prepared`) throw new Error('Daytona snapshot name is not owned by this run');
+    let observation: NonNullable<SnapshotLifecycle['observation']>;
+    try {
+      let snapshot: Snapshot;
+      if (operation) {
+        const response = await this.apiRequest(`/snapshots/${encodeURIComponent(name)}`, 'GET', undefined, operation.signal, Math.min(30_000, operation.timeoutMs));
+        if (!response.ok) throw Object.assign(new Error(`Daytona snapshot lookup failed with HTTP ${response.status}`), { statusCode: response.status });
+        snapshot = await response.json() as Snapshot;
+      } else snapshot = await this.sdk.snapshot.get(name);
+      if (!snapshot || snapshot.name !== name || typeof snapshot.id !== 'string' || typeof snapshot.state !== 'string')
+        throw new Error('Daytona snapshot lookup returned an invalid identity or state');
+      const state = await this.state();
+      if (!state.snapshots.includes(snapshot.id)) { state.snapshots.push(snapshot.id); await this.json(this.stateFile(), state); }
+      observation = { id: snapshot.id, state: snapshot.state, observedAt: new Date().toISOString() };
+    } catch (error) {
+      if ((error as { statusCode?: number }).statusCode !== 404) throw error;
+      observation = { id: null, state: 'absent', observedAt: new Date().toISOString() };
+    }
+    await this.json(join(this.directory, 'receipts', `snapshot-observation-${randomUUID()}.json`), { operationId, name, ...observation });
+    return observation;
+  }
   private async client(sandbox: Sandbox) {
     await this.init();
     if (sandbox.id !== sandbox.generation || !(await this.state()).sandboxes.some(s => s.id === sandbox.id)) throw new Error('Daytona sandbox is not owned by this run');
@@ -183,6 +236,8 @@ export class DaytonaAdapter implements ProviderAdapter {
   async create(request: Operation & { image: string; size: string }) {
     if (request.size !== 'default' || request.image !== 'default') throw new Error('Daytona uses its default container snapshot; select --size default');
     await this.init();
+    request.signal?.throwIfAborted();
+    await this.snapshotPermissions();
     const params = this.createParams(request.name);
     const sandbox = await this.mutation(request, 'create', params, async () => {
       const client = await this.sdk.create(params, { timeout: seconds(request) });
@@ -218,18 +273,65 @@ export class DaytonaAdapter implements ProviderAdapter {
     if (request.dropResponseAfterHeaders) throw new Error('Daytona capture has no documented keyed replay contract');
     if (request.mode !== 'saved-workspace') throw new Error('Unsupported Daytona capture mode');
     await this.init();
+    request.signal?.throwIfAborted();
+    await this.snapshotPermissions();
     const name = `rodeo-${this.runLabel}-prepared`;
     const value = await this.mutation(request, 'snapshot', { sandbox, mode: request.mode, name }, async () => {
       const client = await this.client(sandbox);
+      const deadline = Date.now() + request.timeoutMs;
+      const remaining = () => {
+        request.signal?.throwIfAborted();
+        const time = deadline - Date.now();
+        if (time <= 0) throw new Error('Daytona snapshot deadline exceeded; reconcile the persisted name without resubmitting');
+        return time;
+      };
+      const lifecycle: SnapshotLifecycle = { operationId: request.name, name, source: sandbox, phase: 'stopping', submission: 'not-attempted' };
+      const persist = () => this.json(this.snapshotFile(request.name), lifecycle);
+      await persist();
       // Container snapshots require a stopped source. TTL still bounds retention;
       // immediate auto-delete would destroy it before capture could begin.
-      await this.sdk.stop(client);
-      await client.createSnapshot(name, seconds(request));
-      const snapshot = await this.sdk.snapshot.get(name);
-      const state = await this.state(); state.snapshots.push(snapshot.id); await this.json(this.stateFile(), state);
-      await this.sdk.start(client, seconds(request));
-      this.clients.delete(sandbox.id); // Restart rotates the standard preview token.
-      return { id: snapshot.id };
+      try {
+        await client.stop(Math.ceil(remaining() / 1000));
+        this.clients.delete(sandbox.id); // Stopping rotates the standard preview token.
+        remaining();
+        lifecycle.phase = 'submitting'; lifecycle.submission = 'pending'; await persist();
+        // Submit once using the SDK's public REST endpoint. The SDK's convenience
+        // method also waits on sandbox state; observation here uses the exact name.
+        try {
+          const response = await this.apiRequest(`/sandbox/${encodeURIComponent(sandbox.id)}/snapshot`, 'POST', { name }, request.signal, Math.min(30_000, remaining()));
+          lifecycle.submissionHttpStatus = response.status;
+          await response.body?.cancel().catch(() => {});
+          if (response.status >= 400 && response.status < 500 && response.status !== 408) {
+            lifecycle.submission = 'rejected'; lifecycle.phase = 'rejected'; await persist();
+            throw Object.assign(new Error('Daytona snapshot submission rejected'), { statusCode: response.status });
+          }
+          lifecycle.submission = response.ok ? 'acknowledged' : 'uncertain';
+        } catch (error) {
+          if (lifecycle.submission === 'rejected') throw error;
+          lifecycle.submission = 'uncertain';
+        }
+        lifecycle.phase = 'waiting'; await persist();
+        while (true) {
+          remaining();
+          lifecycle.observation = await this.observeSnapshot(request.name, name, { ...request, timeoutMs: remaining() }); await persist();
+          remaining();
+          if (lifecycle.observation.state === 'active') break;
+          if (['error', 'build_failed', 'removing'].includes(lifecycle.observation.state))
+            throw new Error(`Daytona snapshot entered ${lifecycle.observation.state}`);
+          await pause(Math.min(1000, remaining()), undefined, { signal: request.signal });
+        }
+        lifecycle.phase = 'restarting'; await persist();
+        await this.sdk.start(client, Math.ceil(remaining() / 1000));
+        lifecycle.phase = 'complete'; await persist();
+        return { id: lifecycle.observation.id! };
+      } catch (error) {
+        if (lifecycle.phase !== 'rejected') {
+          lifecycle.phase = 'uncertain'; await persist();
+          // A read/restart failure after submission cannot prove rejection.
+          throw new Error('Daytona snapshot could not complete; reconcile its persisted name', { cause: error });
+        }
+        throw error;
+      }
     });
     return { id: value.id, mode: request.mode, source: sandbox, preservation: 'filesystem', bytes: null, receipt: await this.receipt(request) };
   }
@@ -300,6 +402,7 @@ export class DaytonaAdapter implements ProviderAdapter {
   }
   async cleanup(): Promise<CleanupResult> {
     const errors: string[] = [];
+    const snapshotObservations: NonNullable<CleanupResult['snapshotObservations']> = [];
     let state: State;
     try { await this.init(false, true); state = await this.state(); }
     catch { return { confirmed: false, sandboxes: [], workspaces: [], physicalStorage: 'not-measured', errors: ['Daytona cleanup credential or ownership could not be validated'] }; }
@@ -313,10 +416,17 @@ export class DaytonaAdapter implements ProviderAdapter {
           errors.push(`Daytona operation ${record.name} remains uncertain; it was not reissued`);
         const request = record.request as { name?: string };
         if (['create', 'spawn'].includes(record.kind) && request?.name?.startsWith(`rodeo-${this.runLabel}-`)) names.add(request.name);
+        if (record.kind === 'snapshot') {
+          if (request?.name !== `rodeo-${this.runLabel}-prepared`) throw new Error('Malformed snapshot ownership');
+          const observation = await this.observeSnapshot(record.name, request.name);
+          snapshotObservations.push({ operationId: record.name, name: request.name, ...observation });
+        }
       }
+      // Exact-name observations can add an admitted snapshot after a lost response.
+      state = await this.state();
       for (const sandbox of await this.listSandboxes()) if ((sandbox.labels.repo_rodeo_run === this.runLabel || names.has(sandbox.name)) && !state.sandboxes.some(s => s.id === sandbox.id))
         state.sandboxes.push({ id: sandbox.id, generation: sandbox.id });
-      for (const snapshot of await this.listSnapshots()) if (snapshot.name === `rodeo-${this.runLabel}-prepared` && !state.snapshots.includes(snapshot.id)) state.snapshots.push(snapshot.id);
+      for (const snapshot of await this.listSnapshots()) if (snapshotObservations.some(s => s.name === snapshot.name) && !state.snapshots.includes(snapshot.id)) state.snapshots.push(snapshot.id);
       await this.json(this.stateFile(), state);
     } catch { errors.push('Daytona resource reconciliation or operation journals could not be read'); }
     // Remove restored branches before their prepared source.
@@ -347,6 +457,6 @@ export class DaytonaAdapter implements ProviderAdapter {
     const sandboxes = state.sandboxes.map(sandbox => ({ sandbox, absent: !!inventory && !inventory.sandboxes.some(s => s.id === sandbox.id) }));
     const workspaces = state.snapshots.map(id => ({ id, absent: !!inventory && !inventory.workspaces.some(s => s.id === id) }));
     if ([...sandboxes, ...workspaces].some(s => !s.absent)) errors.push('One or more Daytona resources remain');
-    return { confirmed: !!inventory && errors.length === 0, sandboxes, workspaces, physicalStorage: 'not-measured', errors };
+    return { confirmed: !!inventory && errors.length === 0, sandboxes, workspaces, physicalStorage: 'not-measured', errors, snapshotObservations };
   }
 }

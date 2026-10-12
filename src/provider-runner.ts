@@ -12,7 +12,7 @@ import { readScenario } from './scenario.ts';
 import { prepareSource } from './experiment-source.ts';
 import { verifyPreview } from './browser-verification.ts';
 import { previewStatus } from './preview.ts';
-import { assessPreviewRevocation, probePreviewRevocation } from './preview-revocation.ts';
+import { assessPreviewRevocation, assessPreviewTokenInvalidation, probePreviewRevocation } from './preview-revocation.ts';
 import { exportObservations } from './public-evidence.ts';
 import { redact } from './experiment-result.ts';
 import type { Check, ExperimentResult } from './experiment-result.ts';
@@ -95,10 +95,11 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     source: { kind: options.source ? 'web-checkout' : 'standalone', commit: null, archiveSha256: null, inputHashes: {}, integrity: null },
     environment: { host: { node: process.versions.node, platform: platform(), arch: arch(), playwright: null },
       guest: null, requested: { image: 'node', size: options.size }, observedResourceLimits: null, model: null, billing: 'not-measured' },
-    controls: [], checks: {
+    controls: [], preparedBaseline: null, checks: {
       filesystem: untested('Restore not attempted.'), processes: untested('Process probes not compared.'), isolation: untested('Branch writes not checked.'),
       jobReattachment: untested('API stream reconnect not attempted; dashboard sessions are outside this runner.'),
       captureIdempotency: untested('Response-loss experiment not requested.'), previewRevocation: untested('No previews issued.'),
+      ...(options.provider === 'daytona' ? { previewTokenInvalidation: untested('Source restart was not reached.') } : {}),
     }, storage: { captureBytes: null, before: null, afterCapture: null, afterCleanup: null }, cleanup: null,
     measurements: { elapsedMs: 0, comparableBenchmark: false, costs: null }, errors: [], evidence: { privateDirectory: 'private', files: {}, publicObservations: {} },
   };
@@ -230,6 +231,7 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     if (source.kind === 'web-checkout') assert.ok(original.dependencyHash, 'Installed dependency lockfile missing');
     const sourcePreview = await publish(sandbox, 'source');
     const baseline = await services.verify({ repository, directory: join(privateDirectory, 'prepared-baseline'), url: sourcePreview.url, headers: sourcePreview.headers, seed: options.seed, scenario, signal: abort.signal });
+    result.preparedBaseline = { id: 'prepared-baseline', expected: 'reproduced', patchSha256: null, sourceHashes: { ...original.hashes }, verification: baseline };
     if (baseline.status !== 'reproduced') throw new Error('Prepared baseline was not verified; capture and candidates were not started');
 
     progress('Capturing prepared state and creating three controls.');
@@ -257,6 +259,14 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       assert.equal(after.process.serverReachable, false, 'Stopped container snapshot unexpectedly retained its source listener');
       const resumed = await launch(sandbox, 'source-resumed');
       assert.ok(resumed.process.nonce && resumed.process.nonce !== original.process.nonce, 'Source restart reused pre-capture process state');
+      activeCheck = 'previewTokenInvalidation';
+      const freshPreview = await publish(sandbox, 'source-resumed');
+      assert.equal(freshPreview.url, sourcePreview.url, 'Source restart changed the preview URL; token invalidation could not be compared');
+      const retainedStatus = await services.previewStatus(sourcePreview.url, '/repo-rodeo-bug', sourcePreview.headers);
+      const freshStatus = await services.previewStatus(freshPreview.url, '/repo-rodeo-bug', freshPreview.headers);
+      await writeJson(join(privateDirectory, 'preview-token-invalidation.json'), { retainedStatus, freshStatus, observedAt: new Date().toISOString() });
+      result.checks.previewTokenInvalidation = assessPreviewTokenInvalidation(retainedStatus, freshStatus);
+      if (result.checks.previewTokenInvalidation.status !== 'verified') throw new Error(result.checks.previewTokenInvalidation.detail);
     } else {
       assert.equal(after.process.nonce, original.process.nonce, 'Capture changed the source process nonce');
       assert.equal(after.process.pid, original.process.pid, 'Capture changed the source PID');
@@ -394,7 +404,8 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     result.measurements.elapsedMs = performance.now() - started;
     try {
       result.evidence.files = await sealProviderEvidence(privateDirectory);
-      result.evidence.publicObservations = await exportObservations(privateDirectory, join(output, 'observations'), result.controls,
+      result.evidence.publicObservations = await exportObservations(privateDirectory, join(output, 'observations'),
+        [...(result.preparedBaseline ? [result.preparedBaseline] : []), ...result.controls],
         [options.apiKey || '', ...previews.flatMap(item => [item.preview.url, ...Object.values(item.preview.headers ?? {})])]);
     } catch {
       result.errors.push('Evidence export failed; inspect the private evidence before sharing.');
