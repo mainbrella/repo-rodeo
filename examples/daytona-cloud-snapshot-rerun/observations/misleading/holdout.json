@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "caseId": "holdout",
+  "seed": 12345,
+  "browserVersion": "153.0.8010.12",
+  "runtimeErrors": [],
+  "observations": [
+    {
+      "expected": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "paragraph",
+          "text": ""
+        },
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "actual": [
+        {
+          "id": "button",
+          "text": "12345/0/8b0c4215 — 雨 <&> \" ' long long long long long long long long long long long long long long long "
+        },
+        {
+          "id": "heading",
+          "text": "12345/0/e8f7b1b7 — 雨 <&> \" ' long long "
+        }
+      ],
+      "reload": "refresh"
+    }
+  ]
+}

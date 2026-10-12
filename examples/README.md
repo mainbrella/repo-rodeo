@@ -59,3 +59,12 @@ original credential. It also checks the exact snapshot name and sandbox run labe
 No provider mutation was issued. This observation leaves the original uncertain
 capture, automatic cleanup confirmation, preview revocation, and physical storage
 claims unchanged. See the [Daytona notes](../notes/2026-10-11-daytona.md).
+
+[`daytona-cloud-snapshot-rerun/result.json`](daytona-cloud-snapshot-rerun/result.json)
+records the October 12 rerun with the required sandbox and snapshot scopes. One
+capture supplied three restores; the controls, isolation, input integrity and
+API cleanup passed, and all exact run resources were independently confirmed
+absent. The result remains failed because some deleted-sandbox preview URLs
+returned 401 instead of the required 404/410. See the
+[rerun notes](../notes/2026-10-12-daytona-rerun.md); the earlier result remains
+unchanged.

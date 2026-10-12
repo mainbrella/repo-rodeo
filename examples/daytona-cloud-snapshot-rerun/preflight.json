@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-10-12T09:49:17.050Z",
+  "permissions": [
+    "write:registries",
+    "delete:registries",
+    "write:snapshots",
+    "delete:snapshots",
+    "write:sandboxes",
+    "delete:sandboxes",
+    "read:volumes",
+    "write:volumes",
+    "delete:volumes",
+    "write:regions",
+    "delete:regions",
+    "read:runners",
+    "write:runners",
+    "delete:runners",
+    "read:audit_logs",
+    "manage:secrets",
+    "read:limits",
+    "manage:sso",
+    "read:billing",
+    "manage:billing"
+  ],
+  "previousResourceLookups": {
+    "sandboxId": "237d7ff6-ffda-431e-9fb5-926b91c54f4e",
+    "sandboxHttpStatus": 404,
+    "snapshotId": "c3a09352-ab3a-4c94-831a-259b642a6be5",
+    "snapshotHttpStatus": 404
+  },
+  "localValidation": {
+    "tests": 103,
+    "typecheck": "passed"
+  }
+}

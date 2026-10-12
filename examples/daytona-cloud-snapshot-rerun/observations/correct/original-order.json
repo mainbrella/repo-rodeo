@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "caseId": "original-order",
+  "seed": 12345,
+  "browserVersion": "153.0.8010.12",
+  "runtimeErrors": [],
+  "observations": [
+    {
+      "expected": [
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        },
+        {
+          "id": "button",
+          "text": "Join the waitlist"
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        },
+        {
+          "id": "button",
+          "text": "Join the waitlist"
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        },
+        {
+          "id": "button",
+          "text": "Join the waitlist"
+        }
+      ],
+      "actual": [
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        },
+        {
+          "id": "button",
+          "text": "Join the waitlist"
+        }
+      ],
+      "reload": "refresh"
+    }
+  ]
+}

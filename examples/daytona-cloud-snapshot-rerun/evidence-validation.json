@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "validatedAt": "2026-10-12T09:55:21.544Z",
+  "resultSha256": "7af7c844ef701fd73614a8a111cb09381b241a9c0490a4f3f12f85ae24c58ceb",
+  "runnerCommit": "2c0b5f9a879fc199e4c9db78ea6e0832e572f057",
+  "runnerDirty": false,
+  "counts": {
+    "sealedEvidenceFiles": 1552,
+    "publicObservations": 24,
+    "sourceInputsCheckedAgainstArchiveAndRunnerCommit": 47,
+    "independentlyReverified": 4,
+    "snapshotOperations": 1,
+    "restores": 3
+  },
+  "classifications": [
+    {
+      "id": "prepared-baseline",
+      "status": "reproduced",
+      "verifiedExpectedFailure": true
+    },
+    {
+      "id": "baseline",
+      "status": "reproduced",
+      "verifiedExpectedFailure": true
+    },
+    {
+      "id": "correct",
+      "status": "passed",
+      "verifiedExpectedFailure": false
+    },
+    {
+      "id": "misleading",
+      "status": "reproduced",
+      "verifiedExpectedFailure": true
+    }
+  ],
+  "publicSecretScanPassed": true,
+  "publicFilesScanned": 28
+}
