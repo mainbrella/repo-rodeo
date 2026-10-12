@@ -77,9 +77,14 @@
     },
     {
       "id": "mainbrella-saved-workspace",
-      "claim": "In a production MainBrella deployment that lacks native forking, saved-workspace restore is measured as a separate fresh-process path, without describing it as memory preservation.",
-      "status": "planned",
-      "evidence": []
+      "claim": "The production MainBrella experiment restored one saved workspace into three independent fresh-process branches with prepared files and dependencies intact; the correct repair passed all six checks, while baseline and misleading controls reproduced first-block loss. Capture replay, API job reconnection and cleanup passed.",
+      "status": "verified",
+      "evidence": [
+        "../notes/2026-10-12-production-mainbrella.md",
+        "../examples/mainbrella-cloud-saved-workspace/result.json",
+        "../examples/mainbrella-cloud-saved-workspace/evidence-validation.json",
+        "../examples/mainbrella-cloud-saved-workspace/post-run-inventory.json"
+      ]
     },
     {
       "id": "preview-verification",

@@ -1,5 +1,17 @@
 # Local run record
 
+[`mainbrella-cloud-saved-workspace/result.json`](mainbrella-cloud-saved-workspace/result.json)
+retains the completed production MainBrella run against `api.mainbrella.com`, web
+revision `3eb5f1d`, and seed `12345`. One saved workspace supplied three fresh
+process restores. Baseline and misleading controls reproduced first-block loss;
+the correct repair passed all six checks. Filesystem preservation, isolation,
+capture replay after successful response headers, API job reconnection and cleanup
+passed. The unchanged result, checksum and 24 allowlisted observations include the
+prepared baseline. Independent evidence validation and post-run inventory confirm
+the retained hashes, exact owned-resource absence, preserved existing container
+and four HTTP 404 previews. Physical storage and charges remain unmeasured.
+See the [production notes](../notes/2026-10-12-production-mainbrella.md).
+
 [`run-result.json`](run-result.json) is an unchanged manifest from a real local run with seed `0`. The baseline and misleading patch each produced five verified missing-block failures and one passing reset check; the correct patch passed all six tests. No provider or AI agent participated.
 
 This is a schema example and a retained summary. The companion logs, traces, screenshots, patches, and input snapshot are generated under `artifacts/` and excluded from Git. Run `npm run experiment -- --seed 0` to create a complete bundle on your machine. Paths inside a manifest are relative to its bundle root; attachment paths inside each portable `report.json` are relative to that report. `report.raw.json` retains Playwright's original output.

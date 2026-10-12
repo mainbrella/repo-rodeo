@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent-post-run-inventory",
+  "at": "2026-10-12T09:21:09.894Z",
+  "accountBindingVerified": true,
+  "requests": "GET only",
+  "existingResourcesPreserved": true,
+  "before": {
+    "containers": 1,
+    "workspaces": 0
+  },
+  "after": {
+    "containers": 1,
+    "workspaces": 0,
+    "workspaceUsage": {
+      "saved": 0,
+      "reservedBytes": 0,
+      "savesThisMonth": 4,
+      "captureBytesThisMonth": 14000000000,
+      "retainedCaptureBytes": 14000000000
+    }
+  },
+  "ownedSandboxes": [
+    {
+      "sandbox": {
+        "id": "c4",
+        "generation": "2026-10-12T09:19:06.606Z"
+      },
+      "absent": true
+    },
+    {
+      "sandbox": {
+        "id": "c3",
+        "generation": "2026-10-12T09:18:29.909Z"
+      },
+      "absent": true
+    },
+    {
+      "sandbox": {
+        "id": "c2",
+        "generation": "2026-10-12T09:18:02.329Z"
+      },
+      "absent": true
+    },
+    {
+      "sandbox": {
+        "id": "c1",
+        "generation": "2026-10-12T09:16:46.855Z"
+      },
+      "absent": true
+    }
+  ],
+  "ownedWorkspaces": [
+    {
+      "id": "8455d22a-b5af-4519-879b-36c285c00b78",
+      "absent": true
+    }
+  ],
+  "previewStatuses": [
+    404,
+    404,
+    404,
+    404
+  ],
+  "confirmed": true,
+  "physicalStorage": "not-measured"
+}

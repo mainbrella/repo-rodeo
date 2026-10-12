@@ -2,7 +2,7 @@
 
 Repo Rodeo makes a bug reproduction and its proposed repairs inspectable. The first milestone is a local, repeatable experiment around a deliberately broken editor: run the same browser reproduction against the seeded app, a correct repair, and a plausible patch that leaves the bug in place.
 
-The standalone runner uses deterministic patches in temporary working copies. Tracked MainBrella, E2B, and Daytona adapters implement the scenario through their provider APIs and protected previews. E2B's native memory-fork experiment has completed cloud qualification; full tracked MainBrella and Daytona qualification remains pending. AI repair agents remain future work. Local temporary copies are not security sandboxes for untrusted code. The [provider contract and run guide](src/providers/README.md) describe the supported modes and evidence format.
+The standalone runner uses deterministic patches in temporary working copies. Tracked MainBrella, E2B, and Daytona adapters implement the scenario through their provider APIs and protected previews. MainBrella's production saved-workspace experiment and E2B's native memory-fork experiment have completed cloud qualification; full Daytona qualification remains pending. AI repair agents remain future work. Local temporary copies are not security sandboxes for untrusted code. The [provider contract and run guide](src/providers/README.md) describe the supported modes and evidence format.
 
 A separate [first local Mainbrella run](notes/2026-10-11-local-mainbrella.md) tests the full sibling `../web` checkout through the running Mainbrella API and OrbStack containers. It records provisioning, protected previews, saved-workspace restores, deterministic controls, browser reconnection, interrupted capture retry, and cleanup. That historical result came from the manual harness; it does not qualify the new adapter, production, E2B, or Daytona. Its [public observation bundle](notes/evidence/mainbrella-local-20261011-01/manifest.json) supplements the sanitized result without publishing bearer preview URLs.
 
@@ -64,6 +64,14 @@ The standalone fixture and six browser checks are under [`fixtures/editor`](fixt
 The article draft in [`blog/one-bug-three-clouds.md`](blog/one-bug-three-clouds.md) is explicitly fictional. Provider behavior, agent outcomes, lifecycle results, costs, timings, and any pull request remain planned until backed by durable run evidence. [`blog/claims.json`](blog/claims.json) is the machine-readable claim ledger; local implementation claims and provider claims must have evidence references before their status changes to `verified` or `contradicted`.
 
 The MainBrella command implements saved-workspace restore as a filesystem experiment with fresh server processes. Native filesystem forks, memory forks, volumes, and warm pools remain separate, unimplemented modes. Capability discovery records whether each is unavailable at the provider or simply absent from the adapter. No result establishes comparable cloud performance or price.
+
+The [production Mainbrella run](notes/2026-10-12-production-mainbrella.md) completed
+against `https://api.mainbrella.com` with the tracked runner and pinned full web
+checkout. Its [result](examples/mainbrella-cloud-saved-workspace/result.json)
+verifies three restores from one saved workspace, expected repair controls,
+filesystem preservation, branch isolation, capture replay after successful
+response headers, API job reconnection and cleanup. All four test generations
+and the workspace were removed; existing account resources were preserved.
 
 ## MainBrella experiment
 

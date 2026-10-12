@@ -1,0 +1,52 @@
+{
+  "probes": [
+    {
+      "sandbox": {
+        "id": "c1",
+        "generation": "2026-10-12T09:16:46.855Z"
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T09:20:05.161Z",
+          "authenticated": 404
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "c2",
+        "generation": "2026-10-12T09:18:02.329Z"
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T09:20:05.263Z",
+          "authenticated": 404
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "c3",
+        "generation": "2026-10-12T09:18:29.909Z"
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T09:20:05.678Z",
+          "authenticated": 404
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "c4",
+        "generation": "2026-10-12T09:19:06.606Z"
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T09:20:05.786Z",
+          "authenticated": 404
+        }
+      ]
+    }
+  ]
+}
