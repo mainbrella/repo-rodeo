@@ -1,0 +1,14 @@
+--- a/src/repo-rodeo-bug.ts
++++ b/src/repo-rodeo-bug.ts
+@@ -150,9 +150,8 @@
+ }
+ 
+ function save() {
+-  // Intentional fixture bug: position 0 is false, so the first positioned block is discarded.
+-  const serialized: SavedBlock[] = blocks.map((block, position) => ({ ...block, position }))
+-    .filter(block => block.position);
++  // Preserve every block, including the block at position 0.
++  const serialized: SavedBlock[] = blocks.map((block, position) => ({ ...block, position }));
+   try {
+     localStorage.setItem(storageKey, JSON.stringify(serialized));
+     setStatus('Saved');

@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "runId": "mainbrella-local-20261011-01",
+  "scope": "Manual local Mainbrella API + OrbStack run against the full web checkout; deterministic repair controls",
+  "startedAt": "2026-10-12T00:53:38.473Z",
+  "completedAt": "2026-10-12T01:08:35.462Z",
+  "seed": 12345,
+  "environment": {
+    "frontend": "http://localhost:5173",
+    "api": "http://localhost:8787",
+    "apiVersion": "2026-10-11",
+    "dockerContext": "orbstack",
+    "host": {
+      "node": "v22.22.2",
+      "npm": "10.9.7",
+      "platform": "darwin",
+      "arch": "arm64"
+    },
+    "guest": {
+      "node": "24.21.0",
+      "npm": "11.19.0",
+      "requested": {
+        "size": "small",
+        "cpuVcpu": 0.5,
+        "memoryMiB": 4096,
+        "diskGB": 8
+      },
+      "observedDockerLimits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0
+      }
+    },
+    "sourceRevisions": {
+      "rodeo": {
+        "commit": "c9c982907a9a59a39ab1d29f1298d2c1357dd299",
+        "status": "?? notes/"
+      },
+      "web": {
+        "commit": "ba4d74f2d649ce4bc137e3d25610f706ce1fbe9b",
+        "status": ""
+      },
+      "backend": {
+        "commit": "059caff1dba31bdcb93b90dc29d4302a4d6ebf74",
+        "status": ""
+      }
+    },
+    "archive": {
+      "bytes": 15160966,
+      "sha256": "e792bc0b1857011280824bb02f5a40359b1f70b72c7a49638fa7bd21420290e7"
+    },
+    "inputHashes": {
+      "package-lock.json": "abf7322acde171b3c7b54e4e83606af134ba4b082308d9c98eaa61f41a995a59",
+      "playwright.config.js": "e0f663b73631943a87450ca1688f34639e23134b26f4a6880bce67b044062870",
+      "fixtures/editor/repro.spec.js": "995118174741f84f9c44c24e006646ab8e5a979afed6b7efe101834a45586122",
+      "fixtures/editor/scenario.json": "0d83f5c02ea89f22b4f785540189fbfd8a54d2c91771013c9fd7de6fb458c272",
+      "src/verifier.ts": "90fde94d11ecd59f8ee5e348cfe39799f39cb83f8c5a497c0f8d56024fad871b",
+      "../web/package-lock.json": "107d263594a10ed78e67becf8f5b3f67668e96ce26d6a18387fb2b7ad772eafb",
+      "../web/src/repo-rodeo-bug.ts": "f88eea0aff2d5c3bfb4114d1650fae72c7d6e14ad43becdac16207ccbc8f61bd"
+    }
+  },
+  "capabilities": {
+    "persistence": {
+      "filesystemAfterStop": false,
+      "filesystemFork": false,
+      "snapshots": true,
+      "workspaces": true,
+      "exports": true,
+      "memory": false,
+      "volumes": false
+    },
+    "previews": {
+      "supported": true,
+      "signedUrls": false
+    },
+    "execution": {
+      "foreground": true,
+      "streaming": true,
+      "background": true,
+      "cancellation": true,
+      "reconnect": true,
+      "programmaticPty": true,
+      "ptyResize": true,
+      "stdin": true,
+      "signals": true,
+      "argv": true,
+      "managedProcessListing": true,
+      "processListing": false,
+      "maxStdinChunkBytes": 65536,
+      "maxStdinBytes": 1048576,
+      "maxPendingStdinBytes": 262144,
+      "pty": true,
+      "maxCommandBytes": 16384,
+      "maxTimeoutMs": 60000,
+      "maxOutputBytes": 1048576,
+      "maxConcurrentOperations": 4,
+      "maxManagedTimeoutMs": 900000,
+      "retentionMs": 3600000,
+      "maxRetainedExecutions": 32
+    }
+  },
+  "fixture": {
+    "scope": "Synthetic local Pro trial seeded in D1; no Stripe payment or coupon redemption verification",
+    "d1Target": "local",
+    "expiresAt": 1791853105650,
+    "credentialsRevoked": true,
+    "keyAfterRevocationHttpStatus": 401
+  },
+  "controls": [
+    {
+      "role": "baseline",
+      "expected": "reproduced",
+      "verification": {
+        "status": "reproduced",
+        "verifiedExpectedFailure": true,
+        "reason": "All five persistence tests failed specifically on first-block loss; reset isolation passed.",
+        "tests": [
+          {
+            "id": "button-refresh",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-89f7ccfab4f604a214f448a30d69874c43ea43e0.json"
+          },
+          {
+            "id": "button-reload",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-49ec0271d10226d5aa43170dc960afd6049e2377.json"
+          },
+          {
+            "id": "original-order",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-8f0e72a92afd8c8f6d0d278467ac5a45b68fe762.json"
+          },
+          {
+            "id": "edited-text",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-64776a53f5157e40cd6b35337f1c96043a48f0bd.json"
+          },
+          {
+            "id": "reset-isolation",
+            "status": "passed",
+            "observations": 0,
+            "evidence": "test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-ae7d11432f61632c819ba869f28bb9cf0be125ea.json"
+          },
+          {
+            "id": "holdout",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-4c1bb01b5b6240ba72fd6b6119335fe62be9b0cc.json"
+          }
+        ],
+        "browserVersion": "153.0.8010.12"
+      },
+      "patchSha256": null,
+      "filesVerified": 411,
+      "report": "restored-baseline/report.json",
+      "reportSha256": "aaa32b95e0e62b8c5f07dc0d843cf9d812551ceaa7d6a08e69c194c98115b95c",
+      "reportProcess": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false
+      }
+    },
+    {
+      "role": "correct",
+      "expected": "passed",
+      "verification": {
+        "status": "passed",
+        "verifiedExpectedFailure": false,
+        "reason": "All six tests preserved the document and passed regression checks.",
+        "tests": [
+          {
+            "id": "button-refresh",
+            "status": "passed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-ffcf36a15f8a760017278c1db0b06429dba88b59.json"
+          },
+          {
+            "id": "button-reload",
+            "status": "passed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-edaaa492df703505cc4e0ef8645681571ccee470.json"
+          },
+          {
+            "id": "original-order",
+            "status": "passed",
+            "observations": 1,
+            "evidence": "test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-b8467bde48e84623cd6afbfd3eb0f816e5c81c87.json"
+          },
+          {
+            "id": "edited-text",
+            "status": "passed",
+            "observations": 3,
+            "evidence": "test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-b4c7c3cda2674fb760a085a643c461ca70fceb67.json"
+          },
+          {
+            "id": "reset-isolation",
+            "status": "passed",
+            "observations": 0,
+            "evidence": "test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-d50bbb6ddf18f569b15399a3bec1b0769ae882b3.json"
+          },
+          {
+            "id": "holdout",
+            "status": "passed",
+            "observations": 12,
+            "evidence": "test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-a4cf3b91a6547f1f5abac7eb1b6b24793ca60be1.json"
+          }
+        ],
+        "browserVersion": "153.0.8010.12"
+      },
+      "patchSha256": "846bd0155eb6b0db3536e9a3a8d1d9b3a4cd380551cc2a2f21612502d5080ee2",
+      "filesVerified": 411,
+      "report": "restored-correct/report.json",
+      "reportSha256": "d21ce96724387953206ae5a8c975083f5a82f5ec45fe65efa14ddc506d08f89e",
+      "reportProcess": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false
+      }
+    },
+    {
+      "role": "misleading",
+      "expected": "reproduced",
+      "verification": {
+        "status": "reproduced",
+        "verifiedExpectedFailure": true,
+        "reason": "All five persistence tests failed specifically on first-block loss; reset isolation passed.",
+        "tests": [
+          {
+            "id": "button-refresh",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-04ca61324c71c86ef0dd7f5e9870b6f7158078da.json"
+          },
+          {
+            "id": "button-reload",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-6233e6a84021a04c487f9dddd0c4b90e99559135.json"
+          },
+          {
+            "id": "original-order",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-4b121b8e1815d433bc1d3efc74d655ae595c482c.json"
+          },
+          {
+            "id": "edited-text",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-28efc272d7806acde10a2ac5f8dd0674cd79a720.json"
+          },
+          {
+            "id": "reset-isolation",
+            "status": "passed",
+            "observations": 0,
+            "evidence": "test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-c456e7497041de3c7a0cdd93250a05bbf77ef53a.json"
+          },
+          {
+            "id": "holdout",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-9578c75b63b2c84ef503ac4675ff5342fefe41e9.json"
+          }
+        ],
+        "browserVersion": "153.0.8010.12"
+      },
+      "patchSha256": "c85c6166e7d503a4b90166b5afb93c47a4dc8e0d77cc05987641d833d05424a2",
+      "filesVerified": 411,
+      "report": "restored-misleading/report.json",
+      "reportSha256": "91783db96c0282d52b17c0c5eeede58b5bb05ff296216d269e197aa0800a2670",
+      "reportProcess": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false
+      }
+    }
+  ],
+  "checks": {
+    "initialBaselineVerified": true,
+    "all411TrackedFilesVerifiedInEachOfFiveContainers": true,
+    "installedDependenciesPreserved": true,
+    "branchWritesIndependent": true,
+    "sourceUnchangedByBranchWrites": true,
+    "sourceProcessUnchangedDuringCapture": true,
+    "restoredServerInitiallyAbsentInAllThreeBranches": true,
+    "newNonceOnEveryRestart": true,
+    "memoryPreservation": false,
+    "dashboardFixtureContainers": 4,
+    "dashboardUnsupportedLifecycleControlsHidden": true,
+    "browserReattachment": true,
+    "interruptedCheckpointRetry": {
+      "firstRequestAborted": true,
+      "sameWorkspace": true,
+      "newWorkspaces": 1,
+      "chargedSaves": 1,
+      "workspaceId": "83668b49-3e98-461f-a000-3dd7fe197161"
+    },
+    "exportedReportsReverifiedAfterGuestDeletion": true,
+    "hostInputsUnchanged": true,
+    "hostWebAndBackendClean": {
+      "web": "",
+      "backend": ""
+    }
+  },
+  "responsive": [
+    {
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "blockIds": [
+        "button",
+        "heading",
+        "paragraph"
+      ],
+      "runtimeErrors": []
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "blockIds": [
+        "button",
+        "heading",
+        "paragraph"
+      ],
+      "runtimeErrors": []
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "blockIds": [
+        "button",
+        "heading",
+        "paragraph"
+      ],
+      "runtimeErrors": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "blockIds": [
+        "button",
+        "heading",
+        "paragraph"
+      ],
+      "runtimeErrors": []
+    }
+  ],
+  "cleanup": {
+    "containers": [
+      {
+        "role": "misleading",
+        "id": "c3",
+        "createdAt": "2026-10-12T01:00:43.854Z",
+        "previewRevoked": true,
+        "revokedHttpStatus": 404,
+        "deleted": true,
+        "afterDeleteHttpStatus": 404
+      },
+      {
+        "role": "correct",
+        "id": "c2",
+        "createdAt": "2026-10-12T01:00:41.045Z",
+        "previewRevoked": true,
+        "revokedHttpStatus": 404,
+        "deleted": true,
+        "afterDeleteHttpStatus": 404
+      },
+      {
+        "role": "baseline",
+        "id": "c1",
+        "createdAt": "2026-10-12T01:00:38.208Z",
+        "previewRevoked": true,
+        "revokedHttpStatus": 404,
+        "deleted": true,
+        "afterDeleteHttpStatus": 404
+      },
+      {
+        "role": "snapshot-source",
+        "id": "small",
+        "createdAt": "2026-10-12T00:59:06.481Z",
+        "previewRevoked": true,
+        "revokedHttpStatus": 404,
+        "deleted": true,
+        "afterDeleteHttpStatus": 404
+      }
+    ],
+    "workspaces": [
+      {
+        "id": "c9a4346a-c167-4720-85aa-5b03252c021c",
+        "deleted": true
+      },
+      {
+        "id": "83668b49-3e98-461f-a000-3dd7fe197161",
+        "deleted": true
+      }
+    ],
+    "fixtureInventory": {
+      "containers": [],
+      "workspaces": [],
+      "usage": {
+        "saved": 0,
+        "reservedBytes": 0,
+        "savesThisMonth": 2,
+        "captureBytesThisMonth": 16000000000,
+        "retainedCaptureBytes": 16000000000
+      }
+    },
+    "remainingFixtureDocker": [],
+    "existingWorkspacesUnchanged": true,
+    "retainedProviderSnapshotImages": [
+      {
+        "id": "04d92c43c334",
+        "name": "workerd-container-snap-e94fb408-c844-4afd-a2cf-a32dc9f6e2dc:latest",
+        "containers": 0,
+        "reportedSize": "1.58GB"
+      },
+      {
+        "id": "2c1e86e231eb",
+        "name": "workerd-container-snap-3c4f2271-0f9a-4930-b2b4-fc7bc57247b8:latest",
+        "containers": 0,
+        "reportedSize": "1.58GB"
+      }
+    ],
+    "retainedBaseline": {
+      "id": "small",
+      "createdAt": "2026-10-12T00:54:51.348Z",
+      "previewExpiresAt": 1791770133184,
+      "containerExpiresAt": "2026-10-13T00:54:51.344Z",
+      "lastObservedAt": "2026-10-12T01:08:35.415Z",
+      "httpStatus": 200,
+      "privateDescriptor": "artifacts/mainbrella-local-live.json"
+    }
+  },
+  "hostChecks": {
+    "unitTests": {
+      "command": "npm test",
+      "passed": 32,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    }
+  },
+  "setupFindings": [
+    {
+      "kind": "configuration",
+      "finding": "Vite rejected Host: container with HTTP 403; explicitly allow that hostname in the guest launch configuration.",
+      "evidence": "prepared-baseline/verification.json"
+    },
+    {
+      "kind": "account-quota",
+      "finding": "Existing account has 100 saved workspaces, 200 GB reserved, and 102 monthly saves against current limits of 20, 160 GB, and 100; preserve existing data and use a disposable local test account."
+    },
+    {
+      "kind": "harness",
+      "finding": "The first process probe was registered after Vite fallback; corrected using a configureServer plugin."
+    },
+    {
+      "kind": "harness",
+      "finding": "API keys must be mb_ plus 64 hex characters; the first disposable base64url key was rejected."
+    },
+    {
+      "kind": "harness",
+      "finding": "The container dashboard uses ?view=ad-hoc; ?view=containers opens Overview."
+    },
+    {
+      "kind": "provider-retention",
+      "finding": "API workspace deletion leaves two native Docker snapshot images. Physical deletion and eventual garbage collection are not established."
+    }
+  ],
+  "limitations": [
+    "Native fork and filesystem stop/resume were unavailable and not exercised.",
+    "Synthetic trial/session fixture does not verify login, coupon redemption, or Stripe payments.",
+    "HMR was disabled; Vite WebSocket forwarding is unqualified.",
+    "No production, E2B, Daytona, AI repair, memory preservation, adversarial isolation, or comparable timing/cost qualification.",
+    "One requested baseline container is intentionally still running; two provider snapshot images remain."
+  ],
+  "evidence": {
+    "directory": "artifacts/mainbrella-local-20261011-01",
+    "private": true,
+    "reason": "Preview URLs in raw receipts and browser traces are bearer credentials.",
+    "inventory": "evidence-sha256.json",
+    "inventorySha256": "244b0ddfa3006d62de059cafa4816bd9116b11eea26828a4e34aa676bb957959",
+    "files": 426
+  }
+}

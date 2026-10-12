@@ -2,7 +2,9 @@
 
 Repo Rodeo makes a bug reproduction and its proposed repairs inspectable. The first milestone is a local, repeatable experiment around a deliberately broken editor: run the same browser reproduction against the seeded app, a correct repair, and a plausible patch that leaves the bug in place.
 
-This milestone uses deterministic patches. It does not run AI agents or connect to E2B, Daytona, or MainBrella. The provider adapters are future work; [the provider interface](src/providers/interface.ts) and [acceptance plan](src/providers/README.md) record the planned contract. The local runner uses separate temporary working copies and an external verifier, but these are not security sandboxes and provide no isolation guarantee for untrusted code.
+The standalone runner uses deterministic patches. It does not run AI agents or connect to E2B, Daytona, or MainBrella. The provider adapters are future work; [the provider interface](src/providers/interface.ts) and [acceptance plan](src/providers/README.md) record the planned contract. The local runner uses separate temporary working copies and an external verifier, but these are not security sandboxes and provide no isolation guarantee for untrusted code.
+
+A separate [first local Mainbrella run](notes/2026-10-11-local-mainbrella.md) tests the full sibling `../web` checkout through the running Mainbrella API and OrbStack containers. It records provisioning, protected previews, saved-workspace restores, deterministic controls, browser reconnection, interrupted capture retry, and cleanup. This is a manual local integration run; it does not qualify production, E2B, or Daytona.
 
 ## Requirements
 

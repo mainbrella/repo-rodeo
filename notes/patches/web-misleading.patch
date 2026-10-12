@@ -1,0 +1,10 @@
+--- a/src/repo-rodeo-bug.ts
++++ b/src/repo-rodeo-bug.ts
+@@ -156,6 +156,7 @@
+   try {
+     localStorage.setItem(storageKey, JSON.stringify(serialized));
+     setStatus('Saved');
++    render();
+   } catch {
+     setStatus('Could not save in this browser. Check storage settings.', true);
+   }

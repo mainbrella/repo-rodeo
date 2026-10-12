@@ -1,6 +1,6 @@
 # Provider acceptance plan
 
-**Status: planned.** The local milestone implements deterministic controls only. No cloud adapters or provider runs have been implemented or qualified. This plan defines evidence to collect for the next milestone; it does not assume every provider supports every preservation mode.
+**Status: adapters and cloud qualification planned.** The standalone runner implements deterministic controls only. A [manual local Mainbrella run](../../notes/2026-10-11-local-mainbrella.md) exercises the real local API and OrbStack-backed containers, including saved-workspace restore. No cloud adapter or production provider run has been qualified. This plan defines the acceptance experiments; it does not assume every provider supports every preservation mode.
 
 Use one pinned source commit, lockfile, scenario, external Playwright suite, image, prompt/agent configuration, and resource request across comparable runs. Record source, test, lockfile, patch, and scenario hashes plus the holdout seed. Keep the verifier and exported evidence outside provider sandboxes. Local temporary file copies do not qualify as cloud isolation.
 
