@@ -1,0 +1,1346 @@
+{
+  "schemaVersion": 1,
+  "experiment": "mainbrella-egress-vault",
+  "target": "isolated-local-api-runtime-relay-tls",
+  "runId": "8dcc13bd-3435-4422-b74e-8d36d2b6787d",
+  "startedAt": "2026-10-12T15:23:49.983Z",
+  "ok": false,
+  "releaseQualified": false,
+  "checks": {
+    "enabledDiscovery": true,
+    "vaultCiphertext": true,
+    "metadataOnly": true,
+    "crossAccountIsolation": true,
+    "invalidSelectionDoesNotStart": true,
+    "sameKeyReplay": true,
+    "publicTcpDnsDenial": true,
+    "publicUdpDnsDenial": true,
+    "allowedHttp": true,
+    "allowedHttps": true,
+    "guestHeaderSpoofing": true,
+    "domainDenial": true,
+    "cidrDenial": true,
+    "mixedDnsDenial": true,
+    "redirectDenial": true,
+    "reflectionDenial": true
+  },
+  "errors": [
+    "qualification_failed"
+  ],
+  "budget": {
+    "maxStarts": 2,
+    "captures": 0
+  },
+  "startsRequested": 2,
+  "stage": "completed",
+  "limitations": [
+    "Synthetic local prepaid accounts; no production credentials, remote bindings, deployments or billing proof.",
+    "Public DNS policy is real relay code with fixture answers; authorized public IPs map to loopback TLS upstreams.",
+    "Worker-to-relay HTTPS is bridged to authenticated loopback HTTP; remote relay TLS is not exercised.",
+    "The credential scan covers /workspace, /tmp, self environment and argv; no complete image or snapshot scan.",
+    "RPC changes exercise account configuration and runtime incarnation fencing; no provider crash or deployed rollback proof."
+  ],
+  "pending": [
+    "deployed API/runtime/relay transport and DNS/TLS",
+    "IPv6, alternate ports, raw UDP and full bypass matrix",
+    "guest CA tampering",
+    "snapshot/fork/resume and secret absence from captures",
+    "expiry and actual provider recovery",
+    "SSH, browser terminal and preview WebSockets",
+    "runtime downgrade and deployment gate withdrawal"
+  ],
+  "cleanup": {
+    "completed": true,
+    "remainingContainers": 0,
+    "remainingSecrets": 0,
+    "remainingDockerContainers": [],
+    "errors": []
+  },
+  "image": {
+    "supplied": "cloudflare-dev/usercontainer-terminal-d00e7ed8857c:003b4f6a",
+    "id": "sha256:35015ae81e601d6448df708dfaffb09e1c791d45d680b46a8a5f372f09c2d059",
+    "architecture": "amd64"
+  },
+  "versions": {
+    "node": "v22.22.2",
+    "docker": "29.4.0",
+    "wrangler": "4.147.0",
+    "miniflare": "5.20261001.0-alpha",
+    "workerd": "1.20261001.1"
+  },
+  "revisions": {
+    "runner": {
+      "commit": "5238644b50973d01797a51145c5306e9abcc239d",
+      "dirty": true
+    },
+    "backend": {
+      "commit": "f8b5cf36341e274b4427e76e8887f296068b9ad7",
+      "dirty": true
+    }
+  },
+  "inputHashes": {
+    "src/security-local-experiment.mjs": "388af5c27dd7818c34f8d442da6b7f66fe4cf54ab365c0e701e8646460d0bb8b",
+    "src/security-verifier.ts": "b715821060b8aa16754b492d859fca48228cc859c8e976be7c4a67773f4d6900",
+    "fixtures/security/probe.mjs": "dc893b1900ac9a01a797d48828f35ca66619dbfc2b28c33ee17906092d803744",
+    "fixtures/security/upstream.mjs": "745d43691682e92603d9e214298d92387fcf5d194c624a608ab945af7e9b2d8a",
+    "tests/security-verifier.test.ts": "7706473c9598afc249de9a449241c2cc557cd7aa8df7e74cd9031267e166efcf",
+    "tests/security-upstream.test.ts": "1efc7c548a5db6499c7327a42529a7ad7c877c6feffab6ae4f40d07fd3270657",
+    "package.json": "57dddd890028fb922689356305e6c28968cca31528dba8dba05ec0cb30067a47",
+    "package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c",
+    "backend/package-lock.json": "7101aa9bdebbcc58901b5994029061225a5a8c4c903aab11ab4df1c2c49a1f12",
+    "backend/sdk/javascript/index.js": "441014991aadaa4c4d9974be5c43f8b04ded1bf05f708c036789ed4bfd6a24c8",
+    "backend/services/egress-relay.mjs": "dc457631cf5bd8541d52b0020b0511050599342d3f1cfeba24dfc61419acdf81",
+    "backend/scripts/security-local-dns.mjs": "ea24ba76e2486fe39c1935da8af1473dcf0fd3017c54a330de381015b499d6cd",
+    "bundle-1.mjs": "efe03c4978750037cd769769a8a02a791f19ce897d9dd85fda0f285a291fda06",
+    "bundle-0.mjs": "2dba4905bfd2970c3fe9e5b24a2905135056efe26b9a3091855b8819f2b9dca5"
+  },
+  "upstreamEvents": [
+    {
+      "path": "/public",
+      "authenticated": false,
+      "version": 1,
+      "internalHeaders": false
+    },
+    {
+      "path": "/auth",
+      "authenticated": true,
+      "version": 1,
+      "internalHeaders": false
+    },
+    {
+      "path": "/redirect",
+      "authenticated": true,
+      "version": 1,
+      "internalHeaders": false
+    },
+    {
+      "path": "/reflect",
+      "authenticated": true,
+      "version": 1,
+      "internalHeaders": false
+    },
+    {
+      "path": "/reflect-header",
+      "authenticated": true,
+      "version": 1,
+      "internalHeaders": false
+    },
+    {
+      "path": "/reflect-base64",
+      "authenticated": true,
+      "version": 1,
+      "internalHeaders": false
+    }
+  ],
+  "dnsQueries": [
+    "api.example.com",
+    "api.example.com",
+    "cidr.example.com",
+    "mixed.example.com",
+    "api.example.com",
+    "api.example.com",
+    "api.example.com",
+    "api.example.com"
+  ],
+  "apiOrigin": "http://127.0.0.1:49591",
+  "receipts": [
+    {
+      "sequence": 1,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 2,
+      "method": "POST",
+      "path": "/secrets",
+      "status": 201
+    },
+    {
+      "sequence": 3,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 4,
+      "method": "GET",
+      "path": "/secrets",
+      "status": 200
+    },
+    {
+      "sequence": 5,
+      "method": "PUT",
+      "path": "/secrets/sec_664acb02-ee23-4761-9599-09b9ae370e08",
+      "status": 404
+    },
+    {
+      "sequence": 6,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 7,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 8,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 9,
+      "method": "POST",
+      "path": "/containers",
+      "status": 404
+    },
+    {
+      "sequence": 10,
+      "method": "POST",
+      "path": "/containers",
+      "status": 400
+    },
+    {
+      "sequence": 11,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 12,
+      "method": "GET",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 13,
+      "method": "POST",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 14,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 15,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 16,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 17,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 18,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 19,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 20,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 21,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 22,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 23,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 24,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 25,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 26,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 27,
+      "method": "GET",
+      "path": "/containers/executions/48083df2-24ed-491e-b696-456012cfffca",
+      "status": 200
+    },
+    {
+      "sequence": 28,
+      "method": "DELETE",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 29,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 30,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 31,
+      "method": "POST",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 32,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 33,
+      "method": "GET",
+      "path": "/capabilities",
+      "status": 200
+    },
+    {
+      "sequence": 34,
+      "method": "POST",
+      "path": "/containers",
+      "status": 200
+    },
+    {
+      "sequence": 35,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 36,
+      "method": "PUT",
+      "path": "/containers/files",
+      "status": 200
+    },
+    {
+      "sequence": 37,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 38,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 39,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 40,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 41,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 42,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 43,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 44,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 45,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 46,
+      "method": "GET",
+      "path": "/containers/executions/881cafd3-3481-434c-8bfe-18ac4db6d27c",
+      "status": 200
+    },
+    {
+      "sequence": 47,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 48,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 49,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 50,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 51,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 52,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 53,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 54,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 55,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 56,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 57,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 58,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 59,
+      "method": "GET",
+      "path": "/containers/executions/4b55bd91-7d43-4b1d-99ef-e95b75f2b0f5",
+      "status": 200
+    },
+    {
+      "sequence": 60,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 61,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 62,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 63,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 64,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 65,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 66,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 67,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 68,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 69,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 70,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 71,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 72,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 73,
+      "method": "GET",
+      "path": "/containers/executions/0cf38862-c6fa-44e4-81f8-24af7852e83b",
+      "status": 200
+    },
+    {
+      "sequence": 74,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 75,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 76,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 77,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 78,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 79,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 80,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 81,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 82,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 83,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 84,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 85,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 86,
+      "method": "GET",
+      "path": "/containers/executions/3af810b7-c72e-4b45-90b3-4ff8409524c2",
+      "status": 200
+    },
+    {
+      "sequence": 87,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 88,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 89,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 90,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 91,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 92,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 93,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 94,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 95,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 96,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 97,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 98,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 99,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 100,
+      "method": "GET",
+      "path": "/containers/executions/dc3e6bab-f282-4386-b7fa-ba3c28232f3c",
+      "status": 200
+    },
+    {
+      "sequence": 101,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 102,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 103,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 104,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 105,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 106,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 107,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 108,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 109,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 110,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 111,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 112,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 113,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 114,
+      "method": "GET",
+      "path": "/containers/executions/cc3ad743-1b62-4099-9c9a-8b49c825dd03",
+      "status": 200
+    },
+    {
+      "sequence": 115,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 116,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 117,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 118,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 119,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 120,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 121,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 122,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 123,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 124,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 125,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 126,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 127,
+      "method": "GET",
+      "path": "/containers/executions/217e0419-ef6f-4f8e-a2ea-7417e85cc755",
+      "status": 200
+    },
+    {
+      "sequence": 128,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 129,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 130,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 131,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 132,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 133,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 134,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 135,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 136,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 137,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 138,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 139,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 140,
+      "method": "GET",
+      "path": "/containers/executions/f95facac-3fbc-41ef-8553-b58c51d6ff9d",
+      "status": 200
+    },
+    {
+      "sequence": 141,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 142,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 143,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 144,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 145,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 146,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 147,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 148,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 149,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 150,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 151,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 152,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 153,
+      "method": "GET",
+      "path": "/containers/executions/76a28444-da14-4083-b206-b89e232a118a",
+      "status": 200
+    },
+    {
+      "sequence": 154,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 155,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 156,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 157,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 158,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 159,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 160,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 161,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 162,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 163,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 164,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 165,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 166,
+      "method": "GET",
+      "path": "/containers/executions/e37a3c83-2030-412a-aafd-b6b434d0bb3b",
+      "status": 200
+    },
+    {
+      "sequence": 167,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 168,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 169,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 170,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 171,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 172,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 173,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 174,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 175,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 176,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 177,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 178,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 179,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 180,
+      "method": "GET",
+      "path": "/containers/executions/ba2f6016-5b09-496c-9c26-c21a6845bac5",
+      "status": 200
+    },
+    {
+      "sequence": 181,
+      "method": "POST",
+      "path": "/containers/executions",
+      "status": 202
+    },
+    {
+      "sequence": 182,
+      "method": "GET",
+      "path": "/containers/executions/6bfcc887-b929-4286-a87d-90a4d630be58",
+      "status": 200
+    }
+  ],
+  "onlineKey": "6cbccc99-0cea-4082-ac3a-4b5a22fc8c59",
+  "online": {
+    "id": "small",
+    "createdAt": "2026-10-12T15:23:51.904Z"
+  },
+  "onlineProtocols": {
+    "udpTxt": true,
+    "tcpDns": {
+      "responseReceived": true,
+      "validResponse": true,
+      "answered": true,
+      "addresses": [
+        "172.66.147.243",
+        "104.20.23.154"
+      ],
+      "expectedAddressMatched": false,
+      "transactionMatched": true,
+      "questionMatched": true,
+      "responseCode": 0,
+      "receivedBytes": 63
+    }
+  },
+  "restrictedKey": "bf49b37d-4078-4453-9665-ef3159316668",
+  "restricted": {
+    "id": "small",
+    "createdAt": "2026-10-12T15:23:53.565Z"
+  },
+  "offlineProtocols": {
+    "udpTxt": false,
+    "tcpDns": {
+      "answered": false,
+      "responseReceived": false,
+      "receivedBytes": 0
+    }
+  },
+  "outboundRequests": [
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    },
+    {
+      "url": "https://relay.example.com/v1/egress",
+      "method": "POST",
+      "status": 403
+    }
+  ],
+  "httpProbe": {
+    "status": 200,
+    "credentialReflected": false,
+    "cookieRemoved": true,
+    "acknowledgment": {
+      "fixture": "rodeo-security",
+      "runId": "8dcc13bd-3435-4422-b74e-8d36d2b6787d",
+      "authenticated": false,
+      "version": 1,
+      "internalHeaders": false
+    }
+  },
+  "interruptedBy": "SIGTERM",
+  "failure": {
+    "stage": "rotation-and-incarnation-fencing",
+    "name": "Error",
+    "message": "qualification_interrupted"
+  },
+  "finishedAt": "2026-10-12T15:24:09.943Z"
+}

@@ -51,6 +51,55 @@ npm run fixture        # serve the fixture at http://127.0.0.1:4175/repo-rodeo-b
 npm run capture        # capture the app while a fixture server is running
 ```
 
+## Local egress and vault qualification
+
+With `../backend` installed (`npm ci` there), Docker running, Python 3, OpenSSL,
+and an existing local MainBrella Node image:
+
+```sh
+npm run qualify:security:local -- \
+  --image <existing-local-node-image> \
+  --output artifacts/security-local-<new-run>
+```
+
+This starts an isolated local API and private runtime with
+`EGRESS_POLICIES_ENABLED=true` and `SECRETS_VAULT_ENABLED=true`, disposable D1
+accounts, the actual relay, and a temporary TLS acknowledgment upstream. It
+uses two sequential native Docker starts, no captures, and never loads `.env`,
+changes deployment configuration, or uses an existing account. The runner
+inspects and pins the supplied image; it does not pull or build an image.
+
+The checks cover encrypted vault storage, metadata-only APIs, account isolation,
+admission and replay, native HTTP/HTTPS interception, domain/CIDR/mixed-DNS denial,
+redirect and reflection rejection, rotation/deletion during requests, runtime
+incarnation fencing, missing configuration, credential scans and protected HTTP
+previews. Online public TCP/UDP DNS controls must succeed before restricted
+denial counts. Cleanup verifies API inventories and removes only this run's
+Docker namespace, including its sidecars.
+
+`result.json` and its checksum record each check, pinned tooling/image/source
+hashes, start counts, and cleanup. `inputs/` retains the runner and actual Worker
+bundles without bindings or credentials. A run passes only when every check and
+cleanup succeeds. Existing output directories are refused.
+
+Local relay DNS uses fixture answers and authorized addresses map to loopback
+upstreams. The Worker-to-relay HTTPS URL is bridged to authenticated loopback
+HTTP. Test-only RPC hooks exercise incarnation and account configuration changes.
+These observations qualify local behavior; `releaseQualified` remains false.
+The report lists remaining deployed transport, bypass, lifecycle, snapshot and
+ingress checks before production enablement. SIGINT/SIGTERM write a failed
+report and attempt the same bounded cleanup.
+
+The [October 12 local result](examples/mainbrella-local-security/result.json)
+passed all 26 checks with two starts and complete cleanup. The
+[SIGTERM result](examples/mainbrella-local-security/interrupted-result.json)
+records exit 143 and complete cleanup with a restricted guest active. The full
+inputs remain in `artifacts/security-local-20261012-final/inputs/`.
+The test exposed and fixed the default relay fetch receiver in
+`../backend/containers/account-security.js`: Workers require the stored native
+fetch function to retain `globalThis`; the previous call failed before reaching
+the relay. A backend regression test now covers that receiver requirement.
+
 The reproduction intentionally fails against the seeded app: five assertions fail and the reset-isolation check passes. It passes all six checks with the correct repair. The misleading patch rerenders the current draft after saving but retains the serialization bug, so the reload checks continue to fail. `REPRO_BASE_URL` can point the verifier at an already-running app, for example:
 
 ```sh

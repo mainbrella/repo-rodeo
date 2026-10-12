@@ -77,6 +77,7 @@ export async function qualifyLocalSecurity({ image, output }) {
     limitations: [
       'Synthetic local prepaid accounts; no production credentials, remote bindings, deployments or billing proof.',
       'Public DNS policy is real relay code with fixture answers; authorized public IPs map to loopback TLS upstreams.',
+      'Worker-to-relay HTTPS is bridged to authenticated loopback HTTP; remote relay TLS is not exercised.',
       'The credential scan covers /workspace, /tmp, self environment and argv; no complete image or snapshot scan.',
       'RPC changes exercise account configuration and runtime incarnation fencing; no provider crash or deployed rollback proof.',
     ],
@@ -113,8 +114,13 @@ export async function qualifyLocalSecurity({ image, output }) {
       dirty: !!execFileSync('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }).trim(),
     }]));
     report.inputHashes = {};
-    for (const file of ['src/security-local-experiment.mjs', 'src/security-verifier.ts', 'fixtures/security/probe.mjs', 'fixtures/security/upstream.mjs', 'tests/security-verifier.test.ts', 'package-lock.json']) report.inputHashes[file] = hash(await readFile(join(repository, file)));
-    for (const file of ['package-lock.json', 'sdk/javascript/index.js', 'services/egress-relay.mjs', 'scripts/security-local-dns.mjs']) report.inputHashes[`backend/${file}`] = hash(await readFile(join(backend, file)));
+    const retain = async (name, bytes) => {
+      assertNoCredentialLeak(bytes, credentials);
+      const destination = join(output, 'inputs', name); await mkdir(dirname(destination), { recursive: true });
+      await writeFile(destination, bytes, { flag: 'wx', mode: 0o600 }); report.inputHashes[name] = hash(bytes);
+    };
+    for (const file of ['src/security-local-experiment.mjs', 'src/security-verifier.ts', 'fixtures/security/probe.mjs', 'fixtures/security/upstream.mjs', 'tests/security-verifier.test.ts', 'tests/security-upstream.test.ts', 'package.json', 'package-lock.json']) await retain(file, await readFile(join(repository, file)));
+    for (const file of ['package-lock.json', 'sdk/javascript/index.js', 'services/egress-relay.mjs', 'scripts/security-local-dns.mjs']) await retain(`backend/${file}`, await readFile(join(backend, file)));
     const disposable = () => { const value = randomBytes(32).toString('hex'); credentials.push(value); return value; };
     const token = disposable(), rotated = disposable(), relayToken = disposable(), encryptionKey = randomBytes(32).toString('base64');
     credentials.push(encryptionKey);
@@ -145,7 +151,7 @@ export async function qualifyLocalSecurity({ image, output }) {
       const outfile = file(`bundle-${at}.mjs`);
       await build({ stdin: { contents: source, resolveDir: backend, sourcefile: `security-${at}.js` }, outfile,
         bundle: true, format: 'esm', platform: 'browser', target: 'es2022', external: ['cloudflare:*', 'node:*'], logLevel: 'silent' });
-      const bytes = await readFile(outfile); report.inputHashes[`bundle-${at}`] = hash(bytes); return bytes.toString('utf8');
+      const bytes = await readFile(outfile); await retain(`bundle-${at}.mjs`, bytes); return bytes.toString('utf8');
     }));
     const portProbe = http.createServer(); const apiPort = await listen(portProbe);
     await new Promise(done => portProbe.close(done));
@@ -216,7 +222,11 @@ export async function qualifyLocalSecurity({ image, output }) {
       const caps = await client.capabilities(); assert.equal(caps.networking.egressPolicies, true, 'Enabled policy discovery'); assert.equal(caps.secrets.vault, true, 'Enabled vault discovery'); report.checks.enabledDiscovery = true;
       secret = await client.secrets.create({ name: `Rodeo ${runId}`, value: token, hostname: 'api.example.com', header: 'authorization', prefix: 'Bearer ' });
       const records = await accountStub.vaultRecords(); assert.equal(records.length, 1);
-      assertNoCredentialLeak(JSON.stringify(records), [token]); assert.ok(records[0].ciphertext && records[0].iv); report.checks.vaultCiphertext = true;
+      assertNoCredentialLeak(JSON.stringify(records), [token]); assert.ok(records[0].ciphertext && records[0].iv);
+      const key = await crypto.subtle.importKey('raw', Buffer.from(encryptionKey, 'base64'), 'AES-GCM', false, ['decrypt']);
+      const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: Buffer.from(records[0].iv, 'base64'),
+        additionalData: Buffer.from(`${clients[0].userId}:${secret.id}`) }, key, Buffer.from(records[0].ciphertext, 'base64'));
+      assert.equal(Buffer.from(decrypted).toString(), token); report.checks.vaultCiphertext = true;
       const listed = await client.secrets.list(); assert.deepEqual(listed.secrets, [secret]);
       assert.deepEqual(Object.keys(secret).sort(), ['createdAt', 'header', 'hostname', 'id', 'name', 'prefix', 'updatedAt']); report.checks.metadataOnly = true;
       assert.deepEqual((await other.secrets.list()).secrets, []);
