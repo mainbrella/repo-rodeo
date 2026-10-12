@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-11T23-22-58-072Z-8770d59e",
+  "status": "complete",
+  "provider": "local",
+  "scenario": "editor-first-block",
+  "sourceCommit": "5a1150dfd8341986e9a519627d94a78d8353b0b0",
+  "source": {
+    "dirty": true,
+    "snapshot": "inputs/",
+    "inputHashes": {
+      ".node-version": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+      ".nvmrc": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+      "fixtures/editor/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+      "fixtures/editor/app/editor.js": "541c336cdc2d7d2f7a099bbec1a498d49467a2bc02f9608f956350f7409839ec",
+      "fixtures/editor/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+      "fixtures/editor/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+      "fixtures/editor/patches/correct.patch": "51b4735808203dfd60b3463b97f77161b6ce9d15dfae32ddda082f21220dc137",
+      "fixtures/editor/patches/misleading.patch": "8be1a772f25a2eab019078d30719a90f1c0e0c7dd3971c60c684ef27fbf55973",
+      "fixtures/editor/repro.spec.js": "995118174741f84f9c44c24e006646ab8e5a979afed6b7efe101834a45586122",
+      "fixtures/editor/scenario.json": "0d83f5c02ea89f22b4f785540189fbfd8a54d2c91771013c9fd7de6fb458c272",
+      "package-lock.json": "abf7322acde171b3c7b54e4e83606af134ba4b082308d9c98eaa61f41a995a59",
+      "package.json": "6d6faafd4330be9a0819c5300a849848672efc2704c3324b1ddf4019421a69e2",
+      "playwright.config.js": "e0f663b73631943a87450ca1688f34639e23134b26f4a6880bce67b044062870",
+      "src/evidence.ts": "2bddc60270d6a038fa208007aa340ca499fe538d5c79c3c81bf5ead6aba40df2",
+      "src/metrics.ts": "a8b74d62580e837ce43ce017d829a5598ffb72c9ff00a82bb67c0142863589d3",
+      "src/process.ts": "ee2035f27b5081de46e06da876f2643f3cfc225aa6484b1463f498954d9916c1",
+      "src/providers/interface.ts": "dab3333b2ab6dddc7626cae04cb89e97ae9e489280e9546b5e2fcab68b59e804",
+      "src/providers/README.md": "eff0d324fb6424784c8c42b779550d7cf5c2cb7e68c2c7a1fd20f5570fe40c83",
+      "src/runner.ts": "59d13f4fc6a220f19584bdbb5dbe84ad07c489246c77818a3c135010abf08bc8",
+      "src/scenario.ts": "44ab0a6700a7358ced88f2f9d8f2664e27416bcd096199bb989c3200643eed6d",
+      "src/verifier.ts": "90fde94d11ecd59f8ee5e348cfe39799f39cb83f8c5a497c0f8d56024fad871b",
+      "tests/evidence.test.ts": "dc5017926b0bfc9a75915b05d8ba0c965f0729d8cb75b03f43952e342bc9650d",
+      "tests/verifier.test.ts": "c81cf02c876606d10f0cbc54b63dedd2dd0da10bebe11556baa3f1eb226b8302",
+      "tsconfig.json": "7c64772afc11e22bdaa663c5db86a7fc5c492beb1c241ca29d8aec70c453f883"
+    },
+    "inputIntegrity": true
+  },
+  "startedAt": "2026-10-11T23:22:58.074Z",
+  "finishedAt": "2026-10-11T23:23:08.617Z",
+  "seed": 0,
+  "toolVersions": {
+    "node": "22.22.2",
+    "playwright": "1.63.0",
+    "git": "git version 2.54.0 (Apple Git-157)"
+  },
+  "host": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "arch": "arm64"
+  },
+  "checkpoint": {
+    "mode": "filesystem",
+    "implementation": "local temporary directory copies; no process preservation or sandbox isolation"
+  },
+  "baseline": {
+    "id": "baseline",
+    "expected": "reproduced",
+    "patch": null,
+    "patchSha256": null,
+    "sourceHashes": {
+      "editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+      "editor.js": "541c336cdc2d7d2f7a099bbec1a498d49467a2bc02f9608f956350f7409839ec",
+      "index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+      "server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426"
+    },
+    "verification": {
+      "status": "reproduced",
+      "verifiedExpectedFailure": true,
+      "reason": "All five persistence tests failed specifically on first-block loss; reset isolation passed.",
+      "tests": [
+        {
+          "id": "button-refresh",
+          "status": "failed",
+          "observations": 1,
+          "evidence": "test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-ec698572e207e774da74ea9f1284229b03ec988e.json"
+        },
+        {
+          "id": "button-reload",
+          "status": "failed",
+          "observations": 1,
+          "evidence": "test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-c17823351b306db80d0c58500344ca2707628744.json"
+        },
+        {
+          "id": "original-order",
+          "status": "failed",
+          "observations": 1,
+          "evidence": "test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-29819d000b32caf76500da5c8bef68bcf691d293.json"
+        },
+        {
+          "id": "edited-text",
+          "status": "failed",
+          "observations": 1,
+          "evidence": "test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-0478287f537950ab0bc63130b0ab7bca3a57ae79.json"
+        },
+        {
+          "id": "reset-isolation",
+          "status": "passed",
+          "observations": 0,
+          "evidence": "test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-968a4642d15f24126750f1bcd98f1170f629beca.json"
+        },
+        {
+          "id": "holdout",
+          "status": "failed",
+          "observations": 1,
+          "evidence": "test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-210ef33426c98e10dcd8525f2f4625fb8675f274.json"
+        }
+      ],
+      "browserVersion": "153.0.8010.12"
+    },
+    "process": {
+      "exitCode": 1,
+      "signal": null,
+      "timedOut": false
+    },
+    "preview": {
+      "url": "http://127.0.0.1:58186",
+      "readyAt": "2026-10-11T23:22:58.170Z",
+      "readinessMs": 17.250708000000003
+    },
+    "elapsedMs": 3666.945834,
+    "report": "baseline/report.json",
+    "error": null,
+    "cleanup": {
+      "serverClosed": true,
+      "previewRevoked": true,
+      "workspaceRemoved": true,
+      "confirmed": true
+    }
+  },
+  "candidates": [
+    {
+      "id": "correct",
+      "expected": "passed",
+      "patch": "correct/applied.patch",
+      "patchSha256": "51b4735808203dfd60b3463b97f77161b6ce9d15dfae32ddda082f21220dc137",
+      "sourceHashes": {
+        "editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+        "editor.js": "97e62feeffaf5181604e7cb5768dcffa3b5c76526647d31f00476d4168fd4320",
+        "index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+        "server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426"
+      },
+      "verification": {
+        "status": "passed",
+        "verifiedExpectedFailure": false,
+        "reason": "All six tests preserved the document and passed regression checks.",
+        "tests": [
+          {
+            "id": "button-refresh",
+            "status": "passed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-08f74e305d21f32dc835140433e5975a60e78659.json"
+          },
+          {
+            "id": "button-reload",
+            "status": "passed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-df43b6a9c75a1d0ec91153532cc38e724c9332cd.json"
+          },
+          {
+            "id": "original-order",
+            "status": "passed",
+            "observations": 1,
+            "evidence": "test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-3196d1e3501830cf4827cdd0857344bb4a2eef3b.json"
+          },
+          {
+            "id": "edited-text",
+            "status": "passed",
+            "observations": 3,
+            "evidence": "test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-20db5d79ae9f87f381ddba69fdd0ba045afe21ce.json"
+          },
+          {
+            "id": "reset-isolation",
+            "status": "passed",
+            "observations": 0,
+            "evidence": "test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-0ab2d60945eb20a7fa487c01a6cf35a017e8ad77.json"
+          },
+          {
+            "id": "holdout",
+            "status": "passed",
+            "observations": 12,
+            "evidence": "test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-b759c49ec948026f8dea000bf5e5ab86da2d97c4.json"
+          }
+        ],
+        "browserVersion": "153.0.8010.12"
+      },
+      "process": {
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false
+      },
+      "preview": {
+        "url": "http://127.0.0.1:58202",
+        "readyAt": "2026-10-11T23:23:01.843Z",
+        "readinessMs": 2.9163750000002437
+      },
+      "elapsedMs": 3316.4894999999997,
+      "report": "correct/report.json",
+      "error": null,
+      "cleanup": {
+        "serverClosed": true,
+        "previewRevoked": true,
+        "workspaceRemoved": true,
+        "confirmed": true
+      }
+    },
+    {
+      "id": "misleading",
+      "expected": "reproduced",
+      "patch": "misleading/applied.patch",
+      "patchSha256": "8be1a772f25a2eab019078d30719a90f1c0e0c7dd3971c60c684ef27fbf55973",
+      "sourceHashes": {
+        "editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+        "editor.js": "f08b6272bb0ca831d3b39369797dc967fbf9c48eb3416a0b8acc98a35abaef47",
+        "index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+        "server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426"
+      },
+      "verification": {
+        "status": "reproduced",
+        "verifiedExpectedFailure": true,
+        "reason": "All five persistence tests failed specifically on first-block loss; reset isolation passed.",
+        "tests": [
+          {
+            "id": "button-refresh",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-fb73fce49f75b0afbb277c0d4ecefe16b896833a.json"
+          },
+          {
+            "id": "button-reload",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-4dca411527e04a58647913603c18fbce3d12ab9c.json"
+          },
+          {
+            "id": "original-order",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-2e7cde507c685b951319015cc371e418de13c20f.json"
+          },
+          {
+            "id": "edited-text",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-9477ad0e3dcbbfe93b307345705d7425c683e371.json"
+          },
+          {
+            "id": "reset-isolation",
+            "status": "passed",
+            "observations": 0,
+            "evidence": "test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-5bd6cfdf2ab3126ebff7090c014d2feecc056003.json"
+          },
+          {
+            "id": "holdout",
+            "status": "failed",
+            "observations": 1,
+            "evidence": "test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-1caae59ceb22e364cf4d80bd1c8a0dc54aa1ee56.json"
+          }
+        ],
+        "browserVersion": "153.0.8010.12"
+      },
+      "process": {
+        "exitCode": 1,
+        "signal": null,
+        "timedOut": false
+      },
+      "preview": {
+        "url": "http://127.0.0.1:58217",
+        "readyAt": "2026-10-11T23:23:05.155Z",
+        "readinessMs": 1.5769170000003214
+      },
+      "elapsedMs": 3468.860083999999,
+      "report": "misleading/report.json",
+      "error": null,
+      "cleanup": {
+        "serverClosed": true,
+        "previewRevoked": true,
+        "workspaceRemoved": true,
+        "confirmed": true
+      }
+    }
+  ],
+  "measurements": {
+    "elapsedMs": 10542.47675,
+    "scope": "single local run; not a cloud benchmark",
+    "costs": {
+      "providerCompute": null,
+      "persistentStorage": null,
+      "modelInference": null,
+      "status": "not-measured"
+    }
+  },
+  "cleanup": {
+    "confirmed": true
+  },
+  "error": null,
+  "files": {
+    "baseline/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+    "baseline/app/editor.js": "541c336cdc2d7d2f7a099bbec1a498d49467a2bc02f9608f956350f7409839ec",
+    "baseline/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+    "baseline/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+    "baseline/cleanup.json": "56538c34d8c6a33e32fa048f5e12b96b18349a843a1df8fa58349d49c9138c4f",
+    "baseline/command.json": "613ca4b0677ff94d7d3dcac6c727b2d94b8555deab00b1866b109fa914cfa019",
+    "baseline/process.json": "38f423c3b990c2418eea3e2c73670bda4f648735b06a5ed6f9c90b1ba593af8c",
+    "baseline/report.json": "c77798fbc5a5c3b8185e8bbea0692ddcd9b1a11b4ab0fd401291f77c3445b20d",
+    "baseline/report.raw.json": "18bd76fac9464a8998fc521cf71e65f6a240addb0f78e70acc12f7a2fd039d98",
+    "baseline/stderr.log": "c485d68899e0f44f2c7d84d668458e27cd95a4505ea77b049809acd1b90966b6",
+    "baseline/stdout.log": "61b64841961574dc94c1416262d9883f56b026e8d1e25df36940db9fc140d403",
+    "baseline/test-results/.last-run.json": "748631a0fef5cd9bec67fc5d5cd4a2487e94e5b81751dfd721163f73d6acd444",
+    "baseline/test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-ec698572e207e774da74ea9f1284229b03ec988e.json": "136eb9f2b178fb5aa7050939d61376e7581516a31352c174aa2c7bce00deaebc",
+    "baseline/test-results/repro-button-refresh-button-first-survives-browser-refresh/document-observations.json": "136eb9f2b178fb5aa7050939d61376e7581516a31352c174aa2c7bce00deaebc",
+    "baseline/test-results/repro-button-refresh-button-first-survives-browser-refresh/error-context.md": "d571c416b7ab058d80d469e8729b07ab5283a99a63d8e0e7cb2208a1e41a3244",
+    "baseline/test-results/repro-button-refresh-button-first-survives-browser-refresh/test-failed-1.png": "4b34814969a548c82ff423a21f8a7ae505fd892754dd3d81c63b57bd7c1f54c9",
+    "baseline/test-results/repro-button-refresh-button-first-survives-browser-refresh/trace.zip": "eb057e9dd6960b2c83146fffa912acc11ea9111e5f2ab86aecd8f966f8c44df3",
+    "baseline/test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-c17823351b306db80d0c58500344ca2707628744.json": "50f45c4e82ea41f01a4064234adfb55b890ca19bc8a450d3942b2b79bb4b3f13",
+    "baseline/test-results/repro-button-reload-button-first-survives-Reload-saved/document-observations.json": "50f45c4e82ea41f01a4064234adfb55b890ca19bc8a450d3942b2b79bb4b3f13",
+    "baseline/test-results/repro-button-reload-button-first-survives-Reload-saved/error-context.md": "37577501d329fe191b2660ef652aa75267bf1d5e1c74d0b305948f49eb7d125c",
+    "baseline/test-results/repro-button-reload-button-first-survives-Reload-saved/test-failed-1.png": "67615215eae7b5f37f264c8a4ab830bf1a5ac2ba5eb9ea4484cfaa0166f296cc",
+    "baseline/test-results/repro-button-reload-button-first-survives-Reload-saved/trace.zip": "ea01cc0579696874485ea120ceab7f91be8e1d892339b288ba77de6fab7b61a2",
+    "baseline/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-0478287f537950ab0bc63130b0ab7bca3a57ae79.json": "6d2d24d069341a9f4cad5a5ef74bbd6d4c1d729433764a068f415b4c967ec3fb",
+    "baseline/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/document-observations.json": "6d2d24d069341a9f4cad5a5ef74bbd6d4c1d729433764a068f415b4c967ec3fb",
+    "baseline/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/error-context.md": "862b2562d09db5a4d7ba082e5156745fad67ef32e5412745d362ca9871383540",
+    "baseline/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/test-failed-1.png": "00b2fe6a1f835565b43ee186d63e0370245d798512fc3b84d7963bb612b3adf4",
+    "baseline/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/trace.zip": "e88c0732626c1c3ff44597af61c0edb9e043e9d630217a907ccf362a26ef6ec4",
+    "baseline/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-210ef33426c98e10dcd8525f2f4625fb8675f274.json": "f232585912b4ab3acc5cc162046d1447f9eb7754e01d202de9954048310498e7",
+    "baseline/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/document-observations.json": "f232585912b4ab3acc5cc162046d1447f9eb7754e01d202de9954048310498e7",
+    "baseline/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/error-context.md": "6d86f44c1125f934df0b9d74b997dd5498f84177f044af00c339294c380011b9",
+    "baseline/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/test-failed-1.png": "ecf7cf6cae916984e3da60f64290963be468eeecbb3d939f210119cb82bd061a",
+    "baseline/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/trace.zip": "3fe98f5bdb558990801bfd3afafa9aa46e49ba6d8303ad307c6bd3e84d03cbb8",
+    "baseline/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-29819d000b32caf76500da5c8bef68bcf691d293.json": "d775944abaee7c0cc5b6df2f68b0c31c3a190a0fe83440f7e627526ed6c1b4fb",
+    "baseline/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/document-observations.json": "d775944abaee7c0cc5b6df2f68b0c31c3a190a0fe83440f7e627526ed6c1b4fb",
+    "baseline/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/error-context.md": "722317db01f26d6c53afc0651282960c718dc91abfc3b84f3939763984f40748",
+    "baseline/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/test-failed-1.png": "ed0f67e0cebb5e2345a050817b87153484e2b3f221b7fbf8542c516c79e6a8e6",
+    "baseline/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/trace.zip": "4be174e6031e6d068113e5edd2cd97bca8a089f30d447293cbb65a3fc452306e",
+    "baseline/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-968a4642d15f24126750f1bcd98f1170f629beca.json": "04999697fc83abd8bfaca762c41580be85a40ef4ac33d738a67c482c21f4d31c",
+    "baseline/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/document-observations.json": "04999697fc83abd8bfaca762c41580be85a40ef4ac33d738a67c482c21f4d31c",
+    "baseline/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/test-finished-1.png": "ab86e5bcffb83c352aa387a11a4c3b3dfecedc43d02b5ddca9fb9a6bc11fce4b",
+    "baseline/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/trace.zip": "b1c269013f14f179417fad4b9d1d35b0be0ab251605914d6a01b01bcec7b0f53",
+    "baseline/verification.json": "0cfcf43c81bec44ae37494bdaefef50b5c3441620be65b5e7363cb4e7fdf3491",
+    "correct/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+    "correct/app/editor.js": "97e62feeffaf5181604e7cb5768dcffa3b5c76526647d31f00476d4168fd4320",
+    "correct/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+    "correct/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+    "correct/applied.patch": "51b4735808203dfd60b3463b97f77161b6ce9d15dfae32ddda082f21220dc137",
+    "correct/cleanup.json": "56538c34d8c6a33e32fa048f5e12b96b18349a843a1df8fa58349d49c9138c4f",
+    "correct/command.json": "bd561140c2f084c41b20f43150f4b7aa69ead1a8f373d2390c9725acfe212419",
+    "correct/process.json": "3ba527ecb100218a76082cecbd7cefa2e2fe622d9a50dda9029566253c13888f",
+    "correct/report.json": "619206c7437c2d2ecb53ed879328595b24ed7c5c9881374b8ff806a257a05a94",
+    "correct/report.raw.json": "05c7191dfb7d80905a29fffa2d15f400e9f1a1062f804fd14e6814cf3c3be4b3",
+    "correct/stderr.log": "fbf4f9208dc2414874fe542c3854072cbb89cf3d848a75479ce94dac3043f112",
+    "correct/stdout.log": "7271e7f76e7be799a699c36fe6e0996d470edaa503af6566e98782aaddb7302d",
+    "correct/test-results/.last-run.json": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903",
+    "correct/test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-08f74e305d21f32dc835140433e5975a60e78659.json": "2e9068f27795e18f930068b4a884cf9dc9c5dffb676132f17c10e31343b71f9e",
+    "correct/test-results/repro-button-refresh-button-first-survives-browser-refresh/document-observations.json": "2e9068f27795e18f930068b4a884cf9dc9c5dffb676132f17c10e31343b71f9e",
+    "correct/test-results/repro-button-refresh-button-first-survives-browser-refresh/test-finished-1.png": "4148c4190735153776944c0c58a443d57bbd10bbcf93708257e4f6911d49230e",
+    "correct/test-results/repro-button-refresh-button-first-survives-browser-refresh/trace.zip": "de2e73dffdf06d0b5d5806292cca25028cc3e106ea7549cb93e5115a2f3fedde",
+    "correct/test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-df43b6a9c75a1d0ec91153532cc38e724c9332cd.json": "54b467183b1531423ffd79f0871cbde341d23c46de087c5d5a118e4c69948d96",
+    "correct/test-results/repro-button-reload-button-first-survives-Reload-saved/document-observations.json": "54b467183b1531423ffd79f0871cbde341d23c46de087c5d5a118e4c69948d96",
+    "correct/test-results/repro-button-reload-button-first-survives-Reload-saved/test-finished-1.png": "c0f8fd0dbbbcc41d2bccdfe52a8d332229c4231749d229969fc9eb9bd464c093",
+    "correct/test-results/repro-button-reload-button-first-survives-Reload-saved/trace.zip": "ab607096911274c2f33d927749cd40515e30a963e17369452cded833add978c2",
+    "correct/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-20db5d79ae9f87f381ddba69fdd0ba045afe21ce.json": "81149f15a5ac970b141e834656e0bc58661394b841c611abc8ccd30f16e64441",
+    "correct/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/document-observations.json": "81149f15a5ac970b141e834656e0bc58661394b841c611abc8ccd30f16e64441",
+    "correct/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/test-finished-1.png": "676e5d8154db4cdc5670f2ee637cccf81ff388e5eed1e2f3a2ed2bd331535463",
+    "correct/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/trace.zip": "e29931867a69149d6a2b8c336cc12603f4fcc1cfd23b9e48682892d4dbb013f3",
+    "correct/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-b759c49ec948026f8dea000bf5e5ab86da2d97c4.json": "623b3eaea7522058c714d500a27a734408cc88c96e562b6f7bcabccce5ef840d",
+    "correct/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/document-observations.json": "623b3eaea7522058c714d500a27a734408cc88c96e562b6f7bcabccce5ef840d",
+    "correct/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/test-finished-1.png": "c33435b95accfb4198f92c15a5ead4e9df8f2d32fbe2967d2fc346d400d05f3d",
+    "correct/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/trace.zip": "b94cc6a731d9679671b8b6073f08b600f236540988aa736641f64cbfce3cf8ac",
+    "correct/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-3196d1e3501830cf4827cdd0857344bb4a2eef3b.json": "6ce2c6e7a698b664febe5865aa6cbee735aa22d5217d5b7e5d9e8e9c014205f3",
+    "correct/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/document-observations.json": "6ce2c6e7a698b664febe5865aa6cbee735aa22d5217d5b7e5d9e8e9c014205f3",
+    "correct/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/test-finished-1.png": "530d0425c92dac689f50dd41a4dca66a447b9d5430d0cf075416ac47c79c1a86",
+    "correct/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/trace.zip": "84a2c120f7c5eeb4c8b08ef56681db6e08f97076d6b2fef0549b77388aefdb6d",
+    "correct/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-0ab2d60945eb20a7fa487c01a6cf35a017e8ad77.json": "04999697fc83abd8bfaca762c41580be85a40ef4ac33d738a67c482c21f4d31c",
+    "correct/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/document-observations.json": "04999697fc83abd8bfaca762c41580be85a40ef4ac33d738a67c482c21f4d31c",
+    "correct/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/test-finished-1.png": "ab86e5bcffb83c352aa387a11a4c3b3dfecedc43d02b5ddca9fb9a6bc11fce4b",
+    "correct/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/trace.zip": "89b17a229158545ba3e29dfc4ee63dedca123bfc72dfbddbc02baaabad4d7ef6",
+    "correct/verification.json": "8ff2bcbd3da3321d8e767875cdcddb4b8f67cd070a7b4b78542d4c268c03e80d",
+    "events.jsonl": "59e1e18abe8b42c09f4dd645aad57c9d701d531146cddce5b7b747b5ff43726e",
+    "git-status.txt": "a3be0373580bc8140fde6d576d42efc627140b6870b49683b4c6500fe302b955",
+    "inputs/.node-version": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+    "inputs/.nvmrc": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+    "inputs/fixtures/editor/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+    "inputs/fixtures/editor/app/editor.js": "541c336cdc2d7d2f7a099bbec1a498d49467a2bc02f9608f956350f7409839ec",
+    "inputs/fixtures/editor/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+    "inputs/fixtures/editor/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+    "inputs/fixtures/editor/patches/correct.patch": "51b4735808203dfd60b3463b97f77161b6ce9d15dfae32ddda082f21220dc137",
+    "inputs/fixtures/editor/patches/misleading.patch": "8be1a772f25a2eab019078d30719a90f1c0e0c7dd3971c60c684ef27fbf55973",
+    "inputs/fixtures/editor/repro.spec.js": "995118174741f84f9c44c24e006646ab8e5a979afed6b7efe101834a45586122",
+    "inputs/fixtures/editor/scenario.json": "0d83f5c02ea89f22b4f785540189fbfd8a54d2c91771013c9fd7de6fb458c272",
+    "inputs/package-lock.json": "abf7322acde171b3c7b54e4e83606af134ba4b082308d9c98eaa61f41a995a59",
+    "inputs/package.json": "6d6faafd4330be9a0819c5300a849848672efc2704c3324b1ddf4019421a69e2",
+    "inputs/playwright.config.js": "e0f663b73631943a87450ca1688f34639e23134b26f4a6880bce67b044062870",
+    "inputs/src/evidence.ts": "2bddc60270d6a038fa208007aa340ca499fe538d5c79c3c81bf5ead6aba40df2",
+    "inputs/src/metrics.ts": "a8b74d62580e837ce43ce017d829a5598ffb72c9ff00a82bb67c0142863589d3",
+    "inputs/src/process.ts": "ee2035f27b5081de46e06da876f2643f3cfc225aa6484b1463f498954d9916c1",
+    "inputs/src/providers/interface.ts": "dab3333b2ab6dddc7626cae04cb89e97ae9e489280e9546b5e2fcab68b59e804",
+    "inputs/src/providers/README.md": "eff0d324fb6424784c8c42b779550d7cf5c2cb7e68c2c7a1fd20f5570fe40c83",
+    "inputs/src/runner.ts": "59d13f4fc6a220f19584bdbb5dbe84ad07c489246c77818a3c135010abf08bc8",
+    "inputs/src/scenario.ts": "44ab0a6700a7358ced88f2f9d8f2664e27416bcd096199bb989c3200643eed6d",
+    "inputs/src/verifier.ts": "90fde94d11ecd59f8ee5e348cfe39799f39cb83f8c5a497c0f8d56024fad871b",
+    "inputs/tests/evidence.test.ts": "dc5017926b0bfc9a75915b05d8ba0c965f0729d8cb75b03f43952e342bc9650d",
+    "inputs/tests/verifier.test.ts": "c81cf02c876606d10f0cbc54b63dedd2dd0da10bebe11556baa3f1eb226b8302",
+    "inputs/tsconfig.json": "7c64772afc11e22bdaa663c5db86a7fc5c492beb1c241ca29d8aec70c453f883",
+    "misleading/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+    "misleading/app/editor.js": "f08b6272bb0ca831d3b39369797dc967fbf9c48eb3416a0b8acc98a35abaef47",
+    "misleading/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+    "misleading/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+    "misleading/applied.patch": "8be1a772f25a2eab019078d30719a90f1c0e0c7dd3971c60c684ef27fbf55973",
+    "misleading/cleanup.json": "56538c34d8c6a33e32fa048f5e12b96b18349a843a1df8fa58349d49c9138c4f",
+    "misleading/command.json": "5338591f87b3b4cb08692bcb4698177316d7144c57edfa04c4d7b202426f2848",
+    "misleading/process.json": "38f423c3b990c2418eea3e2c73670bda4f648735b06a5ed6f9c90b1ba593af8c",
+    "misleading/report.json": "5a85dfbe78377218b2fc7daafc43ba2204e0b9207db5c8da093fcab7566fdf23",
+    "misleading/report.raw.json": "9af0f1a566db9f42ee74e328095959eb802768a5bb0766823ed1a9aee8ab81b8",
+    "misleading/stderr.log": "9a7c4b6c64a9ca5126a689c5b2c85912f3210e27d45d464552982525e980285b",
+    "misleading/stdout.log": "57e99ef5687462cfaccdd92fc21b91ecbb7f60383f4bbade32b7f4e0a1e86d8e",
+    "misleading/test-results/.last-run.json": "748631a0fef5cd9bec67fc5d5cd4a2487e94e5b81751dfd721163f73d6acd444",
+    "misleading/test-results/repro-button-refresh-button-first-survives-browser-refresh/attachments/document-observations-fb73fce49f75b0afbb277c0d4ecefe16b896833a.json": "136eb9f2b178fb5aa7050939d61376e7581516a31352c174aa2c7bce00deaebc",
+    "misleading/test-results/repro-button-refresh-button-first-survives-browser-refresh/document-observations.json": "136eb9f2b178fb5aa7050939d61376e7581516a31352c174aa2c7bce00deaebc",
+    "misleading/test-results/repro-button-refresh-button-first-survives-browser-refresh/error-context.md": "d571c416b7ab058d80d469e8729b07ab5283a99a63d8e0e7cb2208a1e41a3244",
+    "misleading/test-results/repro-button-refresh-button-first-survives-browser-refresh/test-failed-1.png": "4b34814969a548c82ff423a21f8a7ae505fd892754dd3d81c63b57bd7c1f54c9",
+    "misleading/test-results/repro-button-refresh-button-first-survives-browser-refresh/trace.zip": "c84f6dc0952e7540a10a1210e3c3afe82e4b9de29297667550c16a5e74addf7c",
+    "misleading/test-results/repro-button-reload-button-first-survives-Reload-saved/attachments/document-observations-4dca411527e04a58647913603c18fbce3d12ab9c.json": "50f45c4e82ea41f01a4064234adfb55b890ca19bc8a450d3942b2b79bb4b3f13",
+    "misleading/test-results/repro-button-reload-button-first-survives-Reload-saved/document-observations.json": "50f45c4e82ea41f01a4064234adfb55b890ca19bc8a450d3942b2b79bb4b3f13",
+    "misleading/test-results/repro-button-reload-button-first-survives-Reload-saved/error-context.md": "37577501d329fe191b2660ef652aa75267bf1d5e1c74d0b305948f49eb7d125c",
+    "misleading/test-results/repro-button-reload-button-first-survives-Reload-saved/test-failed-1.png": "67615215eae7b5f37f264c8a4ab830bf1a5ac2ba5eb9ea4484cfaa0166f296cc",
+    "misleading/test-results/repro-button-reload-button-first-survives-Reload-saved/trace.zip": "07789361a5235846810e585ca8ca6afe841276add832d3cd1ba7d806dd0665b2",
+    "misleading/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/attachments/document-observations-9477ad0e3dcbbfe93b307345705d7425c683e371.json": "6d2d24d069341a9f4cad5a5ef74bbd6d4c1d729433764a068f415b4c967ec3fb",
+    "misleading/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/document-observations.json": "6d2d24d069341a9f4cad5a5ef74bbd6d4c1d729433764a068f415b4c967ec3fb",
+    "misleading/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/error-context.md": "862b2562d09db5a4d7ba082e5156745fad67ef32e5412745d362ca9871383540",
+    "misleading/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/test-failed-1.png": "00b2fe6a1f835565b43ee186d63e0370245d798512fc3b84d7963bb612b3adf4",
+    "misleading/test-results/repro-edited-text-edited-a-537ac-text-survive-repeated-saves/trace.zip": "6aebdbefd32917f73e8fc4792edd0bcfb9b88ac5c7533e699b675c86e501ea28",
+    "misleading/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/attachments/document-observations-1caae59ceb22e364cf4d80bd1c8a0dc54aa1ee56.json": "f232585912b4ab3acc5cc162046d1447f9eb7754e01d202de9954048310498e7",
+    "misleading/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/document-observations.json": "f232585912b4ab3acc5cc162046d1447f9eb7754e01d202de9954048310498e7",
+    "misleading/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/error-context.md": "6d86f44c1125f934df0b9d74b997dd5498f84177f044af00c339294c380011b9",
+    "misleading/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/test-failed-1.png": "ecf7cf6cae916984e3da60f64290963be468eeecbb3d939f210119cb82bd061a",
+    "misleading/test-results/repro-holdout-seeded-unsee-a10c0-ermutations-survive-reloads/trace.zip": "3204986a1955042628723e03408b0406772a4fe8f4d455347ff1cc2677ffa4a9",
+    "misleading/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/attachments/document-observations-2e7cde507c685b951319015cc371e418de13c20f.json": "d775944abaee7c0cc5b6df2f68b0c31c3a190a0fe83440f7e627526ed6c1b4fb",
+    "misleading/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/document-observations.json": "d775944abaee7c0cc5b6df2f68b0c31c3a190a0fe83440f7e627526ed6c1b4fb",
+    "misleading/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/error-context.md": "722317db01f26d6c53afc0651282960c718dc91abfc3b84f3939763984f40748",
+    "misleading/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/test-failed-1.png": "ed0f67e0cebb5e2345a050817b87153484e2b3f221b7fbf8542c516c79e6a8e6",
+    "misleading/test-results/repro-original-order-savin-dcf79-ering-preserves-the-heading/trace.zip": "d40e505acab61127a23b38777fc5af806d69d432bf5d798914692fd538874c28",
+    "misleading/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/attachments/document-observations-5bd6cfdf2ab3126ebff7090c014d2feecc056003.json": "04999697fc83abd8bfaca762c41580be85a40ef4ac33d738a67c482c21f4d31c",
+    "misleading/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/document-observations.json": "04999697fc83abd8bfaca762c41580be85a40ef4ac33d738a67c482c21f4d31c",
+    "misleading/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/test-finished-1.png": "ab86e5bcffb83c352aa387a11a4c3b3dfecedc43d02b5ddca9fb9a6bc11fce4b",
+    "misleading/test-results/repro-reset-isolation-rese-2b5c3-related-browser-data-intact/trace.zip": "b0ac05e7af680cb111ea6dc0e11dc31ca6abc784be2b1fd81c3b4436302808b9",
+    "misleading/verification.json": "c8b336656497a266bd5e64801898b939eab68c19538045c42ddcf9f25d6013be",
+    "source.diff": "acaee461dbd28b5e8856cde2213c941d5144febef97ba203767095cb9a57d023"
+  }
+}

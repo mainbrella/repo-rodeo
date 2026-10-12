@@ -1,0 +1,11 @@
+diff --git a/editor.js b/editor.js
+--- a/editor.js
++++ b/editor.js
+@@ -150,6 +150,7 @@
+   try {
+     localStorage.setItem(storageKey, JSON.stringify(serialized));
+     setStatus('Saved');
++    render();
+   } catch {
+     setStatus('Could not save in this browser. Check storage settings.', true);
+   }

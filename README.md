@@ -1,218 +1,64 @@
-# My pick: Repo Rodeo
+# Repo Rodeo
 
-An open-source GitHub bug reproduction and repair playground
+Repo Rodeo makes a bug reproduction and its proposed repairs inspectable. The first milestone is a local, repeatable experiment around a deliberately broken editor: run the same browser reproduction against the seeded app, a correct repair, and a plausible patch that leaves the bug in place.
 
-# Turn a GitHub issue into a living, shareable bug reproduction.
+This milestone uses deterministic patches. It does not run AI agents or connect to E2B, Daytona, or MainBrella. The provider adapters are future work; [the provider interface](src/providers/interface.ts) and [acceptance plan](src/providers/README.md) record the planned contract. The local runner uses separate temporary working copies and an external verifier, but these are not security sandboxes and provide no isolation guarantee for untrusted code.
 
-Here's the idea:
+## Requirements
 
-Someone files a GitHub issue saying their web app is broken. You want to help, but you don't have their computer, dependencies, environment, or a reliable way to reproduce it.
+- Node.js `22.22.2` (see `.nvmrc` and `.node-version`)
+- npm `10.9.7`
+- Git
+- Chromium installed for Playwright
 
-With Repo Rodeo, you paste the issue URL. It sets up the project in an isolated Linux sandbox, helps reproduce the bug, and gives you a live, interactive version of the broken application.
+From a fresh checkout:
 
-Then comes the fun part.
-
-You can fork that exact prepared environment into three independent sandboxes, assign different AI coding agents to attempt fixes, watch them work, and compare their results.
-
-At the end, you get a live before-and-after demonstration, a reproducible failing test, and potentially a real pull request that fixes somebody's problem.
-
-This would be useful even if the AI agents never fixed anything. Giving a maintainer a one-click, reproducible environment with a failing test is valuable by itself.
-
-And that's why I like this project much more than another agent benchmark. You're building something that developers could actually use.
-
-## The experience you're building
-
-Imagine somebody reports that a drag-and-drop editor loses elements after saving. A successful Repo Rodeo page would show:
-
-## Repo Rodeo
-
-Example issue: Editor loses elements after saving
-
-Repoduced
-
-Original app
-
-Element missing!
-
-Base commit · Test failing
-
-Candidate fix
-
-Element preserved
-
-Patch commit · Test passing
-
-Patch attempts
-
-Agent A · Minimal fix
-
-12/12 tests
-
-Agent B · Refactor
-
-10/12 tests
-
-Agent C · Alternative fix
-
-12/12 tests
-
-Live previews
-
-Browser replay
-
-Git diff
-
-Run logs
-
-Illustrative product UI, not actual test results.
-
-The killer feature isn't three AI agents. It's that the maintainer can click the broken app, see the bug, then click the repaired app and verify the difference without installing anything.
-
-That is compelling enough to give away as a free open-source service, at least for a limited number of runs.
-
-## Why this will force you to learn sandbox infrastructure
-
-Every one of these becomes necessary because of a real user need.
-
-| Feature                 | What happens in Repo Rodeo                                                    |
-| ----------------------- | ------------------------------------------------------------------------------ |
-| Custom images/templates | Installing a big application's dependencies takes time. Prepare once and reuse |
-| Filesystem snapshots    | Preserve the exact environment after a successful build                        |
-| Forking                 | Start three independent repair experiments from an identical state             |
-| Persistent volumes      | Reuse large dependency caches and store artifacts across sandbox lifetimes     |
-| Pause/resume            | The maintainer returns tomorrow and wants to continue investigating            |
-| Network restrictions    | Unknown GitHub projects run untrusted install scripts and code                 |
-| Secrets vault           | Agents need limited GitHub or model API access without reading raw credentials |
-| Background execution    | Tests and agents continue after someone closes the browser                     |
-| Public previews         | Let maintainers interact with the app without a local installation             |
-| Computer use            | Repoduce UI bugs with real clicks, typing, browser screenshots and recordings |
-| File API                | Extract logs, patches, screenshots, traces and test artifacts                  |
-| Webhooks/events         | Notify your application when environments start, stop, fail or finish          |
-| Metrics                 | Determine why a repair job failed, stalled or exhausted memory                 |
-| Warm pools              | Make the Fork and Try button feel instantaneous                                |
-| Lifecycle/cleanup       | Automatically reclaim expensive environments after review                      |
-
-These aren't invented exercises. They arise naturally from the product.
-
-E2B documents sandbox forking, memory-preserving persistence and secret injection. Daytona documents snapshotting, volumes, computer-use tooling and warm pools (although warm pools need organization enablement).&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://docs.e2b.dev\&sz=32)
-
-docs.e2b.dev
-
-+4
-
-
-
-## Your assignment: one real bug, three platforms
-
-### The core challenge
-
-Find one genuine, unresolved bug in an open-source web application and turn it into a reproducible, interactive demonstration on all three providers.
-
-I'd start with a repo you control, possibly `mainbrella/web`, provided the bug is real and repeatable. For the public launch, add a bug reported by someone else in an unrelated open-source project.
-
-The product should support a simple reproduction recipe, for example:
-
-```
-repository: owner/project
-commit: abc123
-setup: npm ci
-start: npm run dev -- --host 0.0.0.0
-port: 3000
-reproduce: npx playwright test repro.spec.ts
+```sh
+npm ci
+npx playwright install chromium
+npm run experiment
 ```
 
-The issue URL gives context; the test script establishes what is actually broken. Don't make an LLM's unsupported assertion count as reproducing a bug.
+On Linux, install browser system dependencies with `npx playwright install --with-deps chromium`. `npm run experiment` runs the baseline, correct patch, and misleading patch in separate temporary copies, then writes evidence under a unique `artifacts/<run-id>/` directory. Its `manifest.json` records assertions, traces, screenshots, command output, source/test/lockfile/patch hashes, the Git revision and dirty-worktree marker, random seed, event timings, and cleanup confirmations. Timings are local elapsed times, not cloud performance or cost measurements.
 
-Pass 1 — E2B: Make the broken app come alive
+Pass a seed to repeat the randomized holdout case:
 
-Build the app, capture browser evidence, checkpoint the prepared environment, fork three independent repair attempts, run tests and publish a live preview. Also test leaving a sandbox paused and returning later.
+```sh
+npm run experiment -- --seed 12345
+```
 
-Deliverable: the first genuinely usable Repo Rodeo page.
+To choose an evidence directory, use a new path; the runner refuses to overwrite an existing one:
 
-Pass 2 — Daytona: Make it fast and repeatable
+```sh
+npm run experiment -- --output artifacts/review-run
+```
 
-Recreate the same experience with the same repository, tests, agent and prompts. Explore Daytona's native snapshot/fork options, shared volumes, computer-use API and warm pools where enabled.
+The randomized holdout is generated from the recorded seed and is kept out of the fixed reproduction cases. It checks whether each patch preserves a fresh editor document through the same save-and-reload path.
 
-Deliverable: the same user-facing product, powered by a second provider, with real performance and lifecycle comparisons.
+The experiment exits successfully only when the baseline and misleading patch reproduce the specified loss, the correct patch passes all six tests, and cleanup succeeds. Browser failures, HTTP errors, missing tests or artifacts, unexpected assertions, and changed experiment inputs fail verification. An unverified baseline stops candidate execution.
 
-Pass 3 — MainBrella: Find out what your platform really needs
+See the [recorded local manifest](examples/run-result.json) and [evidence notes](examples/README.md) for an actual result. Evidence bundles include the exact inputs used, portable reports, original Playwright output, a SHA-256 inventory, and a checksum of the manifest. Uncommitted input changes are explicitly recorded alongside the base Git SHA.
 
-Repeat without changing the product requirements. Use MainBrella's current filesystem save/restore and execution APIs. For features that don't exist, record the gaps rather than pretending a workaround is equivalent.
+## Other commands
 
-For example, restoring three saved filesystems isn't the same as forking a live process with its memory. R2 object storage isn't automatically a shared filesystem mount.
+```sh
+npm test              # unit checks for the evidence verifier
+npm run typecheck
+npm run repro          # browser reproduction; starts the fixture unless REPRO_BASE_URL is set
+npm run fixture        # serve the fixture at http://127.0.0.1:4175/repo-rodeo-bug
+npm run capture        # capture the app while a fixture server is running
+```
 
-Deliverable: a working MainBrella version and an evidence-backed feature roadmap.
+The reproduction intentionally fails against the seeded app: five assertions fail and the reset-isolation check passes. It passes all six checks with the correct repair. The misleading patch rerenders the current draft after saving but retains the serialization bug, so the reload checks continue to fail. `REPRO_BASE_URL` can point the verifier at an already-running app, for example:
 
-## Make the benchmarking part of the open-source product
+```sh
+REPRO_BASE_URL=http://127.0.0.1:4175 npm run repro
+```
 
-Don't write three separate implementations of Repo Rodeo. Build one application with three provider adapters, and keep the experience consistent.
+The standalone fixture and six browser checks are under [`fixtures/editor`](fixtures/editor). `fixtures/editor/scenario.json` describes the versioned scenario; [`patches`](fixtures/editor/patches) contains the two controlled changes. The verifier runs outside the writable app copies so the controlled patches cannot change their own acceptance tests.
 
-The project could expose a public comparison that records these measurements for each provider:
+## Evidence and current scope
 
-Run scorecard
+The article draft in [`blog/one-bug-three-clouds.md`](blog/one-bug-three-clouds.md) is explicitly fictional. Provider behavior, agent outcomes, lifecycle results, costs, timings, and any pull request remain planned until backed by durable run evidence. [`blog/claims.json`](blog/claims.json) is the machine-readable claim ledger; local implementation claims and provider claims must have evidence references before their status changes to `verified` or `contradicted`.
 
-Use measured values only, from the same pinned application and comparable resource allocations.
-
-| Metric                                                 | E2B | Daytona | MainBrella |
-| ------------------------------------------------------ | --- | ------- | ---------- |
-| Cold start to first successful command<br>seconds      | —   | —       | —          |
-| Repository ready and dependencies installed<br>seconds | —   | —       | —          |
-| Clone prepared environment<br>seconds                  | —   | —       | —          |
-| Live preview ready<br>seconds                          | —   | —       | —          |
-| Resume a preserved environment<br>seconds              | —   | —       | —          |
-| Compute cost for a completed bug run<br>USD            | —   | —       | —          |
-
-Eventually add success rates, p50/p95 latency, resource consumption, and feature limitations.
-
-I would also deliberately run three failure scenarios: disconnect while an agent is executing, return to a paused environment after an extended break, and delete a sandbox while preserving its evidence and results.
-
-Those cases teach you far more about a provider than a successful `echo hello` benchmark.
-
-## What makes this a serious open-source project
-
-There are already issue-to-PR agents, including [ProPR](https://github.com/integry/propr) and research projects like [PatchSmith](https://github.com/thromel/patchsmith). I wouldn't compete by building another general coding agent.
-
-Instead, own the reproducibility, interactive preview and independently verifiable evidence layer. Use an existing coding agent to propose changes; Repo Rodeo should be responsible for making the bug and its proposed fixes inspectable.
-
-Start with public repositories and user-authorized GitHub write access. Keep credentials outside untrusted code where possible, set resource and spending limits, restrict public previews, and expire environments. Not every repo will install successfully; a useful failure report should be a first-class result.
-
-### Your definition of done
-
-The project is genuinely successful when a developer can give you a real GitHub issue, and you can produce:
-
-- A verified failing reproduction on the original commit.
-- A live link to the broken application.
-- At least two isolated repair experiments built from the same prepared environment.
-- A candidate fix that passes the reproduction test and relevant regression tests.
-- A live before-and-after comparison, with logs, screenshots, source diff, and a human-approved PR.
-- An evidence record that survives the sandboxes being destroyed, plus the cost and timing results from E2B, Daytona and MainBrella.
-
-A partial failure should still produce a useful report, rather than a fake green checkmark.
-
-## The blog series practically writes itself
-
-One Bug, Three Clouds: Building Repo Rodeo
-
-The opening post: why GitHub bug reports need executable environments.
-
-I Forked a Running Computer to Fix a Bug
-
-E2B, snapshots, parallel agents, and how identical environments diverge.
-
-What Daytona Does Differently
-
-Volumes, warm pools, computer use and real persistence behavior.
-
-Rebuilding Repo Rodeo on MainBrella
-
-An open accounting of what works, what needs improvement, and what isn't yet possible.
-
-Three Clouds, One Real Bug: The Results
-
-Public measurements, failure stories, reproducible code, and the actual pull request.
-
-The part I'd be most excited about is the final public demo: someone clicks an issue, sees a bug happen, watches three independent repair attempts, and interacts with the fixed application. Then they can run the same job themselves.
-
-That turns your experiment into a useful developer tool, gives MainBrella a serious reference application, and produces an unusually credible comparison of E2B, Daytona, and MainBrella.
+When MainBrella work begins, first check whether the deployment advertises filesystem forking and try its native `POST /containers/fork` path when available. If it is unavailable, test saved-workspace restore as a separate fresh-process experiment. Neither path should be described as memory preservation without evidence of preserved process state. Provider adapters, real cloud runs, agent execution, pricing comparisons, and publication are outside this milestone.

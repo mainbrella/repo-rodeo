@@ -1,6 +1,6 @@
 # One bug, three clouds: building Repo Rodeo
 
-> Fictional retrospective, written before the cloud runs. The seeded bug and local screenshot are real; the product, provider outcomes, and repair stories are imagined. See the [working notes](README.md) for assumptions we'll replace with evidence.
+> Fictional retrospective, written before the cloud runs. The seeded bug and local screenshot are real; the product, provider outcomes, and repair stories are imagined. See the [working notes](README.md) and [claim ledger](claims.json) for assumptions we'll replace with evidence.
 
 The button was still there when the editor said “Saved.” It disappeared when we reloaded the page.
 
@@ -14,7 +14,7 @@ The part I kept showing people was the pair of application links. Open the origi
 
 ## A small bug we could keep breaking
 
-We planted this bug on purpose in `mainbrella/web`, at `/repo-rodeo-bug`. It's a small block editor with a heading, a paragraph, and a button. You can edit their text, move them up or down, and save them in browser storage. It needs no account or backend. Reset puts the demo back where it started.
+We planted this bug on purpose in the standalone fixture at `/repo-rodeo-bug`. It's a small block editor with a heading, a paragraph, and a button. You can edit their text, move them up or down, and save them in browser storage. It needs no account or backend. Reset puts the demo back where it started.
 
 That makes it a useful infrastructure fixture. It doesn't make it evidence that an agent can fix a stranger's application. An unfamiliar repository with a bad setup guide is a separate, much less cooperative test.
 
@@ -32,7 +32,7 @@ The [saved editor still shows all three blocks](assets/before-reload.png). Reloa
 
 ![The deliberately broken editor after reload shows two blocks, Friday demo and Bring something that almost works. The Join the waitlist button that occupied the first position is gone.](assets/after-reload.png)
 
-Our [reproduction](repro/editor.spec.js) opened a fresh browser context, reset the demo, moved the button, saved, and reloaded. It compared the ordered block IDs and their text with the values before saving. That last part mattered: checking whether the page still contained “Join the waitlist” could pass because some help text mentioned it.
+Our [reproduction](../fixtures/editor/repro.spec.js) opened a fresh browser context, reset the demo, moved the button, saved, and reloaded. It compared the ordered block IDs and their text with the values before saving. That last part mattered: checking whether the page still contained “Join the waitlist” could pass because some help text mentioned it.
 
 Once that test failed, we had something an agent's explanation couldn't talk us out of. A patch had to preserve the document across a reload. Keeping the button visible until the tab closed wasn't a repair.
 
@@ -49,6 +49,8 @@ The candidate diff still needed review. A browser test can demonstrate the behav
 Getting those two links onto one page was easy. Giving “copy this environment” an honest meaning across three providers took more care.
 
 ## E2B: keep the running starting point
+
+> Experiment note: set an explicit fork lifetime. The [documented default](https://docs.e2b.dev/sandbox/fork#fork-timeout) is 15 seconds, too short for the repair experiment.
 
 E2B's [fork operation](https://docs.e2b.dev/sandbox/fork) captures a running sandbox's filesystem and memory, then creates independent sandboxes from that capture. Our dev server was already running at the checkpoint. The attempts inherited that prepared process state as well as the checkout and installed packages.
 
@@ -82,6 +84,8 @@ What I liked about this pass was how much routine preparation we could reuse. Wh
 
 MainBrella is ours, so this was the pass where a flattering abstraction would have been easiest to write.
 
+> Experiment update: the backend now includes feature-gated, filesystem-only `POST /containers/fork`. When the deployment advertises `persistence.filesystemFork`, try that native operation first. The saved-workspace path imagined below remains a separate fallback experiment. Neither has been verified in a provider run here.
+
 The working path was straightforward. Save the prepared filesystem. Restore it into separate containers. Start the app in each container, wait for the route to respond, and run the same reproduction. The checkout and dependencies survived; the dev-server process had to start again. That matches the documented [saved-workspace behavior](https://mainbrella.com/docs/containers/#saved-workspaces): files and metadata are preserved, running processes and memory are not.
 
 For this bug, that was enough. Its failure lived in the serializer, and the browser could reconstruct all the input it needed. A fresh process lost no evidence the test depended on. We got independent repair attempts and working previews without needing to pretend we'd forked a running computer.
@@ -94,7 +98,7 @@ This gave us a much better roadmap than a list of competitor features. We needed
 
 ## The repair still had to survive a reload
 
-In the demonstration run, two candidates preserved the document and one only hid the symptom. The tempting bad patch kept the current array on screen after Save. The original app already did that. Its preview looked convincing right up to the reload.
+The following candidate outcomes are provisional fictional examples, not results of the local deterministic controls or any provider experiment. Replace the table when actual repair attempts finish. The tempting bad patch kept the current array on screen after Save. The original app already did that. Its preview looked convincing right up to the reload.
 
 | Candidate | What changed | What the reviewer could reproduce |
 | --- | --- | --- |

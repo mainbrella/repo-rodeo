@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "local-reproduction",
+      "claim": "The standalone editor reproduces first-block loss after save and reload; the baseline has five failing checks and one passing reset-isolation check.",
+      "status": "verified",
+      "evidence": [
+        "../examples/run-result.json"
+      ]
+    },
+    {
+      "id": "controlled-patches",
+      "claim": "The correct patch passes all six browser checks, while the misleading rerender patch retains the save-and-reload defect.",
+      "status": "verified",
+      "evidence": [
+        "../examples/run-result.json"
+      ]
+    },
+    {
+      "id": "holdout-case",
+      "claim": "A recorded seed creates a fresh randomized editor document that is held out from the fixed reproduction cases and checked against each patch.",
+      "status": "verified",
+      "evidence": [
+        "../examples/run-result.json"
+      ]
+    },
+    {
+      "id": "external-verifier",
+      "claim": "The acceptance test runs outside the app copies that a repair may modify.",
+      "status": "verified",
+      "evidence": [
+        "../examples/run-result.json"
+      ]
+    },
+    {
+      "id": "local-copy-isolation",
+      "claim": "Each local control uses a separate temporary working copy; this local arrangement is not a security sandbox for untrusted code.",
+      "status": "verified",
+      "evidence": [
+        "../examples/run-result.json"
+      ]
+    },
+    {
+      "id": "e2b-memory-fork",
+      "claim": "An E2B experiment can fork the prepared running environment with the intended filesystem and memory state, and writes remain independent between branches.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "e2b-pause-resume",
+      "claim": "An E2B prepared environment can be paused and resumed with the process state required by the experiment, with client reconnection recorded.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "daytona-snapshot-modes",
+      "claim": "Daytona container filesystem snapshots and VM memory snapshots have distinct capture and restore behavior in the selected sandbox classes.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "daytona-volume-pool",
+      "claim": "Daytona volume reuse and warm-pool reuse are tested as separate configurations with their matching constraints and costs recorded.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "mainbrella-native-fork",
+      "claim": "When the deployment advertises filesystem forking, MainBrella's native POST /containers/fork path is exercised and its preserved state is recorded.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "mainbrella-saved-workspace",
+      "claim": "If native forking is unavailable, MainBrella saved-workspace restore is measured as a separate fresh-process path, without describing it as memory preservation.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "preview-verification",
+      "claim": "An external browser context independently reproduces the same user interaction against each provider preview.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "job-reattachment",
+      "claim": "A job remains discoverable and its output and final state can be recovered after the review browser disconnects during execution.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "cleanup-evidence",
+      "claim": "Exported diffs, test output, screenshots, and run records remain readable after finished sandboxes are deleted, while expired previews are identified as unavailable.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "provider-timing-cost",
+      "claim": "Comparable provider timings and compute costs are measured with preparation mode, resource allocation, region, reuse, and idle capacity recorded; model cost is reported separately.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "repair-agent-outcomes",
+      "claim": "Independent repair attempts use the same pinned agent/model configuration, prompt, and budget, and their diffs and verifier outcomes are reported accurately.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "human-approved-publication",
+      "claim": "A human reviews the selected candidate and approves any pull-request publication.",
+      "status": "planned",
+      "evidence": []
+    },
+    {
+      "id": "unfamiliar-repository",
+      "claim": "The workflow generalizes from the planted fixture to a genuinely unresolved bug in an unrelated public repository.",
+      "status": "planned",
+      "evidence": []
+    }
+  ]
+}

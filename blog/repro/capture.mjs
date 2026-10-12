@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { chromium, expect } from '@playwright/test';
 
@@ -14,10 +14,23 @@ try {
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.getByRole('status')).toHaveText('Saved');
   await expect(page.getByTestId('block')).toHaveCount(3);
-  await page.screenshot({ path: fileURLToPath(new URL('before-reload.png', assets)), fullPage: true });
+  expect(await page.getByTestId('block').evaluateAll(rows => rows.map(row => row.dataset.blockId)))
+    .toEqual(['button', 'heading', 'paragraph']);
+  const before = await page.screenshot({ fullPage: true });
   await page.reload();
   await expect(page.getByRole('status')).toHaveText('Loaded saved draft');
-  await page.screenshot({ path: fileURLToPath(new URL('after-reload.png', assets)), fullPage: true });
+  await expect(page.getByTestId('block')).toHaveCount(2);
+  await expect(page.locator('[data-block-id="button"]')).toHaveCount(0);
+  expect(await page.getByTestId('block').evaluateAll(rows => rows.map(row => ({
+    id: row.dataset.blockId,
+    text: row.querySelector('input').value,
+  })))).toEqual([
+    { id: 'heading', text: 'Friday demo' },
+    { id: 'paragraph', text: 'Bring something that almost works.' },
+  ]);
+  const after = await page.screenshot({ fullPage: true });
+  await writeFile(fileURLToPath(new URL('before-reload.png', assets)), before);
+  await writeFile(fileURLToPath(new URL('after-reload.png', assets)), after);
   console.log(`Captured ${await page.getByTestId('block').count()} blocks after reload.`);
 } finally {
   await browser.close();

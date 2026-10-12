@@ -1,0 +1,61 @@
+:root {
+  color-scheme: dark;
+  --paper: #0d1014;
+  --surface: #141920;
+  --ink: #f2f4f7;
+  --muted: #a4adb8;
+  --blue: #3fb5ff;
+  --button-blue: #096fd3;
+  --line: #2b323b;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-size: 16px; line-height: 1.6; }
+p, h1, h2, h3 { margin: 0; }
+::selection { color: #fff; background: var(--button-blue); }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+
+.repo-rodeo-body { min-height: 100svh; padding: 32px 20px; }
+.repo-rodeo { width: min(100%, 920px); margin: 0 auto; }
+.repo-rodeo-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+.repo-rodeo-header h1 { font-size: 28px; line-height: 1.25; letter-spacing: -.025em; }
+.repo-rodeo-note { margin-top: 4px; color: var(--muted); font-size: 14px; }
+#save-status { min-height: 44px; padding: 10px 0; color: var(--muted); font-size: 14px; }
+#save-status[data-state="error"] { color: #ffb4ab; }
+.repo-rodeo-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 20px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.repo-rodeo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.repo-rodeo-actions button, .repo-rodeo-move button { min-height: 44px; padding: 8px 14px; border: 1px solid #465260; border-radius: 6px; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.repo-rodeo-actions button:hover, .repo-rodeo-move button:hover { background: #202832; }
+.repo-rodeo-actions #save { border-color: var(--button-blue); background: var(--button-blue); font-weight: 600; }
+.repo-rodeo-actions #save:hover, #preview-content button:hover { background: #075db4; }
+#block-count { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.repo-rodeo-workspace { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(240px, .8fr); gap: 32px; margin-top: 24px; }
+.repo-rodeo-workspace h2 { margin-bottom: 12px; font-size: 16px; line-height: 1.4; letter-spacing: 0; }
+#blocks { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.repo-rodeo-block { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.repo-rodeo-field { display: grid; gap: 6px; min-width: 0; }
+.repo-rodeo-field label { color: var(--muted); font-size: 13px; font-weight: 600; }
+.repo-rodeo-field input { width: 100%; min-width: 0; min-height: 44px; padding: 9px 11px; border: 1px solid #465260; border-radius: 6px; background: #0e1319; color: var(--ink); font: inherit; font-size: 15px; }
+.repo-rodeo-move { display: flex; gap: 4px; }
+.repo-rodeo-move button { padding: 8px 10px; }
+.repo-rodeo-move button:disabled { opacity: .45; cursor: not-allowed; }
+.repo-rodeo-preview { align-self: start; padding: 16px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+#preview-content { display: grid; gap: 12px; overflow-wrap: anywhere; }
+#preview-content h3 { font-size: 22px; }
+#preview-content p { color: var(--muted); }
+#preview-content button { justify-self: start; min-width: 0; max-width: 100%; min-height: 44px; padding: 8px 14px; border: 0; border-radius: 6px; background: var(--button-blue); color: #fff; font: inherit; font-weight: 600; white-space: normal; overflow-wrap: anywhere; text-align: left; }
+@media (max-width: 640px) {
+  .repo-rodeo-body { padding: 20px 16px; }
+  .repo-rodeo-header { display: block; }
+  #save-status { min-height: 36px; padding: 4px 0 0; }
+  .repo-rodeo-toolbar { align-items: flex-start; }
+  .repo-rodeo-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+  .repo-rodeo-actions #save { grid-column: 1 / -1; }
+  .repo-rodeo-actions button { padding-right: 8px; padding-left: 8px; }
+  .repo-rodeo-workspace { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .repo-rodeo-block { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 8px; }
+  .repo-rodeo-move button { flex: 1; }
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0d1014" />
+    <meta name="robots" content="noindex" />
+    <title>Block editor · Repo Rodeo</title>
+    <link rel="stylesheet" href="/editor.css" />
+  </head>
+  <body class="repo-rodeo-body">
+    <main class="repo-rodeo" aria-labelledby="page-title">
+      <header class="repo-rodeo-header">
+        <div>
+          <h1 id="page-title">Block editor</h1>
+          <p class="repo-rodeo-note">Deliberately broken demo. Data stays in this browser.</p>
+        </div>
+        <p id="save-status" role="status" aria-live="polite">Ready</p>
+      </header>
+
+      <section class="repo-rodeo-toolbar" aria-label="Editor controls">
+        <div class="repo-rodeo-actions">
+          <button class="repo-rodeo-primary" id="save" type="button">Save</button>
+          <button id="reload" type="button">Reload saved</button>
+          <button id="reset" type="button">Reset demo</button>
+        </div>
+        <p id="block-count" aria-live="polite">3 blocks</p>
+      </section>
+
+      <div class="repo-rodeo-workspace">
+        <section aria-labelledby="blocks-heading">
+          <h2 id="blocks-heading">Blocks</h2>
+          <ol id="blocks" aria-label="Editable blocks"></ol>
+        </section>
+        <section class="repo-rodeo-preview" aria-labelledby="preview-heading">
+          <h2 id="preview-heading">Preview</h2>
+          <div id="preview-content"></div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/editor.js"></script>
+  </body>
+</html>

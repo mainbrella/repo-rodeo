@@ -1,0 +1,15 @@
+diff --git a/editor.js b/editor.js
+--- a/editor.js
++++ b/editor.js
+@@ -144,9 +144,8 @@
+ }
+ 
+ function save() {
+-  // Intentional fixture bug: position 0 is false, so the first positioned block is discarded.
+-  const serialized = blocks.map((block, position) => ({ ...block, position }))
+-    .filter(block => block.position);
++  // Preserve every block, including the block at position 0.
++  const serialized = blocks.map((block, position) => ({ ...block, position }));
+   try {
+     localStorage.setItem(storageKey, JSON.stringify(serialized));
+     setStatus('Saved');

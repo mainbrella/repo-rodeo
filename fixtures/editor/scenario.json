@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "editor-first-block",
+  "runtime": { "node": "22.22.2", "playwright": "1.63.0" },
+  "app": "fixtures/editor/app",
+  "route": "/repo-rodeo-bug",
+  "verifier": {
+    "config": "playwright.config.js",
+    "testFile": "fixtures/editor/repro.spec.js",
+    "assertion": "RODEO_DOCUMENT_PRESERVED_V1",
+    "attachment": "document-observations",
+    "failure": "Only the first block disappears; the remaining IDs, text and order are unchanged."
+  },
+  "holdout": { "documents": 6, "reloadsPerDocument": 2 },
+  "tests": [
+    { "id": "button-refresh", "title": "button first survives browser refresh", "baseline": "failed", "observations": 1 },
+    { "id": "button-reload", "title": "button first survives Reload saved", "baseline": "failed", "observations": 1 },
+    { "id": "original-order", "title": "saving without reordering preserves the heading", "baseline": "failed", "observations": 1 },
+    { "id": "edited-text", "title": "edited and empty text survive repeated saves", "baseline": "failed", "observations": 3 },
+    { "id": "reset-isolation", "title": "reset leaves unrelated browser data intact", "baseline": "passed", "observations": 0 },
+    { "id": "holdout", "title": "seeded unseen text and permutations survive reloads", "baseline": "failed", "observations": 12 }
+  ],
+  "controls": [
+    { "id": "baseline", "patch": null, "expected": "reproduced" },
+    { "id": "correct", "patch": "fixtures/editor/patches/correct.patch", "expected": "passed" },
+    { "id": "misleading", "patch": "fixtures/editor/patches/misleading.patch", "expected": "reproduced" }
+  ]
+}
