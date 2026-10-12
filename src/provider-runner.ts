@@ -215,7 +215,7 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
     const after = await inspect(sandbox, 'source-after-capture');
     assert.equal(after.process.nonce, original.process.nonce, 'Capture changed the source process nonce');
     assert.equal(after.process.pid, original.process.pid, 'Capture changed the source PID');
-    const branches: { id: string; sandbox: Sandbox; nonce: string | null }[] = [];
+    const branches: { id: string; sandbox: Sandbox; nonce: string | null; hashes: Record<string, string> }[] = [];
     for (const control of scenario.controls) {
       activeCheck = 'filesystem';
       const { sandbox: branch } = await adapter.spawn(prepared, operation(`${control.id}-restore`, 180_000));
@@ -243,7 +243,7 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       const running = await launch(branch, control.id);
       assert.deepEqual(running.hashes, record.sourceHashes, 'Patched guest source differs from the retained patch');
       assert.ok(running.process.nonce && running.process.nonce !== original.process.nonce, 'Restored server reused source process state');
-      branches.push({ id: control.id, sandbox: branch, nonce: running.process.nonce });
+      branches.push({ id: control.id, sandbox: branch, nonce: running.process.nonce, hashes: record.sourceHashes });
       const preview = await publish(branch, control.id);
       const verification = await services.verify({ repository, directory: join(privateDirectory, control.id), url: preview.url, seed: options.seed, scenario, signal: abort.signal });
       result.controls[result.controls.length - 1].verification = verification;
@@ -252,11 +252,18 @@ export async function runProvider(options: ProviderRunOptions, services: RunServ
       if (verification.status !== control.expected) throw new Error(`${control.id} did not match the expected verification`);
     }
     activeCheck = 'isolation';
-    for (const branch of branches) assert.equal((await inspect(branch.sandbox, `${branch.id}-isolation`)).branchMarker, branch.id, 'Branch marker leaked');
+    const branchMarkers: string[] = [];
+    for (const branch of branches) {
+      const state = await inspect(branch.sandbox, `${branch.id}-isolation`);
+      assert.deepEqual(state.hashes, branch.hashes, `Later branch writes changed ${branch.id}'s source`);
+      assert.equal(state.branchMarker, branch.id, 'Branch marker leaked');
+      branchMarkers.push(state.branchMarker);
+    }
+    assert.equal(new Set(branchMarkers).size, branches.length, 'Branch markers are not independent');
     const sourceAfterBranches = await inspect(sandbox, 'source-isolation');
     assert.equal(sourceAfterBranches.branchMarker, null, 'Branch writes reached the source');
     assert.deepEqual(sourceAfterBranches.hashes, source.hashes, 'Branch patches reached the source');
-    result.checks.isolation = verified('Each branch retained its own marker; the source marker stayed absent and its tracked files stayed unchanged.');
+    result.checks.isolation = verified('After all controls finished, each branch retained its expected patched hashes and a distinct marker; the source marker stayed absent and its tracked files stayed unchanged.');
     result.checks.filesystem = verified(`Three restores retained source hashes, prepared marker, permissions and symlink${source.kind === 'web-checkout' ? ', plus installed dependencies without another npm ci' : '; the standalone fixture has no install step'}.`);
     activeCheck = 'processes';
     assert.equal(new Set(branches.map(branch => branch.nonce)).size, 3, 'Restored servers reused a process nonce');

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -6,9 +7,16 @@ import test from 'node:test';
 import { MainbrellaAdapter } from '../src/providers/mainbrella.ts';
 
 const response = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
+function makeAdapter(options: ConstructorParameters<typeof MainbrellaAdapter>[0]) {
+  const fetcher = options.fetch!;
+  return new MainbrellaAdapter({ ...options, fetch: async (input, init) => {
+    if (new URL(String(input)).pathname === '/api-keys/me') return response({ accountId: 'account-A' });
+    return fetcher(input, init);
+  } });
+}
 async function harness(fetch: typeof globalThis.fetch) {
   const directory = await mkdtemp(join(tmpdir(), 'mainbrella-adapter-'));
-  return { directory, adapter: new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory, fetch, pollIntervalMs: 0 }),
+  return { directory, adapter: makeAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory, fetch, pollIntervalMs: 0 }),
     close: () => rm(directory, { recursive: true, force: true }) };
 }
 const createOp = { name: 'create-once', timeoutMs: 5000, image: 'node', size: 'small' };
@@ -115,7 +123,7 @@ test('fresh cleanup recovers an uncertain create and deletes only its exact gene
   try {
     await assert.rejects(h.adapter.create(createOp));
     const seen: { path: string; method: string; key: string | null; body: string }[] = [];
-    const restarted = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory, pollIntervalMs: 0,
+    const restarted = makeAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory, pollIntervalMs: 0,
       fetch: async (input, init) => {
         const url = new URL(String(input));
         const method = String(init?.method ?? 'GET');
@@ -217,7 +225,7 @@ test('cleanup proceeds with valid owned resources when another operation journal
     await assert.rejects(h.adapter.create(createOp));
     await writeFile(join(h.directory, 'operations', 'corrupt.json'), '{bad');
     const calls: string[] = [];
-    const restarted = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory,
+    const restarted = makeAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory,
       fetch: async (input, init) => {
         const url = new URL(String(input)); const method = String(init?.method ?? 'GET'); calls.push(`${method} ${url.pathname}`);
         if (method === 'POST' && url.pathname === '/containers') return response({ creation: { containerId: 'known', createdAt: 'gen', status: 'running' }, containers: [{ id: 'known', createdAt: 'gen', status: 'running' }] });
@@ -243,7 +251,7 @@ test('expired ambiguous create is reported unresolved without replaying its key'
     const record = JSON.parse(await readFile(file, 'utf8'));
     record.createdAt = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
     await writeFile(file, JSON.stringify(record));
-    const restarted = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory,
+    const restarted = makeAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory,
       fetch: async (input, init) => {
         calls++;
         const url = new URL(String(input));
@@ -271,7 +279,7 @@ test('successful capture headers followed by an auth failure remain unresolved d
   });
   try {
     await assert.rejects(h.adapter.capture({ id: 'source', generation: 'source-gen' }, { name: 'ambiguous-capture', timeoutMs: 3000, mode: 'saved-workspace' }));
-    const restarted = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory,
+    const restarted = makeAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory,
       fetch: async (input, init) => {
         const url = new URL(String(input));
         if (url.pathname === '/workspaces' && init?.method === 'POST') return response({ error: 'unauthorized' }, 401);
@@ -342,10 +350,150 @@ test('event reattachment cancels the first stream and resumes using its complete
     const first = await h.adapter.readEvents(sandbox, 'j1', 0, 'rodeo-reconnect-start');
     assert.equal(first.cursor, 1);
     assert.equal(cancelled, true);
-    const newClient = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory, fetch: fetcher });
+    const newClient = makeAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory, fetch: fetcher });
     const remaining = await newClient.readEvents(sandbox, 'j1', first.cursor);
     assert.equal(remaining.cursor, 2);
     assert.match(remaining.text, /rodeo-reconnect-done/);
     assert.deepEqual(cursors, ['0', '1']);
   } finally { await h.close(); }
 });
+
+test('cleanup rejects another account before replaying an uncertain create or deleting known resources; rotated keys work', async () => {
+  let ambiguous = false;
+  const h = await harness(async () => {
+    if (ambiguous) throw new Error('lost create response');
+    return response({ creation: { containerId: 'owned', createdAt: 'generation-A', status: 'running' },
+      containers: [{ id: 'owned', createdAt: 'generation-A', status: 'running' }] });
+  });
+  try {
+    await h.adapter.create(createOp);
+    ambiguous = true;
+    await assert.rejects(h.adapter.create({ ...createOp, name: 'uncertain-create' }));
+    const seen: { method: string; path: string; account: string }[] = [];
+    const makeClient = (apiKey: string) => new MainbrellaAdapter({ apiUrl: 'http://local', apiKey, directory: h.directory,
+      fetch: async (input, init) => {
+        const path = new URL(String(input)).pathname;
+        const method = init?.method ?? 'GET';
+        const key = new Headers(init?.headers).get('Authorization');
+        const account = key === 'Bearer account-B-key' ? 'account-B' : 'account-A';
+        seen.push({ method, path, account });
+        if (path === '/api-keys/me') return response({ accountId: account });
+        if (method === 'POST') return response({ creation: { containerId: 'uncertain', createdAt: 'generation-A2', status: 'running' },
+          containers: [{ id: 'uncertain', createdAt: 'generation-A2', status: 'running' }] });
+        if (method === 'DELETE') return response({});
+        if (path === '/containers') return response({ containers: [], limits: { maxContainers: 4 } });
+        if (path === '/workspaces') return response({ workspaces: [], limits: null,
+          usage: { saved: 0, reservedBytes: 0, savesThisMonth: 0, captureBytesThisMonth: 0, retainedCaptureBytes: 0 } });
+        throw new Error('unexpected request');
+      } });
+    const rejected = await makeClient('account-B-key').cleanup();
+    assert.equal(rejected.confirmed, false);
+    assert.match(rejected.errors.join(' '), /different account/);
+    assert.deepEqual(seen, [{ method: 'GET', path: '/api-keys/me', account: 'account-B' }]);
+    await assert.rejects(makeClient('account-B-key').create(createOp), /different account/);
+    assert.ok(seen.every(call => call.path === '/api-keys/me'));
+    seen.length = 0;
+    const accepted = await makeClient('rotated-account-A-key').cleanup();
+    assert.equal(accepted.confirmed, true);
+    assert.equal(accepted.sandboxes.length, 2);
+    assert.ok(seen.some(call => call.method === 'POST'));
+    assert.equal(seen.filter(call => call.method === 'DELETE').length, 2);
+    assert.ok(seen.every(call => call.account === 'account-A'));
+    const binding = await readFile(join(h.directory, 'account.json'), 'utf8');
+    assert.deepEqual(JSON.parse(binding), { schemaVersion: 1, apiUrl: 'http://local', accountId: 'account-A' });
+    assert.doesNotMatch(binding, /mb-secret-test|rotated-account-A-key/);
+  } finally { await h.close(); }
+});
+
+test('missing, malformed or foreign-origin account bindings never adopt existing recovery records', async () => {
+  const h = await harness(async () => response({ creation: { containerId: 'owned', createdAt: 'generation-A', status: 'running' },
+    containers: [{ id: 'owned', createdAt: 'generation-A', status: 'running' }] }));
+  try {
+    await h.adapter.create(createOp);
+    const accountFile = join(h.directory, 'account.json');
+    for (const binding of [null, 'null', '0', '{bad', JSON.stringify({ schemaVersion: 1, apiUrl: 'http://other', accountId: 'account-A' })]) {
+      if (binding === null) await rm(accountFile);
+      else await writeFile(accountFile, binding);
+      let calls = 0;
+      const restarted = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'other-key', directory: h.directory,
+        fetch: async () => { calls++; return response({ accountId: 'account-A' }); } });
+      assert.equal((await restarted.cleanup()).confirmed, false);
+      await assert.rejects(restarted.create(createOp), /account binding/);
+      assert.equal(calls, 0);
+    }
+  } finally { await h.close(); }
+});
+
+test('unavailable or malformed authenticated identity prevents journaling and provisioning', async () => {
+  for (const identity of [response({}, 404), response({}, 401), response({}, 503), response({}), response({ accountId: '' })]) {
+    const directory = await mkdtemp(join(tmpdir(), 'mainbrella-identity-'));
+    const calls: string[] = [];
+    try {
+      const adapter = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory,
+        fetch: async input => { calls.push(new URL(String(input)).pathname); return identity; } });
+      await assert.rejects(adapter.create(createOp), /account identity/);
+      assert.deepEqual(calls, ['/api-keys/me']);
+      assert.deepEqual(await readdir(join(directory, 'operations')), []);
+      await assert.rejects(readFile(join(directory, 'account.json')), { code: 'ENOENT' });
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  }
+});
+
+for (const phase of ['payload-sync', 'payload-rename', 'journal-rename', 'before-request']) {
+  test(`SIGKILL at upload ${phase} leaves cleanup recoverable without missing journal bytes`, async () => {
+    const h = await harness(async () => response({ creation: { containerId: 'owned', createdAt: 'generation-A', status: 'running' },
+      containers: [{ id: 'owned', createdAt: 'generation-A', status: 'running' }] }));
+    try {
+      const { sandbox } = await h.adapter.create(createOp);
+      const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
+        import fs from 'node:fs/promises';
+        import { syncBuiltinESMExports } from 'node:module';
+        const phase = ${JSON.stringify(phase)};
+        const crash = () => process.kill(process.pid, 'SIGKILL');
+        const originalOpen = fs.open;
+        fs.open = async (...args) => {
+          const handle = await originalOpen(...args);
+          if (String(args[0]).includes('.bin.') && phase === 'payload-sync') {
+            const sync = handle.sync.bind(handle);
+            handle.sync = async () => { await sync(); crash(); };
+          }
+          return handle;
+        };
+        const originalRename = fs.rename;
+        fs.rename = async (from, to) => {
+          await originalRename(from, to);
+          if (String(to).endsWith('.bin') && phase === 'payload-rename') crash();
+          if (String(to).includes('/operations/') && phase === 'journal-rename') crash();
+        };
+        syncBuiltinESMExports();
+        const { MainbrellaAdapter } = await import(${JSON.stringify(new URL('../src/providers/mainbrella.ts', import.meta.url).href)});
+        const adapter = new MainbrellaAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test',
+          directory: ${JSON.stringify(h.directory)}, fetch: async (input, init) => {
+            if (new URL(String(input)).pathname === '/api-keys/me') return new Response(JSON.stringify({ accountId: 'account-A' }));
+            if (init?.method === 'PUT' && phase === 'before-request') crash();
+            throw new Error('Upload must not reach the server before the injected crash');
+          } });
+        await adapter.upload(${JSON.stringify(sandbox)}, { name: 'crash-upload', timeoutMs: 1000,
+          path: '/tmp/probe', bytes: Buffer.from([0, 1, 255]) });
+      `], { encoding: 'utf8', timeout: 10000 });
+      assert.equal(child.signal, 'SIGKILL', child.stderr);
+      const journals = await readdir(join(h.directory, 'operations'));
+      for (const file of journals.filter(file => file.endsWith('.json'))) {
+        const record = JSON.parse(await readFile(join(h.directory, 'operations', file), 'utf8'));
+        if (record.upload) assert.deepEqual(await readFile(record.upload.file), Buffer.from([0, 1, 255]));
+      }
+      const restarted = makeAdapter({ apiUrl: 'http://local', apiKey: 'mb-secret-test', directory: h.directory,
+        fetch: async (input, init) => {
+          const url = new URL(String(input));
+          if (init?.method === 'DELETE') return response({});
+          if (url.pathname === '/containers') return response({ containers: [], limits: { maxContainers: 4 } });
+          if (url.pathname === '/workspaces') return response({ workspaces: [], limits: null,
+            usage: { saved: 0, reservedBytes: 0, savesThisMonth: 0, captureBytesThisMonth: 0, retainedCaptureBytes: 0 } });
+          throw new Error('Cleanup must not replay an upload');
+        } });
+      const cleanup = await restarted.cleanup();
+      assert.equal(cleanup.confirmed, true, cleanup.errors.join(' '));
+      assert.deepEqual(cleanup.sandboxes, [{ sandbox, absent: true }]);
+    } finally { await h.close(); }
+  });
+}

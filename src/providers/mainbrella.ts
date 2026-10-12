@@ -7,6 +7,7 @@ import type {
 } from './interface.ts';
 
 type Options = { apiUrl: string; apiKey: string; directory: string; fetch?: typeof globalThis.fetch; pollIntervalMs?: number };
+type AccountBinding = { schemaVersion: 1; apiUrl: string; accountId: string };
 type Journal = {
   name: string; method: string; path: string; body?: unknown; bodyText?: string; bodyHash: string; key: string;
   createdAt: string; retentionMs: number; attempts: number; attemptEvidence?: { at: string; status?: number; responseBody?: string; error?: string }[]; responseStatus?: number;
@@ -43,6 +44,7 @@ export class MainbrellaAdapter implements ProviderAdapter {
   private readonly bytesDir: string;
   private readonly ownedDir: string;
   private readonly receiptsDir: string;
+  private accountCheck?: Promise<void>;
 
   constructor(options: Options) {
     this.apiUrl = options.apiUrl.replace(/\/$/, '');
@@ -62,6 +64,43 @@ export class MainbrellaAdapter implements ProviderAdapter {
     await Promise.all([this.opsDir, this.bytesDir, this.ownedDir, this.receiptsDir].map(async p => {
       await mkdir(p, { recursive: true, mode: 0o700 }); await chmod(p, 0o700);
     }));
+  }
+  private async checkAccount(allowBind: boolean) {
+    await this.init();
+    const file = join(this.directory, 'account.json');
+    let binding: AccountBinding | undefined;
+    try {
+      binding = JSON.parse(await readFile(file, 'utf8'));
+      if (!binding || typeof binding !== 'object') throw safeError('Invalid account binding');
+    }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw safeError('Mainbrella account binding is unreadable; refusing provider requests');
+    }
+    if (binding && (binding.schemaVersion !== 1 || binding.apiUrl !== this.apiUrl ||
+        typeof binding.accountId !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(binding.accountId)))
+      throw safeError('Mainbrella account binding is invalid or belongs to another API origin');
+    if (!binding && (!allowBind || (await readdir(this.opsDir)).some(name => name.endsWith('.json')) ||
+        (await readdir(this.ownedDir)).some(name => name.endsWith('.json'))))
+      throw safeError('Mainbrella run has no authenticated account binding; refusing to adopt existing recovery records');
+    let response: Response;
+    try {
+      response = await this.fetcher(`${this.apiUrl}/api-keys/me`, {
+        headers: { Authorization: `Bearer ${this.apiKey}` }, redirect: 'error', signal: AbortSignal.timeout(10000),
+      });
+    } catch { throw safeError('Mainbrella authenticated account identity could not be verified'); }
+    if (!response.ok) throw safeError(`Mainbrella account identity request failed with HTTP ${response.status}`);
+    let accountId: unknown;
+    try { accountId = (await response.json()).accountId; }
+    catch { throw safeError('Mainbrella authenticated account identity is malformed'); }
+    if (typeof accountId !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(accountId))
+      throw safeError('Mainbrella authenticated account identity is missing or malformed');
+    if (binding && binding.accountId !== accountId)
+      throw safeError('Mainbrella API key belongs to a different account than this run; refusing provider requests');
+    if (!binding) await this.writeAtomic(file, json({ schemaVersion: 1, apiUrl: this.apiUrl, accountId }) + '\n');
+  }
+  private async ensureAccount(allowBind = true, refresh = false) {
+    if (!this.accountCheck || refresh) this.accountCheck = this.checkAccount(allowBind);
+    await this.accountCheck;
   }
   private opFile(name: string) { return join(this.opsDir, `${hash(name).slice(0, 32)}.json`); }
   private ownedFile(kind: string, id: string) { return join(this.ownedDir, `${kind}-${hash(id).slice(0, 32)}.json`); }
@@ -84,12 +123,27 @@ export class MainbrellaAdapter implements ProviderAdapter {
     return result;
   }
   private async putRecord(record: Journal) {
-    const file = this.opFile(record.name);
+    await this.writeAtomic(this.opFile(record.name), json(record) + '\n');
+  }
+  private async writeAtomic(file: string, bytes: string | Buffer) {
     const temp = `${file}.${randomUUID()}.tmp`;
     const handle = await open(temp, 'wx', 0o600);
-    try { await handle.writeFile(json(record) + '\n'); await handle.sync(); } finally { await handle.close(); }
+    try { await handle.writeFile(bytes); await handle.sync(); } finally { await handle.close(); }
     await rename(temp, file);
-    await chmod(file, 0o600);
+    // Persist the directory entry before another durable file can refer to it.
+    const directory = await open(resolve(file, '..'), 'r');
+    try { await directory.sync(); } finally { await directory.close(); }
+  }
+  private async readRecord(name: string): Promise<Journal | null> {
+    try {
+      const record = JSON.parse(await readFile(this.opFile(name), 'utf8')) as Journal;
+      if (!record || typeof record !== 'object') throw safeError('Invalid operation journal');
+      return record;
+    }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
+      throw safeError(`operation ${name} journal is unreadable; refusing to make a new key`);
+    }
   }
   private async validateRecord(value: unknown, checkUploadFile: boolean): Promise<Journal> {
     const r = value as Journal;
@@ -121,17 +175,13 @@ export class MainbrellaAdapter implements ProviderAdapter {
     return r;
   }
   private async prepare(op: Operation, method: string, path: string, body?: unknown, retentionMs = CREATE_RETENTION, upload?: Journal['upload'], enforceRetention = true) {
-    await this.init();
+    await this.ensureAccount();
     const bodyText = body === undefined ? '' : Buffer.isBuffer(body) ? body : typeof body === 'string' ? body : json(body);
     const bodyHash = hash(bodyText);
     if (retentionMs !== expectedRetention(method, path)) throw safeError(`operation ${op.name} has an invalid retention policy`);
-    const file = this.opFile(op.name);
-    let rec: Journal;
-    let created = false;
-    try { rec = JSON.parse(await readFile(file, 'utf8')) as Journal; }
-    catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw safeError(`operation ${op.name} journal is unreadable; refusing to make a new key`);
-      created = true;
+    let rec = await this.readRecord(op.name);
+    const created = rec === null;
+    if (rec === null) {
       rec = { name: op.name, method, path, ...(body === undefined || Buffer.isBuffer(body) ? {} : { body }),
         ...(!Buffer.isBuffer(body) ? { bodyText: bodyText as string } : {}), bodyHash,
         key: randomUUID(), createdAt: new Date().toISOString(), retentionMs, attempts: 0, attemptEvidence: [], ...(upload ? { upload } : {}) };
@@ -305,8 +355,14 @@ export class MainbrellaAdapter implements ProviderAdapter {
   async upload(sandbox: Sandbox, request: Operation & { path: string; bytes: Buffer }): Promise<void> {
     const digest = hash(request.bytes); const file = join(this.bytesDir, `${hash(request.name).slice(0, 32)}.bin`);
     const path = `/containers/files/transfer${this.q(sandbox, { path: request.path, size: String(request.bytes.length) })}`;
-    await this.prepare(request, 'PUT', path, request.bytes, CREATE_RETENTION, { file, size: request.bytes.length, sha256: digest }, false);
-    await this.init(); await writeFile(file, request.bytes, { mode: 0o600 }); await chmod(file, 0o600);
+    await this.ensureAccount();
+    if (await this.readRecord(request.name)) {
+      // Validate an existing request before touching its retained payload.
+      await this.prepare(request, 'PUT', path, request.bytes, CREATE_RETENTION, { file, size: request.bytes.length, sha256: digest }, false);
+    } else {
+      await this.writeAtomic(file, request.bytes);
+    }
+    // request() persists the journal only after the payload is durable.
     await this.request(request, 'PUT', path, request.bytes, { upload: { file, size: request.bytes.length, sha256: digest } });
   }
   private async submitJob(sandbox: Sandbox, request: Operation & { argv: string[]; cwd?: string; env?: Record<string, string> }) {
@@ -409,7 +465,13 @@ export class MainbrellaAdapter implements ProviderAdapter {
   }
 
   async cleanup(): Promise<CleanupResult> {
-    await this.init();
+    // Validate again before any ambiguous create replay, deletion or inventory
+    // can be interpreted as evidence about the account that owns this run.
+    try { await this.ensureAccount(false, true); }
+    catch (error) {
+      return { confirmed: false, sandboxes: [], workspaces: [], physicalStorage: 'not-measured',
+        errors: [error instanceof Error ? error.message : 'Mainbrella cleanup account could not be verified'] };
+    }
     const sandboxes = new Map<string, Sandbox>();
     const workspaces = new Set<string>();
     const previews: { sandbox: Sandbox; id: string }[] = [];
