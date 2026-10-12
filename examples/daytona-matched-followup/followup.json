@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 1,
+  "kind": "matched-editor-cleanup-followup",
+  "provider": "daytona",
+  "seed": 12345,
+  "sourceRef": "3eb5f1d144324793492bed765d94bc6463614ef3",
+  "runner": {
+    "commit": "99f25ce00fe907b29c618b2b83959118d1e15f86",
+    "dirty": true,
+    "patchSha256": "929da6e71c69d1b9ab4772c32dc06c0d234e77a0f68ea46a1f921af64ed10cb5",
+    "inputHashes": {
+      ".node-version": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+      ".nvmrc": "4c42fb8d6334c5cdcac68b93f96c581fb83b1f58cda898cff115e5e941ef717d",
+      "fixtures/editor/app/editor.css": "899147045d819bfc53ecb907b216d352f2fe855a0f29768cc2b7b37960341870",
+      "fixtures/editor/app/editor.js": "541c336cdc2d7d2f7a099bbec1a498d49467a2bc02f9608f956350f7409839ec",
+      "fixtures/editor/app/index.html": "6ac54f8adfbb0e1665f513d040fe41e688e409472c2b0a39f5f631a0706001ab",
+      "fixtures/editor/app/server.mjs": "6dc39fbce44c61d9a0ccf397364507fdc3cf78f560092fe49d198006f94a2426",
+      "fixtures/editor/patches/correct.patch": "51b4735808203dfd60b3463b97f77161b6ce9d15dfae32ddda082f21220dc137",
+      "fixtures/editor/patches/misleading.patch": "8be1a772f25a2eab019078d30719a90f1c0e0c7dd3971c60c684ef27fbf55973",
+      "fixtures/editor/preview-auth.js": "9589de483915c6966a6d38b13e9468ef361a0fe3fdf55c05925b350ac686e2fe",
+      "fixtures/editor/repro.spec.js": "f3c399fb08444f8d128202447e0d960f7aa8f95611cb737f6b02b15e1270468b",
+      "fixtures/editor/scenario.json": "0d83f5c02ea89f22b4f785540189fbfd8a54d2c91771013c9fd7de6fb458c272",
+      "notes/patches/web-correct.patch": "846bd0155eb6b0db3536e9a3a8d1d9b3a4cd380551cc2a2f21612502d5080ee2",
+      "notes/patches/web-misleading.patch": "c85c6166e7d503a4b90166b5afb93c47a4dc8e0d77cc05987641d833d05424a2",
+      "package-lock.json": "329da6d329fc63f6bc6b4ee6470a29a4a0839f737289e29b6ec85e5804fd517c",
+      "package.json": "ebd5fe7fcaf7137e1e441a9b57b492604cfa8fb97d422bb9a0a3a4ea96ad6762",
+      "playwright.config.js": "e0f663b73631943a87450ca1688f34639e23134b26f4a6880bce67b044062870",
+      "src/browser-verification.ts": "c6fa1c340f6056898735393bbc1d11a9214ea4e746885d81fe8a00f2ebea3c4c",
+      "src/evidence.ts": "e2a148a19d2ee05fc52c4c4d7181adf3a73fb284b987546e5d07b070477cd1ca",
+      "src/experiment-result.ts": "be7f7536ed98b1df0ed21e376185445cb97f28cf3733686365066feea0dc7189",
+      "src/experiment-source.ts": "6b2a13671d6dd3621eae9ace91be2c79fe91dc618c85865c93d22c9e2b148ce9",
+      "src/experiment.ts": "e3d8617c1ed4084134d82682be1a8c66efd6794ba2a7768217036b81c802a8b6",
+      "src/guest/inspect.mjs": "a60d72fca972c0093b6b986895387ede4802ff269de07188c4141fc4afc20f18",
+      "src/guest/launch.mjs": "a1a2cc769146be3cc6ce3f9a79c0ca8ec2bd6c577dfd70c3db5acaede6a41a69",
+      "src/matched-followup.ts": "43eab038d8719becef4c89c34c728bc190b02e3cfe3e56fe2d9a1df26606dcba",
+      "src/metrics.ts": "a8b74d62580e837ce43ce017d829a5598ffb72c9ff00a82bb67c0142863589d3",
+      "src/preview-revocation.ts": "a5e06e368d06b2c18aed73fd1e732c06fea02c949adb7d4b4ffaaccd1e9b9edc",
+      "src/preview.ts": "0a5b6655fcd026b62d434f402dd211056a593577a37a675e857b53c3ddfd8203",
+      "src/process.ts": "ee2035f27b5081de46e06da876f2643f3cfc225aa6484b1463f498954d9916c1",
+      "src/provider-runner.ts": "c2539556ed8c76067a69958b257f2ed7bbb1f76e6a03660fed38e31c5b2dfb56",
+      "src/providers/daytona.ts": "7c9ef6e2f862c765a631769b54402cdd31a26d61e877f5ce17aeb890b9ec2687",
+      "src/providers/e2b.ts": "d8f6e1425142a9f085197bacc8cb7f5ed461a546635e2bde9066791dde82ae7d",
+      "src/providers/interface.ts": "89978a31aa150bc27c29c7a57e3ae5e799c636cf07da5a092ce773273b85dbb0",
+      "src/providers/mainbrella.ts": "ca1ca83bf673329edf935c60305daf4693e8dc923c6784d73d39886a4f88de74",
+      "src/providers/README.md": "c865a21fd65564edc02bded2d60f50971a862e646fdfef63f9e6a36dc4f16b82",
+      "src/public-evidence.ts": "feed0ef28aa194260ce247caaed57019f152e45390d604de0954964e676ddcc1",
+      "src/runner.ts": "28bc1d17d5f8aac9d295911996e2aa5a98f60db5d788e7193684f230545e2b67",
+      "src/scenario.ts": "44ab0a6700a7358ced88f2f9d8f2664e27416bcd096199bb989c3200643eed6d",
+      "src/verifier.ts": "90fde94d11ecd59f8ee5e348cfe39799f39cb83f8c5a497c0f8d56024fad871b",
+      "tests/daytona.test.ts": "4888b45682980a2d51c77c2f8767af625e68fe6744793eaa0605fbd05623bc32",
+      "tests/e2b.test.ts": "ed7333fb95ca627bee389823b2f49031a8611f025550a3cdf4b8407202ece385",
+      "tests/evidence.test.ts": "7795d24c4161f7dc5997ca9e57e2cabe29be4769e49e413a3798729a8c674272",
+      "tests/experiment.test.ts": "2f13422df448f671db51dc6fb5c21f0301a13cc075cf94b208264affe6e0e092",
+      "tests/mainbrella.test.ts": "f0a8d6f099ca7d0c396b2f5360a2e149a2fa33e201eef746bb238b6dd2b027dc",
+      "tests/preview-revocation.test.ts": "d4fc55e465f050a72984e3c9ff35d06d333092faf40c7453054a819fc25b3b65",
+      "tests/preview.test.ts": "af74f31563b36c6608a49346863933ee848b45434bd2d2bd6206b52983d97570",
+      "tests/provider-runner.test.ts": "c96167b03f08e617267b0200a0b46055524f50adc14432897b30653485ce9a70",
+      "tests/verifier.test.ts": "c81cf02c876606d10f0cbc54b63dedd2dd0da10bebe11556baa3f1eb226b8302",
+      "tsconfig.json": "7c64772afc11e22bdaa663c5db86a7fc5c492beb1c241ca29d8aec70c453f883"
+    }
+  },
+  "editor": {
+    "status": "complete",
+    "controls": [
+      {
+        "id": "baseline",
+        "status": "reproduced"
+      },
+      {
+        "id": "correct",
+        "status": "passed"
+      },
+      {
+        "id": "misleading",
+        "status": "reproduced"
+      }
+    ],
+    "checks": {
+      "filesystem": {
+        "status": "verified",
+        "detail": "Three restores retained source hashes, prepared marker, permissions and symlink, plus installed dependencies without another npm ci."
+      },
+      "processes": {
+        "status": "verified",
+        "detail": "Container capture explicitly stopped and restarted its source; the source listener was absent after restart and its server received a fresh nonce when relaunched. Each filesystem restore had no listener, then a distinct nonce after explicitly starting a server."
+      },
+      "isolation": {
+        "status": "verified",
+        "detail": "After all controls finished, each branch retained its expected patched hashes and a distinct marker; the source marker stayed absent and its tracked files stayed unchanged."
+      },
+      "jobReattachment": {
+        "status": "verified",
+        "detail": "After initial session output, the first polling client detached. A new Daytona SDK client recovered the same session and command IDs, exit 0 and retained stdout, then read remaining bytes from the saved offset. Live stream disconnection, server SSE replay and dashboard reconnection were not exercised."
+      },
+      "captureIdempotency": {
+        "status": "not-exercised",
+        "detail": "Response-loss experiment not requested."
+      },
+      "previewRevocation": {
+        "status": "verified",
+        "detail": "4 previews worked with the retained credential before cleanup; after exact API-confirmed sandbox absence, three matched probes per URL with and without that credential returned HTTP 401/403 (access denied) or 404/410 (route absent). This does not establish independent token invalidation or physical storage deletion."
+      },
+      "previewTokenInvalidation": {
+        "status": "verified",
+        "detail": "After source restart, the retained token returned HTTP 401/403 while a fresh token returned HTTP 200 for the same preview URL."
+      }
+    }
+  },
+  "cleanup": {
+    "confirmed": true,
+    "sandboxes": [
+      {
+        "sandbox": {
+          "id": "dd9a408d-9034-4e5e-9cb0-bd745915a734",
+          "generation": "dd9a408d-9034-4e5e-9cb0-bd745915a734"
+        },
+        "absent": true
+      },
+      {
+        "sandbox": {
+          "id": "8a978e86-9e09-4823-8ef6-f264213a160f",
+          "generation": "8a978e86-9e09-4823-8ef6-f264213a160f"
+        },
+        "absent": true
+      },
+      {
+        "sandbox": {
+          "id": "cea4eda0-51eb-46ef-bd20-9dfabe271355",
+          "generation": "cea4eda0-51eb-46ef-bd20-9dfabe271355"
+        },
+        "absent": true
+      },
+      {
+        "sandbox": {
+          "id": "8af204e1-556c-4556-908f-66b9d2de5540",
+          "generation": "8af204e1-556c-4556-908f-66b9d2de5540"
+        },
+        "absent": true
+      }
+    ],
+    "workspaces": [
+      {
+        "id": "ffd0506f-611c-4e6a-8e53-b469b564038a",
+        "absent": true
+      }
+    ],
+    "physicalStorage": "not-measured",
+    "errors": [],
+    "snapshotObservations": [
+      {
+        "operationId": "prepared-capture",
+        "name": "rodeo-a37ed81b-830a-4ec2-9d0e-423c4377dc04-prepared",
+        "id": "ffd0506f-611c-4e6a-8e53-b469b564038a",
+        "state": "active",
+        "observedAt": "2026-10-12T10:44:35.113Z"
+      }
+    ]
+  },
+  "liveControl": {
+    "initialStatus": 200,
+    "cleanup": {
+      "confirmed": true,
+      "sandboxes": [
+        {
+          "sandbox": {
+            "id": "1a1f7055-bbcc-4941-b113-dd9e0b993db8",
+            "generation": "1a1f7055-bbcc-4941-b113-dd9e0b993db8"
+          },
+          "absent": true
+        }
+      ],
+      "workspaces": [],
+      "physicalStorage": "not-measured",
+      "errors": [],
+      "snapshotObservations": []
+    }
+  },
+  "probes": [
+    {
+      "sandbox": {
+        "id": "dd9a408d-9034-4e5e-9cb0-bd745915a734",
+        "generation": "dd9a408d-9034-4e5e-9cb0-bd745915a734"
+      },
+      "beforeCleanup": {
+        "at": "2026-10-12T10:44:32.739Z",
+        "authenticated": 200,
+        "unauthenticated": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.413Z",
+          "authenticated": 401,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.032Z",
+          "authenticated": 401,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.730Z",
+          "authenticated": 401,
+          "unauthenticated": 401,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "8a978e86-9e09-4823-8ef6-f264213a160f",
+        "generation": "8a978e86-9e09-4823-8ef6-f264213a160f"
+      },
+      "beforeCleanup": {
+        "at": "2026-10-12T10:44:33.536Z",
+        "authenticated": 200,
+        "unauthenticated": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.488Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.107Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.803Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "cea4eda0-51eb-46ef-bd20-9dfabe271355",
+        "generation": "cea4eda0-51eb-46ef-bd20-9dfabe271355"
+      },
+      "beforeCleanup": {
+        "at": "2026-10-12T10:44:34.062Z",
+        "authenticated": 200,
+        "unauthenticated": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.561Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.181Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.876Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "8af204e1-556c-4556-908f-66b9d2de5540",
+        "generation": "8af204e1-556c-4556-908f-66b9d2de5540"
+      },
+      "beforeCleanup": {
+        "at": "2026-10-12T10:44:34.685Z",
+        "authenticated": 200,
+        "unauthenticated": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.634Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.255Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.951Z",
+          "authenticated": 404,
+          "unauthenticated": 401,
+          "liveControl": 200
+        }
+      ]
+    }
+  ],
+  "previewApplicationAccess": {
+    "status": "verified",
+    "detail": "4 previews worked with the retained credential before cleanup; after exact API-confirmed sandbox absence, three matched probes per URL with and without that credential returned HTTP 401/403 (access denied) or 404/410 (route absent). This does not establish independent token invalidation or physical storage deletion."
+  },
+  "independentTokenInvalidation": {
+    "status": "not-exercised",
+    "detail": "Deletion and gateway responses do not prove independent invalidation of a credential for a still-live resource. Any separate source restart token check is reported in editor.checks."
+  },
+  "inventory": {
+    "before": {
+      "sandboxes": [],
+      "workspaces": [
+        "1477894e-1b04-4396-97c4-59e0b070093e",
+        "4c37811b-309b-4aa2-86cc-e95ce87ecd46",
+        "699ac091-21e0-46d3-92b1-16d51e20312f",
+        "6eaee55f-befe-4382-8757-3d1f071d3e65",
+        "a00f0620-568c-47f6-9c55-3fb08cfce754",
+        "b27c211c-b320-4dca-a839-8459aaf10d3e",
+        "dad882b3-a047-4715-8713-bddec50bb7ca",
+        "daffdb59-5963-4e37-89d0-a14510e137e7",
+        "dc0eb3c0-6c2e-403e-804c-6b0533be3be2",
+        "eb8b476b-e26c-48c2-9981-5b858e976df0",
+        "ebfb8d45-1735-43ab-844d-94b1c8193da4",
+        "eec7bdb2-90a8-4674-8311-45f184896827",
+        "f49620c1-d1bb-470e-ad53-43f196d35cb4"
+      ]
+    },
+    "after": {
+      "sandboxes": [],
+      "workspaces": [
+        "1477894e-1b04-4396-97c4-59e0b070093e",
+        "4c37811b-309b-4aa2-86cc-e95ce87ecd46",
+        "699ac091-21e0-46d3-92b1-16d51e20312f",
+        "6eaee55f-befe-4382-8757-3d1f071d3e65",
+        "a00f0620-568c-47f6-9c55-3fb08cfce754",
+        "b27c211c-b320-4dca-a839-8459aaf10d3e",
+        "dad882b3-a047-4715-8713-bddec50bb7ca",
+        "daffdb59-5963-4e37-89d0-a14510e137e7",
+        "dc0eb3c0-6c2e-403e-804c-6b0533be3be2",
+        "eb8b476b-e26c-48c2-9981-5b858e976df0",
+        "ebfb8d45-1735-43ab-844d-94b1c8193da4",
+        "eec7bdb2-90a8-4674-8311-45f184896827",
+        "f49620c1-d1bb-470e-ad53-43f196d35cb4"
+      ]
+    },
+    "restoredExactly": true
+  },
+  "physicalStorage": "not-measured",
+  "errors": [],
+  "completedAt": "2026-10-12T10:45:01.332Z"
+}

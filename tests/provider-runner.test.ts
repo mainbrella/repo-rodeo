@@ -424,6 +424,6 @@ test('matched cleanup keeps gateway uncertainty separate from a completed repair
   const before = JSON.parse(await readFile(join(f.options.output, 'private/preview-before-cleanup.json'), 'utf8'));
   const after = JSON.parse(await readFile(join(f.options.output, 'private/preview-revocation.json'), 'utf8'));
   assert.equal(before.probes.length, 4);
-  assert.ok(after.probes.every((probe: { beforeCleanup: { authenticated: number }; rounds: { authenticated: number; unauthenticated: number }[] }) =>
-    probe.beforeCleanup.authenticated === 200 && probe.rounds.length === 3 && probe.rounds.every(round => round.authenticated === 502 && round.unauthenticated === 502)));
+  assert.ok(after.probes.every((probe: { beforeCleanup: { authenticated: number }; rounds: { authenticated: number; withoutPreviewHeaders: number }[] }) =>
+    probe.beforeCleanup.authenticated === 200 && probe.rounds.length === 3 && probe.rounds.every(round => round.authenticated === 502 && round.withoutPreviewHeaders === 502)));
 });

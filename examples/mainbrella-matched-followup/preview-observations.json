@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "provider": "mainbrella",
+  "sourceSha256": "8d6799e6ee9c6cf1b0bd18bc3d9c2a259b75cc45ad4983a68d3d05fd4f28bf37",
+  "source": "followup.json",
+  "clarification": "The immutable original record called its no-header request unauthenticated. MainBrella encodes its credential in the hostname, so omitting headers retains that credential; those are repeated retained-URL probes. E2B and Daytona actually remove a token header. No HTTP status alone demonstrates independent token invalidation.",
+  "probes": [
+    {
+      "sandbox": {
+        "id": "c1",
+        "generation": "2026-10-12T10:35:18.413Z"
+      },
+      "credentialTransport": "bearer-url",
+      "credentialRemovalTested": false,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 200
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:48.655Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:51.940Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:54.849Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "c2",
+        "generation": "2026-10-12T10:36:31.710Z"
+      },
+      "credentialTransport": "bearer-url",
+      "credentialRemovalTested": false,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 200
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:48.831Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:52.225Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:54.932Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "c3",
+        "generation": "2026-10-12T10:37:00.168Z"
+      },
+      "credentialTransport": "bearer-url",
+      "credentialRemovalTested": false,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 200
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:49.206Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:52.298Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:55.027Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "c4",
+        "generation": "2026-10-12T10:37:34.102Z"
+      },
+      "credentialTransport": "bearer-url",
+      "credentialRemovalTested": false,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 200
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:49.606Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:52.378Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:55.111Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 404,
+          "liveControl": 200
+        }
+      ]
+    }
+  ],
+  "apiCleanupConfirmed": true,
+  "inventoryRestoredExactly": true,
+  "previewApplicationAccess": "verified",
+  "independentTokenInvalidation": "not-exercised",
+  "physicalStorage": "not-measured"
+}

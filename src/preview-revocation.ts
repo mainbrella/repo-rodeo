@@ -6,11 +6,12 @@ import { previewStatus } from './preview.ts';
 export interface PreviewRound {
   at: string;
   authenticated: number;
-  unauthenticated: number;
+  withoutPreviewHeaders: number;
   liveControl?: number;
 }
 export interface RevocationProbe {
   sandbox: Sandbox;
+  credentialTransport?: 'header' | 'bearer-url';
   beforeCleanup?: PreviewRound;
   rounds: PreviewRound[];
 }
@@ -35,21 +36,22 @@ export function assessPreviewRevocation(_provider: ProviderName, cleanup: Cleanu
     record.sandbox.id === probe.sandbox.id && record.sandbox.generation === probe.sandbox.generation));
   if (!absent) return { status: 'inconclusive', detail: 'Exact API-confirmed sandbox absence is missing. Preview observations do not establish resource deletion.' };
   if (probes.some(probe => probe.rounds.some(round =>
-    [round.authenticated, round.unauthenticated].some(status => classifyPreviewStatus(status) === 'accessible')))) {
+    [round.authenticated, round.withoutPreviewHeaders].some(status => classifyPreviewStatus(status) === 'accessible')))) {
     return { status: 'failed', detail: 'A retained preview returned a successful HTTP response after API-confirmed sandbox deletion.' };
   }
   const complete = probes.every(probe => probe.beforeCleanup?.authenticated === 200 && probe.rounds.length >= 3 && probe.rounds.every(round =>
-    [round.authenticated, round.unauthenticated].every(status => ['denied', 'absent'].includes(classifyPreviewStatus(status))) &&
+    [round.authenticated, round.withoutPreviewHeaders].every(status => ['denied', 'absent'].includes(classifyPreviewStatus(status))) &&
     (round.liveControl === undefined || round.liveControl === 200)));
   return complete
-    ? { status: 'verified', detail: `${probes.length} previews worked with the retained credential before cleanup; after exact API-confirmed sandbox absence, three matched probes per URL with and without that credential returned HTTP 401/403 (access denied) or 404/410 (route absent). This does not establish independent token invalidation or physical storage deletion.` }
+    ? { status: 'verified', detail: `${probes.length} previews worked with the retained credential before cleanup; after exact API-confirmed sandbox absence, three rounds per URL with and without preview headers returned HTTP 401/403 (access denied) or 404/410 (route absent). For bearer-URL previews, omitting headers still retains the URL credential. This does not establish independent token invalidation or physical storage deletion.` }
     : { status: 'inconclusive', detail: 'API sandbox absence and preview HTTP observations are recorded separately. Missing pre-cleanup access, fewer than three matched probes, gateway errors (including HTTP 502), a failing live control, and network failures cannot confirm the preview access transition or independent token invalidation.' };
 }
 
 export async function probePreviewRevocation(_provider: ProviderName, previews: { sandbox: Sandbox; preview: Preview }[],
   request: typeof previewStatus = previewStatus,
   options: { beforeCleanup?: RevocationProbe[]; rounds?: number; intervalMs?: number; liveControl?: Preview } = {}): Promise<RevocationProbe[]> {
-  const probes: RevocationProbe[] = previews.map(({ sandbox }) => ({ sandbox,
+  const probes: RevocationProbe[] = previews.map(({ sandbox, preview }) => ({ sandbox,
+    credentialTransport: Object.keys(preview.headers ?? {}).length ? 'header' : 'bearer-url',
     ...(options.beforeCleanup?.find(probe => probe.sandbox.id === sandbox.id && probe.sandbox.generation === sandbox.generation)?.rounds[0]
       ? { beforeCleanup: options.beforeCleanup.find(probe => probe.sandbox.id === sandbox.id && probe.sandbox.generation === sandbox.generation)!.rounds[0] } : {}), rounds: [] }));
   const status = async (preview: Preview, authenticated: boolean) => {
@@ -60,8 +62,8 @@ export async function probePreviewRevocation(_provider: ProviderName, previews: 
     if (round) await pause(options.intervalMs ?? 2000);
     const liveControl = options.liveControl ? await status(options.liveControl, true) : undefined;
     for (const [index, { preview }] of previews.entries()) {
-      const [authenticated, unauthenticated] = await Promise.all([status(preview, true), status(preview, false)]);
-      probes[index].rounds.push({ at: new Date().toISOString(), authenticated, unauthenticated,
+      const [authenticated, withoutPreviewHeaders] = await Promise.all([status(preview, true), status(preview, false)]);
+      probes[index].rounds.push({ at: new Date().toISOString(), authenticated, withoutPreviewHeaders,
         ...(liveControl === undefined ? {} : { liveControl }) });
     }
   }

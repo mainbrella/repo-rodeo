@@ -1,6 +1,6 @@
 # Run records
 
-New [matched editor and cleanup follow-ups](../notes/2026-10-12-matched-followup.md) use identical probes and interpretation for all providers. Their results separate repair controls, API resource deletion, preview HTTP observations, independent token invalidation and physical storage. Historical bundles below retain their original bytes and classifications; those old completion labels are not an overall provider ranking.
+New [matched editor and cleanup follow-ups](../notes/2026-10-12-matched-followup.md) use identical probes and interpretation for all providers. Their results separate repair controls, API resource deletion, preview HTTP observations, independent token invalidation and physical storage. The new results are in [`mainbrella-matched-followup`](mainbrella-matched-followup/), [`e2b-matched-followup`](e2b-matched-followup/) and [`daytona-matched-followup`](daytona-matched-followup/). Their append-only `preview-observations.json` records clarify that omitting headers removes the E2B/Daytona token, while MainBrella still carries a bearer hostname. Historical bundles below retain their original bytes and classifications; those old completion labels are not an overall provider ranking.
 
 [`mainbrella-cloud-saved-workspace/result.json`](mainbrella-cloud-saved-workspace/result.json)
 retains the completed production MainBrella run against `api.mainbrella.com`, web

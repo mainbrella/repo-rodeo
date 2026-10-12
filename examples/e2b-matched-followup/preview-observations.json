@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "provider": "e2b",
+  "sourceSha256": "d1bd66234a5b53d0cb990d467d2e65bbc25e00298123d44185681850defafa02",
+  "source": "followup.json",
+  "clarification": "The immutable original record called its no-header request unauthenticated. MainBrella encodes its credential in the hostname, so omitting headers retains that credential; those are repeated retained-URL probes. E2B and Daytona actually remove a token header. No HTTP status alone demonstrates independent token invalidation.",
+  "probes": [
+    {
+      "sandbox": {
+        "id": "iyofc8s90zzwdf9ediykx",
+        "generation": "iyofc8s90zzwdf9ediykx"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 403
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:01.008Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:03.538Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:05.731Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "img7g0zwhnko06inwla14",
+        "generation": "img7g0zwhnko06inwla14"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 403
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:01.044Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:03.576Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:05.769Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "i86rzojcgd7u20cwwjsgj",
+        "generation": "i86rzojcgd7u20cwwjsgj"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 403
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:01.369Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:03.616Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:05.804Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "ijmk0w0oaqnzxkiaandvf",
+        "generation": "ijmk0w0oaqnzxkiaandvf"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 403
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:38:01.409Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:03.652Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:38:05.840Z",
+          "withCredential": 502,
+          "withoutPreviewHeaders": 502,
+          "liveControl": 200
+        }
+      ]
+    }
+  ],
+  "apiCleanupConfirmed": true,
+  "inventoryRestoredExactly": true,
+  "previewApplicationAccess": "inconclusive",
+  "independentTokenInvalidation": "not-exercised",
+  "physicalStorage": "not-measured"
+}

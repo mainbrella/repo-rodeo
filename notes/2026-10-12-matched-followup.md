@@ -38,7 +38,7 @@ check. Each issued preview is revoked where the adapter supports it, then the
 four exact sandbox generations and capture resources are cleaned up.
 
 All providers receive three probes per retained URL, spaced two seconds apart,
-with and without its current credential. The same HTTP interpretation applies:
+with and without preview headers. E2B and Daytona put their preview credential in a header, so the second request removes it. MainBrella uses a bearer hostname: both requests retain that credential and are repeated probes of the same retained URL. An unauthenticated request to that same URL is not available. The same HTTP interpretation applies:
 
 | HTTP observation | Meaning |
 | --- | --- |
@@ -70,21 +70,39 @@ resources are modified.
 ## Results and inspectable evidence
 
 - [MainBrella editor result](../examples/mainbrella-matched-followup/result.json),
-  [matched cleanup observations](../examples/mainbrella-matched-followup/followup.json),
+  [matched cleanup observations](../examples/mainbrella-matched-followup/preview-observations.json),
   [hash validation](../examples/mainbrella-matched-followup/evidence-validation.json).
 - [E2B editor result](../examples/e2b-matched-followup/result.json),
-  [matched cleanup observations](../examples/e2b-matched-followup/followup.json),
+  [matched cleanup observations](../examples/e2b-matched-followup/preview-observations.json),
   [hash validation](../examples/e2b-matched-followup/evidence-validation.json).
+- [Daytona editor result](../examples/daytona-matched-followup/result.json),
+  [matched cleanup observations](../examples/daytona-matched-followup/preview-observations.json),
+  [hash validation](../examples/daytona-matched-followup/evidence-validation.json).
 
-Both completed the expected baseline/correct/misleading outcomes, filesystem and
-isolation checks, and new-client command recovery. MainBrella's four current
-previews returned 200 before cleanup and 404 in both credential modes in all
-three controlled rounds. E2B's four returned 200 before cleanup and 502 in both
-credential modes in all three controlled rounds. Both known-live controls stayed
-at 200. All exact run resources and both known-live controls were confirmed
-absent, and each final inventory exactly matched its original empty inventory.
-The E2B preview access transition remains **inconclusive**, while API deletion is
-confirmed. Neither run establishes independent token invalidation after deletion.
+All three completed the expected baseline/correct/misleading outcomes,
+filesystem and isolation checks, and new-client command recovery. Every current
+preview returned 200 with its credential before cleanup.
+
+| Provider | After cleanup, with credential | Without preview headers | API inventory |
+| --- | --- | --- | --- |
+| MainBrella | 404 at all four URLs, all three rounds | 404; bearer hostname still present | Original empty inventory restored |
+| E2B | 502 at all four URLs, all three rounds | 502, token removed | Original empty inventory restored |
+| Daytona | Source: 401; three branches: 404, all three rounds | 401 at all four URLs, token removed | All 13 original snapshots preserved; zero sandboxes |
+
+All three known-live controls stayed at 200. Every exact run resource and control
+was confirmed absent. The E2B preview access transition remains **inconclusive**,
+while API deletion is confirmed. None establishes independent token invalidation
+after deletion. Daytona separately verified source-restart token rotation: the
+retained token returned 401 while its replacement returned 200 at the same live
+URL.
+
+The immutable raw `followup.json` records used the field name `unauthenticated`
+for requests without headers. That name is inaccurate for MainBrella
+bearer-hostname previews. The linked `preview-observations.json` files append an
+explicit credential-transport clarification, preserve every observed status,
+and bind to the original follow-up SHA-256. New runner output uses
+`withoutPreviewHeaders` and records credential transport directly. The raw
+records and checksums have not been rewritten.
 
 ## Source provenance and limits
 
@@ -98,14 +116,17 @@ patch changes the existing runner. Each result identifies the full base commit,
 results, not falsely attributed to an unchanged commit.
 
 For the MainBrella run, independent local validation checked 1,594 sealed private
-files; for E2B, 1,524. It also checked all 24 allowlisted browser observations and
+files; for E2B, 1,524; for Daytona, 1,812. It also checked all 24 allowlisted
+browser observations and
 48 retained input hashes per run, both result/follow-up checksums, and absence of
 retained preview URLs and tokens in the public export. The public observations
 make document contents inspectable but cannot independently replay the strict
 verification without the private browser traces and screenshots.
 
-Before provisioning, type checking and 106 repository tests passed. A subsequent
-focused runner test also verified that API-confirmed cleanup with HTTP 502 leaves
+Before provisioning, type checking and 106 repository tests passed. After
+clarifying bearer-URL transport, all 21 relevant preview and provider-runner
+tests passed, including a focused test that verified that API-confirmed cleanup
+with HTTP 502 leaves
 the preview check inconclusive while preserving completed repair controls. No
 billing or physical storage reclamation was measured.
 

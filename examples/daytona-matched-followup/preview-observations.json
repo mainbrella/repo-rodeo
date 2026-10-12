@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "provider": "daytona",
+  "sourceSha256": "c02aac18e8d41823ce58493024521cf1b94045a14aab3e0b439ce68043829823",
+  "source": "followup.json",
+  "clarification": "The immutable original record called its no-header request unauthenticated. MainBrella encodes its credential in the hostname, so omitting headers retains that credential; those are repeated retained-URL probes. E2B and Daytona actually remove a token header. No HTTP status alone demonstrates independent token invalidation.",
+  "probes": [
+    {
+      "sandbox": {
+        "id": "dd9a408d-9034-4e5e-9cb0-bd745915a734",
+        "generation": "dd9a408d-9034-4e5e-9cb0-bd745915a734"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.413Z",
+          "withCredential": 401,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.032Z",
+          "withCredential": 401,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.730Z",
+          "withCredential": 401,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "8a978e86-9e09-4823-8ef6-f264213a160f",
+        "generation": "8a978e86-9e09-4823-8ef6-f264213a160f"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.488Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.107Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.803Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "cea4eda0-51eb-46ef-bd20-9dfabe271355",
+        "generation": "cea4eda0-51eb-46ef-bd20-9dfabe271355"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.561Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.181Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.876Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        }
+      ]
+    },
+    {
+      "sandbox": {
+        "id": "8af204e1-556c-4556-908f-66b9d2de5540",
+        "generation": "8af204e1-556c-4556-908f-66b9d2de5540"
+      },
+      "credentialTransport": "header",
+      "credentialRemovalTested": true,
+      "beforeCleanup": {
+        "withCredential": 200,
+        "withoutPreviewHeaders": 401
+      },
+      "rounds": [
+        {
+          "at": "2026-10-12T10:44:52.634Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:55.255Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        },
+        {
+          "at": "2026-10-12T10:44:57.951Z",
+          "withCredential": 404,
+          "withoutPreviewHeaders": 401,
+          "liveControl": 200
+        }
+      ]
+    }
+  ],
+  "apiCleanupConfirmed": true,
+  "inventoryRestoredExactly": true,
+  "previewApplicationAccess": "verified",
+  "independentTokenInvalidation": "not-exercised",
+  "physicalStorage": "not-measured"
+}

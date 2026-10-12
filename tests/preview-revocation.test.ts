@@ -5,9 +5,9 @@ import type { CleanupResult } from '../src/providers/interface.ts';
 
 const sandbox = { id: 'source', generation: 'source-generation' };
 const cleanup: CleanupResult = { confirmed: true, sandboxes: [{ sandbox, absent: true }], workspaces: [], physicalStorage: 'not-measured', errors: [] };
-const probe = (authenticated = 404, unauthenticated = 401): RevocationProbe => ({ sandbox,
-  beforeCleanup: { at: '', authenticated: 200, unauthenticated: 401 },
-  rounds: Array.from({ length: 3 }, () => ({ at: '2026-10-12T03:25:04Z', authenticated, unauthenticated, liveControl: 200 })) });
+const probe = (authenticated = 404, withoutPreviewHeaders = 401): RevocationProbe => ({ sandbox,
+  beforeCleanup: { at: '', authenticated: 200, withoutPreviewHeaders: 401 },
+  rounds: Array.from({ length: 3 }, () => ({ at: '2026-10-12T03:25:04Z', authenticated, withoutPreviewHeaders, liveControl: 200 })) });
 
 for (const provider of ['mainbrella', 'e2b', 'daytona'] as const) {
   test(`${provider} uses the same access transition and exact deletion requirements`, () => {
@@ -17,7 +17,7 @@ for (const provider of ['mainbrella', 'e2b', 'daytona'] as const) {
       assert.equal(assessPreviewRevocation(provider, inventory, [probe()]).status, 'inconclusive');
     }
     for (const sample of [probe(502), probe(404, 502), probe(0), probe(404, 0), probe(503), probe(400),
-      { ...probe(), beforeCleanup: undefined }, { ...probe(), beforeCleanup: { at: '', authenticated: 401, unauthenticated: 401 } },
+      { ...probe(), beforeCleanup: undefined }, { ...probe(), beforeCleanup: { at: '', authenticated: 401, withoutPreviewHeaders: 401 } },
       { ...probe(), rounds: probe().rounds.slice(1) }, { ...probe(), rounds: probe().rounds.map(round => ({ ...round, liveControl: 502 })) }]) {
       assert.equal(assessPreviewRevocation(provider, cleanup, [sample]).status, 'inconclusive');
     }
@@ -47,4 +47,12 @@ test('preview token invalidation requires an authentication denial and fresh acc
   for (const [retained, fresh] of [[400, 200], [404, 200], [0, 200], [502, 200], [401, 400], [401, 0]]) {
     assert.equal(assessPreviewTokenInvalidation(retained, fresh).status, 'inconclusive');
   }
+});
+
+test('bearer URL previews explicitly report that removing headers does not remove their credential', async () => {
+  const probes = await probePreviewRevocation('mainbrella', [{ sandbox, preview: {
+    id: 'bearer-host', url: 'https://bearer-preview.example.test', expiresAt: null,
+  } }], async () => 404, { intervalMs: 0 });
+  assert.equal(probes[0].credentialTransport, 'bearer-url');
+  assert.ok(probes[0].rounds.every(round => round.authenticated === 404 && round.withoutPreviewHeaders === 404));
 });
