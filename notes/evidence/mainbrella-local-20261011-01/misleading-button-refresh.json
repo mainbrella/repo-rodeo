@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "caseId": "button-refresh",
+  "seed": 12345,
+  "browserVersion": "153.0.8010.12",
+  "observations": [
+    {
+      "expected": [
+        {
+          "id": "button",
+          "text": "Join the waitlist"
+        },
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "button",
+          "text": "Join the waitlist"
+        },
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "button",
+          "text": "Join the waitlist"
+        },
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        }
+      ],
+      "actual": [
+        {
+          "id": "heading",
+          "text": "Friday demo"
+        },
+        {
+          "id": "paragraph",
+          "text": "Bring something that almost works."
+        }
+      ],
+      "reload": "refresh"
+    }
+  ],
+  "runtimeErrors": []
+}

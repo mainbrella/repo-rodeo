@@ -2,9 +2,9 @@
 
 Repo Rodeo makes a bug reproduction and its proposed repairs inspectable. The first milestone is a local, repeatable experiment around a deliberately broken editor: run the same browser reproduction against the seeded app, a correct repair, and a plausible patch that leaves the bug in place.
 
-The standalone runner uses deterministic patches. It does not run AI agents or connect to E2B, Daytona, or MainBrella. The provider adapters are future work; [the provider interface](src/providers/interface.ts) and [acceptance plan](src/providers/README.md) record the planned contract. The local runner uses separate temporary working copies and an external verifier, but these are not security sandboxes and provide no isolation guarantee for untrusted code.
+The standalone runner uses deterministic patches in temporary working copies. A tracked MainBrella adapter now runs the same scenario through its container API, saved workspaces, and protected previews. E2B and Daytona adapters and AI repair agents remain future work. Local temporary copies are not security sandboxes for untrusted code. The [provider contract and run guide](src/providers/README.md) describe the supported modes and evidence format.
 
-A separate [first local Mainbrella run](notes/2026-10-11-local-mainbrella.md) tests the full sibling `../web` checkout through the running Mainbrella API and OrbStack containers. It records provisioning, protected previews, saved-workspace restores, deterministic controls, browser reconnection, interrupted capture retry, and cleanup. This is a manual local integration run; it does not qualify production, E2B, or Daytona.
+A separate [first local Mainbrella run](notes/2026-10-11-local-mainbrella.md) tests the full sibling `../web` checkout through the running Mainbrella API and OrbStack containers. It records provisioning, protected previews, saved-workspace restores, deterministic controls, browser reconnection, interrupted capture retry, and cleanup. That historical result came from the manual harness; it does not qualify the new adapter, production, E2B, or Daytona. Its [public observation bundle](notes/evidence/mainbrella-local-20261011-01/manifest.json) supplements the sanitized result without publishing bearer preview URLs.
 
 ## Requirements
 
@@ -63,4 +63,34 @@ The standalone fixture and six browser checks are under [`fixtures/editor`](fixt
 
 The article draft in [`blog/one-bug-three-clouds.md`](blog/one-bug-three-clouds.md) is explicitly fictional. Provider behavior, agent outcomes, lifecycle results, costs, timings, and any pull request remain planned until backed by durable run evidence. [`blog/claims.json`](blog/claims.json) is the machine-readable claim ledger; local implementation claims and provider claims must have evidence references before their status changes to `verified` or `contradicted`.
 
-When MainBrella work begins, first check whether the deployment advertises filesystem forking and try its native `POST /containers/fork` path when available. If it is unavailable, test saved-workspace restore as a separate fresh-process experiment. Neither path should be described as memory preservation without evidence of preserved process state. Provider adapters, real cloud runs, agent execution, pricing comparisons, and publication are outside this milestone.
+The MainBrella command implements saved-workspace restore as a filesystem experiment with fresh server processes. Native filesystem forks, memory forks, volumes, and warm pools remain separate, unimplemented modes. Capability discovery records whether each is unavailable at the provider or simply absent from the adapter. No result establishes comparable cloud performance or price.
+
+## MainBrella experiment
+
+Use a test account with capacity for four containers and one saved workspace, including its full-disk capture reservation. The command reads quotas before creating anything. It never seeds account entitlements or deletes existing account resources to make room.
+
+```sh
+export MAINBRELLA_API_URL=http://localhost:8787
+# Set MAINBRELLA_API_KEY in your host environment.
+npm run experiment -- --provider mainbrella --seed 12345 --check-idempotency
+```
+
+The default workload is the bundled editor. To repeat the full web-checkout variant from the first local run:
+
+```sh
+npm run experiment -- --provider mainbrella \
+  --source ../web --source-ref ba4d74f2d649ce4bc137e3d25610f706ce1fbe9b \
+  --seed 12345 --check-idempotency
+```
+
+`--source` uses an existing Git checkout and archives the pinned commit. Uncommitted files are left alone. This variant installs dependencies once, then restores three controls without another install. Both variants use the same external verifier; the web variant uses the retained TypeScript adaptations of the two fixture patches.
+
+Every provider command writes a version-2 `result.json`, checksum, and allowlisted `observations/`. Raw API receipts, request keys, source archives, browser reports, traces, screenshots, and preview URLs stay in `private/`. Share only the sanitized result and observation files. The raw bundle is private even after previews expire.
+
+```sh
+npm run experiment -- --provider e2b       # unsupported result, exit 2
+npm run experiment -- --provider daytona   # unsupported result, exit 2
+npm run experiment -- --cleanup artifacts/<run-directory>
+```
+
+Cleanup reconciles uncertain creates/saves with their persisted keys, deletes only recorded generations/workspaces, and checks inventory and known preview URLs. It writes a separate reconciliation report without replacing the original result. Retry within the API's idempotency retention window; an expired unresolved operation remains unconfirmed. API deletion does not establish physical snapshot reclamation. See the [provider run guide](src/providers/README.md) for limitations and follow-up experiments.

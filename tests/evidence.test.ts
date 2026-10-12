@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test, { type TestContext } from 'node:test';
-import { hashFiles, sha256, writeJson } from '../src/evidence.ts';
+import { hashFiles, sha256, writeJson, sealProviderEvidence } from '../src/evidence.ts';
 
 async function temporaryDirectory(t: TestContext): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), 'repo-rodeo-evidence-'));
@@ -47,4 +47,16 @@ test('writeJson creates a file once and refuses to overwrite it', async t => {
 
   await assert.rejects(writeJson(path, { status: 'replaced' }), { code: 'EEXIST' });
   assert.equal(await readFile(path, 'utf8'), original);
+});
+
+test('provider evidence keeps its original hashes when cleanup extends the live journal', async t => {
+  const directory = await temporaryDirectory(t);
+  await mkdir(join(directory, 'operations'));
+  await writeFile(join(directory, 'operations/request.json'), 'original request');
+  await writeFile(join(directory, 'report.json'), 'original report');
+  const sealed = await sealProviderEvidence(directory);
+  assert.equal(sealed['operations/request.json'], undefined);
+  assert.equal(sealed['journal-snapshot/operations/request.json'], sha256('original request'));
+  await writeFile(join(directory, 'operations/request.json'), 'cleanup retry');
+  for (const [path, hash] of Object.entries(sealed)) assert.equal(sha256(await readFile(join(directory, path))), hash);
 });

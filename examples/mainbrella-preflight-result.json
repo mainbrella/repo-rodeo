@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 2,
+  "runId": "mainbrella-2026-10-12T01-39-35-588Z-34c0bee0",
+  "provider": "mainbrella",
+  "mode": "saved-workspace",
+  "status": "failed",
+  "scope": "local-api",
+  "startedAt": "2026-10-12T01:39:35.590Z",
+  "finishedAt": "2026-10-12T01:39:35.745Z",
+  "seed": 12345,
+  "capabilities": {
+    "modes": {
+      "saved-workspace": {
+        "status": "supported",
+        "reason": "requires snapshots and workspaces capabilities"
+      },
+      "filesystem-fork": {
+        "status": "unsupported",
+        "reason": "provider does not advertise filesystem fork"
+      },
+      "memory-fork": {
+        "status": "unsupported",
+        "reason": "provider does not advertise memory preservation"
+      },
+      "volume": {
+        "status": "unsupported",
+        "reason": "volume lifecycle is not implemented by this adapter"
+      },
+      "warm-pool": {
+        "status": "unsupported",
+        "reason": "managed pool lifecycle is not implemented by this adapter"
+      }
+    },
+    "previews": true,
+    "managedJobs": true,
+    "jobReattachment": true,
+    "apiVersion": "2026-10-11",
+    "resources": [
+      {
+        "id": "lite",
+        "cpuVcpu": 0.0625,
+        "memoryMiB": 256,
+        "diskGB": 2
+      },
+      {
+        "id": "small",
+        "cpuVcpu": 0.5,
+        "memoryMiB": 4096,
+        "diskGB": 8
+      },
+      {
+        "id": "medium",
+        "cpuVcpu": 1,
+        "memoryMiB": 6144,
+        "diskGB": 12
+      },
+      {
+        "id": "large",
+        "cpuVcpu": 2,
+        "memoryMiB": 8192,
+        "diskGB": 16
+      },
+      {
+        "id": "xl",
+        "cpuVcpu": 4,
+        "memoryMiB": 12288,
+        "diskGB": 20
+      }
+    ]
+  },
+  "source": {
+    "kind": "web-checkout",
+    "commit": null,
+    "archiveSha256": null,
+    "inputHashes": {},
+    "integrity": false
+  },
+  "environment": {
+    "host": {
+      "node": "22.22.2",
+      "platform": "darwin",
+      "arch": "arm64",
+      "playwright": "1.63.0"
+    },
+    "guest": null,
+    "requested": {
+      "image": "node",
+      "size": "small",
+      "cpuVcpu": 0.5,
+      "memoryMiB": 4096,
+      "diskGB": 8
+    },
+    "observedResourceLimits": null,
+    "model": null,
+    "billing": "not-measured"
+  },
+  "controls": [],
+  "checks": {
+    "filesystem": {
+      "status": "not-exercised",
+      "detail": "Restore not attempted."
+    },
+    "processes": {
+      "status": "not-exercised",
+      "detail": "Process probes not compared."
+    },
+    "isolation": {
+      "status": "not-exercised",
+      "detail": "Branch writes not checked."
+    },
+    "jobReattachment": {
+      "status": "not-exercised",
+      "detail": "API stream reconnect not attempted; dashboard sessions are outside this runner."
+    },
+    "captureIdempotency": {
+      "status": "not-exercised",
+      "detail": "Response-loss experiment not requested."
+    },
+    "previewRevocation": {
+      "status": "not-exercised",
+      "detail": "No previews issued."
+    }
+  },
+  "storage": {
+    "captureBytes": null,
+    "before": {
+      "saved": 100,
+      "reservedBytes": 200000000000,
+      "savesThisMonth": 102,
+      "captureBytesThisMonth": 204000000000,
+      "retainedCaptureBytes": 204000000000
+    },
+    "afterCapture": null,
+    "afterCleanup": {
+      "saved": 100,
+      "reservedBytes": 200000000000,
+      "savesThisMonth": 102,
+      "captureBytesThisMonth": 204000000000,
+      "retainedCaptureBytes": 204000000000
+    }
+  },
+  "cleanup": {
+    "confirmed": true,
+    "sandboxes": [],
+    "workspaces": [],
+    "physicalStorage": "not-measured",
+    "errors": []
+  },
+  "measurements": {
+    "elapsedMs": 155.683375,
+    "comparableBenchmark": false,
+    "costs": null
+  },
+  "errors": [
+    "Workspace quota preflight failed; existing resources were left untouched. Use a test account with capture allowance"
+  ],
+  "evidence": {
+    "privateDirectory": "private",
+    "files": {
+      "connection.json": "9c6ae750c7dccd8b203b24b80ed3216becde887cb26162c6d2fad3370ab26c07",
+      "journal-snapshot/operations/16fcd09114647c0cf0e8ecef7670013d.json": "e742dfb2be633c5e6450daf535c94c10a459afa4864b9fe8cf5a7b78d44b3e21",
+      "journal-snapshot/operations/3fc0e5c4c484797a0035141c53252fba.json": "08b32899fe6379bd8af152d168d75c39603a7102207c7ee57eecd82c24a8c128",
+      "journal-snapshot/operations/fb43c55de0e321acf4ed2c9eae545b5c.json": "e1891498e46b85b744a5db5db6407c879131c343494a51fda822b8958471fe92"
+    },
+    "publicObservations": {}
+  }
+}

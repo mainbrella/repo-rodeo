@@ -162,8 +162,7 @@ async function runControl(
   return result;
 }
 
-async function main() {
-  const { values } = parseArgs({ options: { seed: { type: 'string' }, output: { type: 'string' }, help: { type: 'boolean' } } });
+export async function runLocal(values: { seed?: string; output?: string; help?: boolean }) {
   if (values.help) {
     console.log('npm run experiment -- [--seed <uint32>] [--output <new-directory>]');
     return;
@@ -250,7 +249,10 @@ async function main() {
   }
 }
 
-main().catch(error => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  const { values } = parseArgs({ options: { seed: { type: 'string' }, output: { type: 'string' }, help: { type: 'boolean' } } });
+  runLocal(values).catch(error => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
+}

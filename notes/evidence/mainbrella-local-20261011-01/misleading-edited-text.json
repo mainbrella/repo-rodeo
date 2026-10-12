@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "caseId": "edited-text",
+  "seed": 12345,
+  "browserVersion": "153.0.8010.12",
+  "observations": [
+    {
+      "expected": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "A longer note with <markup>, & punctuation, and a changed plan."
+        },
+        {
+          "id": "button",
+          "text": "Remind me next Friday"
+        }
+      ],
+      "beforeSave": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "A longer note with <markup>, & punctuation, and a changed plan."
+        },
+        {
+          "id": "button",
+          "text": "Remind me next Friday"
+        }
+      ],
+      "afterSave": [
+        {
+          "id": "heading",
+          "text": ""
+        },
+        {
+          "id": "paragraph",
+          "text": "A longer note with <markup>, & punctuation, and a changed plan."
+        },
+        {
+          "id": "button",
+          "text": "Remind me next Friday"
+        }
+      ],
+      "actual": [
+        {
+          "id": "paragraph",
+          "text": "A longer note with <markup>, & punctuation, and a changed plan."
+        },
+        {
+          "id": "button",
+          "text": "Remind me next Friday"
+        }
+      ],
+      "reload": "refresh"
+    }
+  ],
+  "runtimeErrors": []
+}

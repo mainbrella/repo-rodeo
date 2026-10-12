@@ -73,7 +73,7 @@
     },
     {
       "id": "mainbrella-saved-workspace",
-      "claim": "If native forking is unavailable, MainBrella saved-workspace restore is measured as a separate fresh-process path, without describing it as memory preservation.",
+      "claim": "In a production MainBrella deployment that lacks native forking, saved-workspace restore is measured as a separate fresh-process path, without describing it as memory preservation.",
       "status": "planned",
       "evidence": []
     },
@@ -118,6 +118,42 @@
       "claim": "The workflow generalizes from the planted fixture to a genuinely unresolved bug in an unrelated public repository.",
       "status": "planned",
       "evidence": []
+    },
+    {
+      "id": "mainbrella-local-saved-workspace-fanout",
+      "claim": "In the local MainBrella run, one saved workspace restored into three independent branches with the prepared filesystem and dependencies intact; writes remained isolated, and each service process had to be started anew.",
+      "status": "verified",
+      "evidence": [
+        "../notes/2026-10-11-local-mainbrella.md",
+        "../notes/mainbrella-local-20261011-01.json"
+      ]
+    },
+    {
+      "id": "mainbrella-local-protected-preview-verification",
+      "claim": "The unchanged external browser verifier checked protected local MainBrella previews for baseline, correct-repair, and misleading-repair branches, reproducing the expected baseline and misleading failures and confirming all six correct-repair checks.",
+      "status": "verified",
+      "evidence": [
+        "../notes/mainbrella-local-20261011-01.json",
+        "../notes/evidence/mainbrella-local-20261011-01/manifest.json"
+      ]
+    },
+    {
+      "id": "mainbrella-local-job-reattachment",
+      "claim": "After the review browser disconnected during a running local managed job, a new browser recovered the same execution ID, exit status, and output without canceling or duplicating the job.",
+      "status": "verified",
+      "evidence": [
+        "../notes/2026-10-11-local-mainbrella.md",
+        "../notes/mainbrella-local-20261011-01.json"
+      ]
+    },
+    {
+      "id": "mainbrella-local-api-cleanup-preview-revocation",
+      "claim": "For the local fixture, all four protected previews returned 404 after revocation and after deletion of their exact container generations; API cleanup left no fixture containers or workspaces and zero live reserved workspace bytes, while provider snapshot images remained.",
+      "status": "verified",
+      "evidence": [
+        "../notes/2026-10-11-local-mainbrella.md",
+        "../notes/mainbrella-local-20261011-01.json"
+      ]
     }
   ]
 }

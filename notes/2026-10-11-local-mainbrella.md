@@ -233,3 +233,50 @@ To resolve an uncertain request, use its already persisted key and body.
   discovery disabled them. No release flags were changed. RAM preservation,
   adversarial isolation, production DNS/TLS, payment verification, AI repair,
   E2B, and Daytona remain outside this run.
+
+## Accounting and follow-up
+
+The post-cleanup fixture inventory showed zero active containers, zero saved
+workspaces, and zero live reserved workspace bytes. Its usage counters still
+reported two monthly saves and 16,000,000,000 bytes for both monthly captured
+and retained capture. Each save reserved the requested source disk's full 8 GB
+against these capture budgets; deletion released live workspace quota without
+refunding those counters. Keep those accounting values separate from the measured
+426,092,457-byte filesystem capture and the two Docker snapshot images, each
+reported by Docker as 1.58 GB. These figures have different sources and this run
+did not reconcile their accounting basis. The two images had no attached
+containers and remained after API deletion.
+
+The original account's quota state also needs investigation before another
+full run: its inventory showed 100 saved workspaces, 200 GB reserved, and 102
+monthly saves against limits of 20 workspaces, 160 GB, and 100 saves. Preserve
+that account's existing workspaces while resolving the discrepancy.
+
+Next retention experiment: by **October 14, 2026 at 5:00 PM PDT**, use one
+disposable local workspace, record only the exact snapshot image IDs created by
+its capture, delete that workspace through the API, and recheck those same IDs
+at capture, immediately after deletion, and after 24 hours. Record API inventory
+and per-image attachment and size data at each point. Do not run a global Docker
+prune. This is a planned experiment; no new retention measurement is claimed
+here.
+
+The 150 ms client abort in step 16 did not establish that the first checkpoint
+request had been admitted before the disconnect. Although the retry returned
+the same workspace ID and usage increased once, admission-confirmed idempotency
+remains unverified. Repeat with an observable admission acknowledgment before
+disconnecting, then replay the identical persisted body and idempotency key.
+
+The curated [document-observation bundle](evidence/mainbrella-local-20261011-01/manifest.json)
+contains the 18 allowlisted observation files referenced by the restored
+baseline, correct, and misleading control verifications. It preserves the
+original run ID, seed, report hashes, and per-file SHA-256 checksums. It supports
+inspection of document observations; without private traces and screenshots it
+cannot independently reproduce the full `verifyReport` decision.
+
+The subsequent [tracked adapter](../src/providers/README.md) now provides the
+reusable command and a separate, versioned result format. Its admission-aware
+response-loss check discards a capture body only after successful HTTP headers.
+A [new local preflight result](../examples/mainbrella-preflight-result.json)
+confirmed the original account still exceeds quota and stopped before mutations.
+The new adapter has not yet completed a full live capture/restore run; the
+historical verification above remains tied to the original manual harness.
