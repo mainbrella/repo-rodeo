@@ -7,6 +7,7 @@ export const securityChecks = [
   'rotation', 'rotationDuringRequest', 'deletionDuringRequest', 'deletedBindingDenial',
   'incarnationDuringRequest', 'configurationWithdrawal', 'guestCredentialScan',
   'sameKeyReplay', 'exactStartBudget', 'disabledDiscovery',
+  'publicTcpDnsDenial', 'publicUdpDnsDenial', 'protectedPreview',
 ] as const;
 
 export type SecurityCheck = typeof securityChecks[number];
